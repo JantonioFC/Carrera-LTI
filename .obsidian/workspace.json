@@ -4,17 +4,27 @@
     "type": "split",
     "children": [
       {
-        "id": "96421aeb851b41fc",
+        "id": "7265ff970668e2cc",
         "type": "tabs",
         "children": [
           {
-            "id": "a2c2df217c06c568",
+            "id": "431a1e07b8324c55",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {},
-              "icon": "lucide-file",
-              "title": "Nueva pestaña"
+              "type": "kanban",
+              "state": {
+                "file": "Tareas/Tablero-Semestre.md",
+                "kanbanViewState": {
+                  "kanban-plugin": "board",
+                  "list-collapse": [
+                    false,
+                    false,
+                    false
+                  ]
+                }
+              },
+              "icon": "lucide-trello",
+              "title": "Tablero-Semestre"
             }
           }
         ]
@@ -174,8 +184,13 @@
       "yet-another-obsidian-synchronizer:YAOS": false
     }
   },
-  "active": "a2c2df217c06c568",
+  "active": "431a1e07b8324c55",
   "lastOpenFiles": [
+    "Tareas/Tablero-Semestre.md",
+    "Asignaturas/30-Derecho",
+    "Asignaturas/20-Filosofia",
+    "Asignaturas/10-Ingles",
+    "Preparar examen de filosofia.md",
     "_templates/plantilla_nota_clase.md",
     "_templates/Nuevo Documento de texto.txt",
     "_templates/plantilla_tarea.md",
@@ -187,12 +202,8 @@
     "02-mi-semestre/Dashboard Principal.md",
     "02-mi-semestre/_templates/plantilla_nota_clase.md",
     "02-mi-semestre/_templates/plantilla_tarea.md",
-    "Sin título.md",
     "02-mi-semestre/Sin título.md",
     "02-mi-semestre/Tareas",
-    "02-mi-semestre/asignaturas",
-    "02-mi-semestre/_templates",
-    "01aplicacion",
-    "02-mi-semestre"
+    "02-mi-semestre/asignaturas"
   ]
 }
