@@ -1,0 +1,38 @@
+
+{
+  "name": "StudyPlan - Calendario de Estudios",
+  "short_name": "StudyPlan",
+  "description": "Organiza tu tiempo de estudio con nuestro calendario inteligente",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1E3A8A",
+  "theme_color": "#1E3A8A",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "48x48",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "/favicon.ico",
+      "sizes": "96x96",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "/favicon.ico",
+      "sizes": "192x192",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "/favicon.ico",
+      "sizes": "512x512",
+      "type": "image/x-icon"
+    }
+  ],
+  "categories": ["education", "productivity", "utilities"],
+  "lang": "es",
+  "dir": "ltr",
+  "scope": "/",
+  "prefer_related_applications": false
+}

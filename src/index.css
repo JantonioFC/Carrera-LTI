@@ -1,0 +1,248 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Study Schedule Calendar Design System */
+@layer base {
+  :root {
+    /* Primary Blues */
+    --study-primary: 30 64% 27%; /* #1E3A8A */
+    --study-primary-light: 213 94% 68%; /* #3B82F6 */
+    --study-accent: 24 95% 53%; /* #F97316 */
+    --study-accent-light: 32 95% 44%; /* #EA580C */
+    
+    /* Background Colors */
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    
+    /* Updated Primary to match study theme */
+    --primary: 30 64% 27%; /* Study Primary Blue */
+    --primary-foreground: 210 40% 98%;
+    
+    /* Secondary Colors */
+    --secondary: 214 32% 91%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    
+    /* Muted Colors */
+    --muted: 214 32% 95%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    
+    /* Accent using orange */
+    --accent: 24 95% 53%; /* Study Accent Orange */
+    --accent-foreground: 0 0% 100%;
+    
+    /* Destructive */
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    
+    /* Borders and Inputs */
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 30 64% 27%; /* Study Primary */
+    --radius: 0.75rem;
+    
+    /* Sidebar */
+    --sidebar-background: 214 32% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 30 64% 27%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 214 32% 95%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 214 32% 88%;
+    --sidebar-ring: 30 64% 27%;
+  }
+
+  .dark {
+    --background: 30 64% 4%;
+    --foreground: 210 40% 98%;
+    --card: 30 64% 7%;
+    --card-foreground: 210 40% 98%;
+    --popover: 30 64% 7%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 213 94% 68%; /* Light blue for dark mode */
+    --primary-foreground: 30 64% 4%;
+    --secondary: 30 32% 15%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 30 32% 12%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 32 95% 60%; /* Lighter orange for dark mode */
+    --accent-foreground: 30 64% 4%;
+    --destructive: 0 62.8% 60%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 30 32% 15%;
+    --input: 30 32% 15%;
+    --ring: 213 94% 68%;
+    --sidebar-background: 30 64% 7%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 213 94% 68%;
+    --sidebar-primary-foreground: 30 64% 4%;
+    --sidebar-accent: 30 32% 12%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 30 32% 15%;
+    --sidebar-ring: 213 94% 68%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+  
+  /* Custom scrollbar for webkit browsers */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--muted));
+    border-radius: 3px;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground) / 0.3);
+    border-radius: 3px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 0.5);
+  }
+}
+
+/* Custom animations for the study scheduler */
+@layer utilities {
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+  }
+  
+  .animate-slide-up {
+    animation: slideUp 0.3s ease-out;
+  }
+  
+  .animate-bounce-in {
+    animation: bounceIn 0.5s ease-out;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  @keyframes slideUp {
+    from { 
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to { 
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes bounceIn {
+    0% { 
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    50% { 
+      transform: scale(1.05);
+    }
+    100% { 
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  
+  /* Gradient backgrounds */
+  .bg-study-gradient {
+    background: linear-gradient(135deg, hsl(var(--study-primary)) 0%, hsl(var(--study-primary-light)) 100%);
+  }
+  
+  .bg-accent-gradient {
+    background: linear-gradient(135deg, hsl(var(--study-accent)) 0%, hsl(var(--study-accent-light)) 100%);
+  }
+  
+  /* Custom focus states */
+  .focus-study {
+    @apply focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 focus:outline-none;
+  }
+  
+  /* Subject color classes */
+  .subject-red { background-color: #EF4444; }
+  .subject-orange { background-color: #F97316; }
+  .subject-yellow { background-color: #EAB308; }
+  .subject-green { background-color: #22C55E; }
+  .subject-cyan { background-color: #06B6D4; }
+  .subject-blue { background-color: #3B82F6; }
+  .subject-purple { background-color: #8B5CF6; }
+  .subject-pink { background-color: #EC4899; }
+}
+
+/* Mobile-first responsive design improvements */
+@media (max-width: 768px) {
+  .calendar-grid {
+    font-size: 0.875rem;
+  }
+  
+  .event-card {
+    padding: 0.5rem;
+    font-size: 0.75rem;
+  }
+  
+  .sidebar-mobile {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+  }
+  
+  .sidebar-mobile.open {
+    transform: translateX(0);
+  }
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .print-friendly {
+    background: white !important;
+    color: black !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --border: 0 0% 20%;
+    --ring: 0 0% 20%;
+  }
+  
+  .dark {
+    --border: 0 0% 80%;
+    --ring: 0 0% 80%;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in,
+  .animate-slide-up,
+  .animate-bounce-in {
+    animation: none;
+  }
+  
+  * {
+    transition-duration: 0.01ms !important;
+  }
+}
