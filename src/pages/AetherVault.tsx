@@ -1,11 +1,12 @@
-import { useState, useMemo, useEffect } from 'react';
-import MDEditor from '@uiw/react-md-editor';
-import ForceGraph2D from 'react-force-graph-2d';
-import { useAether } from '../hooks/useAether';
+import { useState, useMemo, useEffect, lazy, Suspense } from 'react';
+
+const MDEditor = lazy(() => import('@uiw/react-md-editor'));
+const ForceGraph2D = lazy(() => import('react-force-graph-2d'));
+import { useAetherStore } from '../store/aetherStore';
 import { Search, Plus, Network, FileText, ChevronLeft, ChevronRight } from 'lucide-react';
 
 export default function AetherVault() {
-  const { notes, addNote, updateNote, deleteNote, getGraphData, findBacklinks } = useAether();
+  const { notes, addNote, updateNote, deleteNote, getGraphData, findBacklinks } = useAetherStore();
   const [activeNoteId, setActiveNoteId] = useState<string | null>(notes[0]?.id || null);
   const [viewMode, setViewMode] = useState<'editor' | 'graph'>('editor');
   const [searchQuery, setSearchQuery] = useState('');
@@ -133,14 +134,16 @@ export default function AetherVault() {
                     />
                   </div>
                   <div className="flex-1 overflow-y-auto">
-                    <MDEditor
-                      value={activeNote.content}
-                      onChange={(val) => updateNote(activeNote.id, { content: val || '' })}
-                      preview="live"
-                      height="100%"
-                      visibleDragbar={false}
-                      className="border-none w-full !bg-transparent"
-                    />
+                    <Suspense fallback={<div className="h-full flex items-center justify-center text-slate-500">Cargando editor...</div>}>
+                      <MDEditor
+                        value={activeNote.content}
+                        onChange={(val) => updateNote(activeNote.id, { content: val || '' })}
+                        preview="live"
+                        height="100%"
+                        visibleDragbar={false}
+                        className="border-none w-full !bg-transparent"
+                      />
+                    </Suspense>
                   </div>
                </div>
                
@@ -181,35 +184,37 @@ export default function AetherVault() {
 
           {viewMode === 'graph' && (
             <div className="flex-1 bg-[#090b10]">
-              <ForceGraph2D
-                width={graphDimensions.width}
-                height={graphDimensions.height}
-                graphData={graphData}
-                nodeAutoColorBy="id"
-                nodeLabel="name"
-                nodeRelSize={6}
-                linkColor={() => 'rgba(255,255,255,0.2)'}
-                backgroundColor="#0d1117"
-                onNodeClick={(node) => {
-                  setActiveNoteId(node.id as string);
-                  setViewMode('editor');
-                }}
-                nodeCanvasObject={(node, ctx, globalScale) => {
-                  const label = node.name as string;
-                  const fontSize = 12/globalScale;
-                  ctx.font = `${fontSize}px Sans-Serif`;
-                  const textWidth = ctx.measureText(label).width;
-                  const bckgDimensions = [textWidth, fontSize].map(n => n + fontSize * 0.2); 
+              <Suspense fallback={<div className="h-full flex items-center justify-center text-slate-500">Iniciando motor gráfico...</div>}>
+                <ForceGraph2D
+                  width={graphDimensions.width}
+                  height={graphDimensions.height}
+                  graphData={graphData}
+                  nodeAutoColorBy="id"
+                  nodeLabel="name"
+                  nodeRelSize={6}
+                  linkColor={() => 'rgba(255,255,255,0.2)'}
+                  backgroundColor="#0d1117"
+                  onNodeClick={(node) => {
+                    setActiveNoteId(node.id as string);
+                    setViewMode('editor');
+                  }}
+                  nodeCanvasObject={(node, ctx, globalScale) => {
+                    const label = node.name as string;
+                    const fontSize = 12/globalScale;
+                    ctx.font = `${fontSize}px Sans-Serif`;
+                    const textWidth = ctx.measureText(label).width;
+                    const bckgDimensions = [textWidth, fontSize].map(n => n + fontSize * 0.2); 
 
-                  ctx.fillStyle = 'rgba(13, 17, 23, 0.8)';
-                  ctx.fillRect(node.x! - bckgDimensions[0] / 2, node.y! - bckgDimensions[1] / 2, bckgDimensions[0], bckgDimensions[1]);
+                    ctx.fillStyle = 'rgba(13, 17, 23, 0.8)';
+                    ctx.fillRect(node.x! - bckgDimensions[0] / 2, node.y! - bckgDimensions[1] / 2, bckgDimensions[0], bckgDimensions[1]);
 
-                  ctx.textAlign = 'center';
-                  ctx.textBaseline = 'middle';
-                  ctx.fillStyle = node.color as string;
-                  ctx.fillText(label, node.x!, node.y!);
-                }}
-              />
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillStyle = node.color as string;
+                    ctx.fillText(label, node.x!, node.y!);
+                  }}
+                />
+              </Suspense>
               <div className="absolute bottom-6 right-6 bg-navy-900/90 border border-navy-700/50 p-4 rounded-xl backdrop-blur-sm max-w-xs shadow-2xl">
                  <h4 className="text-sm font-semibold text-white mb-2">Red de Conocimiento</h4>
                  <p className="text-xs text-slate-400">Total de Nodos: {graphData.nodes.length}</p>

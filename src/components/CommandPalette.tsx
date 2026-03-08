@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, FileText, Database, BrainCircuit } from 'lucide-react';
-import { useNexus } from '../hooks/useNexus';
+import { useNexusStore } from '../store/nexusStore';
 import { useNexusDB } from '../hooks/useNexusDB';
 
 export function CommandPalette({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) {
   const [query, setQuery] = useState('');
-  const { documents } = useNexus();
+  const { documents } = useNexusStore();
   const { allDatabases } = useNexusDB();
   const navigate = useNavigate();
 

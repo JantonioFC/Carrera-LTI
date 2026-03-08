@@ -6,6 +6,7 @@ import {
   type PresencialEvent
 } from '../data/lti';
 import { useSubjectData } from '../hooks/useSubjectData';
+import { calculateProgressStats, calculateSemesterAverages } from '../domain/progressAnalysis';
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, CartesianGrid } from 'recharts';
 
 interface DashboardProps {
@@ -145,9 +146,7 @@ export default function Dashboard({ presenciales, onUpdatePresenciales }: Dashbo
   const { data } = useSubjectData();
 
   // Charts Data
-  const totalApproved = CURRICULUM.flatMap(s => s.subjects).filter(s => data[s.id]?.status === 'aprobada').reduce((acc, s) => acc + s.credits, 0);
-  const totalInProgress = CURRICULUM.flatMap(s => s.subjects).filter(s => data[s.id]?.status === 'en_curso').reduce((acc, s) => acc + s.credits, 0);
-  const totalMissing = TOTAL_CREDITS - totalApproved - totalInProgress;
+  const { totalApproved, totalInProgress, totalMissing } = useMemo(() => calculateProgressStats(data), [data]);
 
   const pieData = useMemo(() => [
     { name: 'Aprobados', value: totalApproved, color: '#10b981' },
@@ -155,18 +154,7 @@ export default function Dashboard({ presenciales, onUpdatePresenciales }: Dashbo
     { name: 'Pendientes', value: totalMissing, color: '#475569' },
   ], [totalApproved, totalInProgress, totalMissing]);
 
-  const barData = useMemo(() => {
-    return CURRICULUM.map(sem => {
-      const semSubjects = sem.subjects.filter(s => data[s.id]?.status === 'aprobada' && data[s.id]?.grade !== undefined);
-      const avg = semSubjects.length > 0 
-        ? semSubjects.reduce((acc, s) => acc + (data[s.id]?.grade || 0), 0) / semSubjects.length
-        : 0;
-      return {
-        name: `S${sem.number}`,
-        Promedio: Number(avg.toFixed(1))
-      };
-    });
-  }, [data]);
+  const barData = useMemo(() => calculateSemesterAverages(data), [data]);
 
   return (
     <div className="p-6 space-y-6 animate-fade-in">
@@ -190,8 +178,9 @@ export default function Dashboard({ presenciales, onUpdatePresenciales }: Dashbo
       </header>
 
       {/* Countdown + Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-        <div className="card p-5 col-span-1 border-l-4 border-lti-blue/50">
+      <div className="@container">
+        <div className="grid grid-cols-1 @sm:grid-cols-2 @xl:grid-cols-4 gap-4">
+          <div className="card p-5 col-span-1 border-l-4 border-lti-blue/50">
           <p className="text-slate-400 text-xs font-medium uppercase tracking-wider">Promedio General</p>
           <div className="flex items-end gap-2 mt-1">
             <p className="text-white text-2xl font-bold">{average > 0 ? average.toFixed(1) : '--'}</p>
@@ -219,10 +208,12 @@ export default function Dashboard({ presenciales, onUpdatePresenciales }: Dashbo
           <p className="text-white text-2xl font-bold mt-1">{upcomingPresenciales.length}</p>
           <p className="text-purple-400 text-sm mt-1 font-medium">pendientes</p>
         </div>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Presenciales */}
+      <div className="@container">
+        <div className="grid grid-cols-1 @lg:grid-cols-2 gap-6">
+          {/* Presenciales */}
         <div className="card p-5">
           <div className="flex items-center justify-between mb-4">
             <div>
@@ -314,11 +305,13 @@ export default function Dashboard({ presenciales, onUpdatePresenciales }: Dashbo
             ))}
           </div>
         </div>
+        </div>
       </div>
 
       {/* Analytics Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="card p-5 col-span-1 border-t-2 border-lti-coral">
+      <div className="@container">
+        <div className="grid grid-cols-1 @lg:grid-cols-3 gap-6">
+          <div className="card p-5 col-span-1 border-t-2 border-lti-coral">
           <h2 className="text-white font-semibold text-sm mb-4">Progreso de la Carrera</h2>
           <div className="h-48 relative">
             <ResponsiveContainer width="100%" height="100%">
@@ -386,6 +379,7 @@ export default function Dashboard({ presenciales, onUpdatePresenciales }: Dashbo
             </ResponsiveContainer>
           </div>
         </div>
+      </div>
       </div>
 
       {/* Edit modal */}

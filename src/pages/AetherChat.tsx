@@ -1,15 +1,30 @@
 import { useState, useRef, useEffect } from 'react';
-import { useAether } from '../hooks/useAether';
+import { useAetherStore } from '../store/aetherStore';
 import { GoogleGenAI } from '@google/genai';
-import { generateContentWithRetry, truncateContext } from '../utils/aiUtils';
+import { generateStructuredContentWithRetry, truncateContext } from '../utils/aiUtils';
 import { Key, Send, Bot, User, Trash2, Brain } from 'lucide-react';
 import MDEditor from '@uiw/react-md-editor';
+import rehypeSanitize from 'rehype-sanitize';
+import { type RemoteData, notAsked, loading, success, failure, isLoading } from '../utils/result';
+import { z } from 'zod';
+
+const AetherResponseSchema = z.object({
+  text: z.string().describe("La respuesta conversacional en formato Markdown")
+});
+
+const aetherGeminiSchema = {
+  type: 'OBJECT',
+  properties: {
+    text: { type: 'STRING', description: 'La respuesta conversacional en formato Markdown' }
+  },
+  required: ['text']
+};
 
 export default function AetherChat() {
-  const { notes, geminiApiKey, setGeminiApiKey, chatHistory, addChatMessage, clearChatHistory } = useAether();
+  const { notes, geminiApiKey, setGeminiApiKey, chatHistory, addChatMessage, clearChatHistory } = useAetherStore();
   const [inputKey, setInputKey] = useState('');
   const [prompt, setPrompt] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [status, setStatus] = useState<RemoteData<void, string>>(notAsked());
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -18,7 +33,7 @@ export default function AetherChat() {
 
   useEffect(() => {
     scrollToBottom();
-  }, [chatHistory, isLoading]);
+  }, [chatHistory, status]);
 
   const handleSaveKey = (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,7 +49,7 @@ export default function AetherChat() {
     const userText = prompt.trim();
     setPrompt('');
     addChatMessage({ role: 'user', text: userText });
-    setIsLoading(true);
+    setStatus(loading());
 
     try {
       // Initialize Gemini Client
@@ -52,32 +67,35 @@ Aquí están las notas actuales del usuario en su bóveda:
 ${contextText}`;
 
       // Call Gemini API 
-      const response = await generateContentWithRetry(ai, {
+      const response = await generateStructuredContentWithRetry(ai, {
         model: 'gemini-2.5-flash',
         contents: userText,
         config: {
           systemInstruction: systemInstruction,
           temperature: 0.7
         }
-      });
+      }, AetherResponseSchema, aetherGeminiSchema);
 
-      addChatMessage({ 
-        role: 'model', 
-        text: response.text || 'Sin respuesta del modelo.' 
-      });
-
+      if (response.ok) {
+        addChatMessage({ 
+          role: 'model', 
+          text: response.value.text || 'Sin respuesta del modelo.' 
+        });
+        setStatus(success(undefined));
+      } else {
+        throw response.error;
+      }
     } catch (error: any) {
       console.error("Gemini API Error:", error);
       addChatMessage({ 
         role: 'model', 
-        text: `**Error de Conexión:** ${error.message || 'No se pudo contactar con Gemini. Revisa tu API Key o conexión a internet.'}` 
+        text: `**Error de Conexión:** ${error.message || 'No se pudo contactar con Gemini. Revisa tu API Key o conexión al servicio.'}` 
       });
       // If unauthorized, clear key to prompt again
       if (error.status === 401 || error.message?.includes('API key not valid')) {
         setGeminiApiKey('');
       }
-    } finally {
-      setIsLoading(false);
+      setStatus(failure(error.message));
     }
   };
 
@@ -172,7 +190,11 @@ ${contextText}`;
                   <p className="whitespace-pre-wrap">{msg.text}</p>
                 ) : (
                   <div className="aether-chat-markdown">
-                    <MDEditor.Markdown source={msg.text} style={{ backgroundColor: 'transparent', color: 'inherit' }} />
+                    <MDEditor.Markdown 
+                       source={msg.text} 
+                       style={{ backgroundColor: 'transparent', color: 'inherit' }} 
+                       rehypePlugins={[[rehypeSanitize]]} 
+                    />
                   </div>
                 )}
               </div>
@@ -185,7 +207,7 @@ ${contextText}`;
           ))
         )}
         
-        {isLoading && (
+        {isLoading(status) && (
           <div className="flex gap-4 justify-start">
             <div className="w-8 h-8 rounded-full bg-lti-coral/20 flex flex-shrink-0 items-center justify-center self-end">
               <Bot size={16} className="text-lti-coral" />
@@ -209,11 +231,11 @@ ${contextText}`;
             onChange={(e) => setPrompt(e.target.value)}
             placeholder="Pregúntale a tu segundo cerebro..."
             className="w-full bg-navy-900 border border-navy-700 text-white rounded-xl pl-4 pr-12 py-3 focus:outline-none focus:border-lti-blue focus:ring-1 focus:ring-lti-blue transition-all"
-            disabled={isLoading}
+            disabled={isLoading(status)}
           />
           <button
             type="submit"
-            disabled={!prompt.trim() || isLoading}
+            disabled={!prompt.trim() || isLoading(status)}
             className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-slate-400 hover:text-lti-blue disabled:opacity-50 disabled:hover:text-slate-400 transition-colors"
           >
             <Send size={20} />

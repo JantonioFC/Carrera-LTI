@@ -1,14 +1,15 @@
-import { useState, useMemo } from 'react';
-import { useNexus } from '../hooks/useNexus';
+import { useState, useMemo, lazy, Suspense } from 'react';
+import { useNexusStore } from '../store/nexusStore';
 import { BlockNoteEditor } from '@blocknote/core';
 import '@blocknote/core/fonts/inter.css';
-import { BlockNoteView } from '@blocknote/mantine';
 import '@blocknote/mantine/style.css';
+
+const BlockNoteView = lazy(() => import('@blocknote/mantine').then(module => ({ default: module.BlockNoteView })));
 import { Search, Plus, FileText, LayoutDashboard, Clock } from 'lucide-react';
 import { esDictionary } from '../utils/blocknote-es';
 
 export default function NexusWorkspace() {
-  const { documents, addDocument, getDocument, getYDoc } = useNexus();
+  const { documents, addDocument, getDocument, getYDoc } = useNexusStore();
   const [activeDocId, setActiveDocId] = useState<string | null>(documents[0]?.id || null);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -111,11 +112,13 @@ export default function NexusWorkspace() {
               placeholder="Página sin título"
             />
             {/* The BlockNote editor */}
-            <BlockNoteView 
-              editor={editor} 
-              theme="dark" 
-              className="nexus-editor min-h-[500px]"
-            />
+            <Suspense fallback={<div className="h-64 flex items-center justify-center text-slate-500">Cargando editor de bloques...</div>}>
+              <BlockNoteView 
+                editor={editor as any} 
+                theme="dark" 
+                className="nexus-editor min-h-[500px]"
+              />
+            </Suspense>
           </div>
         ) : (
           <div className="h-full flex items-center justify-center text-slate-400">

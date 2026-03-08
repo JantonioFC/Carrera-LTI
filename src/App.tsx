@@ -7,8 +7,6 @@ import LoadingSpinner from './components/LoadingSpinner';
 import Sidebar from './components/Sidebar';
 import { CommandPalette } from './components/CommandPalette';
 import Pomodoro from './components/Pomodoro';
-import { AetherProvider } from './hooks/useAether';
-import { NexusProvider } from './hooks/useNexus';
 import { DEFAULT_PRESENCIALES, type PresencialEvent } from './data/lti';
 
 // ─── Lazy-loaded pages (code splitting) ───────────────────────
@@ -40,7 +38,7 @@ function App() {
   };
 
   return (
-    <GlobalContextWrapper>
+    <>
       <CommandPalette 
         isOpen={isCommandPaletteOpen} 
         onClose={() => setIsCommandPaletteOpen(false)} 
@@ -102,18 +100,7 @@ function App() {
         </main>
         <Pomodoro />
       </div>
-    </GlobalContextWrapper>
-  );
-}
-
-// Separate component to keep App clean
-function GlobalContextWrapper({ children }: { children: React.ReactNode }) {
-  return (
-    <AetherProvider>
-      <NexusProvider>
-        {children}
-      </NexusProvider>
-    </AetherProvider>
+    </>
   );
 }
 

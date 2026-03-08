@@ -4,61 +4,69 @@
  */
 
 import type { ZodType } from 'zod';
+import { type Result, ok, err } from './result';
 
 /**
- * Lee y parsea un valor de localStorage con protección contra errores.
- * @param key - La clave en localStorage.
- * @param fallback - Valor por defecto devuelto en caso de fallo o inexistencia.
- * @returns El objeto parseado de tipo T o el fallback.
+ * Lee y parsea un valor de localStorage retornando un Result.
+ */
+export function parseJSON<T>(key: string): Result<T, Error> {
+  try {
+    const raw = localStorage.getItem(key);
+    if (raw === null) return err(new Error(`Clave "${key}" no encontrada en localStorage`));
+    return ok(JSON.parse(raw) as T);
+  } catch (e) {
+    return err(e instanceof Error ? e : new Error(String(e)));
+  }
+}
+
+/**
+ * Funciones legacy adaptadas para mantener compatibilidad, wrappers sobre parseJSON
  */
 export function safeParseJSON<T>(key: string, fallback: T): T {
-  try {
-    const raw = localStorage.getItem(key);
-    if (raw === null) return fallback;
-    return JSON.parse(raw) as T;
-  } catch {
-    console.warn(`[safeStorage] Error leyendo "${key}" de localStorage, usando fallback.`);
-    return fallback;
-  }
+  const result = parseJSON<T>(key);
+  if (result.ok) return result.value;
+  console.warn(`[safeStorage] Error leyendo "${key}" de localStorage, usando fallback.`);
+  return fallback;
 }
 
-/**
- * Lee y parsea un valor de sessionStorage con protección contra errores.
- * @param key - La clave en sessionStorage.
- * @param fallback - Valor por defecto devuelto en caso de fallo.
- * @returns El objeto parseado de tipo T o el fallback.
- */
-export function safeParseSessionJSON<T>(key: string, fallback: T): T {
+export function parseSessionJSON<T>(key: string): Result<T, Error> {
   try {
     const raw = sessionStorage.getItem(key);
-    if (raw === null) return fallback;
-    return JSON.parse(raw) as T;
-  } catch {
-    console.warn(`[safeStorage] Error leyendo "${key}" de sessionStorage, usando fallback.`);
-    return fallback;
+    if (raw === null) return err(new Error(`Clave "${key}" no encontrada en sessionStorage`));
+    return ok(JSON.parse(raw) as T);
+  } catch (e) {
+    return err(e instanceof Error ? e : new Error(String(e)));
   }
 }
 
+export function safeParseSessionJSON<T>(key: string, fallback: T): T {
+  const result = parseSessionJSON<T>(key);
+  if (result.ok) return result.value;
+  console.warn(`[safeStorage] Error leyendo "${key}" de sessionStorage, usando fallback.`);
+  return fallback;
+}
+
 /**
- * Lee, parsea y valida un valor de localStorage usando un schema Zod.
- * @param key - La clave en localStorage.
- * @param schema - Schema de Zod para validación estructural.
- * @param fallback - Valor a retornar en caso de error o invalidación.
- * @returns Los datos tipificados y validados, o el fallback.
+ * Lee, parsea y valida un valor de localStorage usando un schema Zod, retornando un Result.
  */
-export function safeParseValidatedJSON<T>(key: string, schema: ZodType<T>, fallback: T): T {
+export function parseValidatedJSON<T>(key: string, schema: ZodType<T>): Result<T, Error> {
   try {
     const raw = localStorage.getItem(key);
-    if (raw === null) return fallback;
+    if (raw === null) return err(new Error(`Clave "${key}" no encontrada`));
     const parsed = JSON.parse(raw);
     const result = schema.safeParse(parsed);
     if (result.success) {
-      return result.data;
+      return ok(result.data);
     }
-    console.warn(`[safeStorage] Datos inválidos en "${key}":`, result.error.issues[0]?.message);
-    return fallback;
-  } catch {
-    console.warn(`[safeStorage] Error leyendo "${key}" de localStorage, usando fallback.`);
-    return fallback;
+    return err(new Error(`Datos inválidos en "${key}": ${result.error.issues[0]?.message}`));
+  } catch (e) {
+    return err(e instanceof Error ? e : new Error(String(e)));
   }
+}
+
+export function safeParseValidatedJSON<T>(key: string, schema: ZodType<T>, fallback: T): T {
+  const result = parseValidatedJSON(key, schema);
+  if (result.ok) return result.value;
+  console.warn(`[safeStorage] ${result.error.message}. Usando fallback.`);
+  return fallback;
 }

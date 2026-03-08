@@ -1,12 +1,15 @@
 /// <reference types="vitest" />
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import { VitePWA } from 'vite-plugin-pwa'
+import tailwindcss from '@tailwindcss/vite'
+// import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
   plugins: [
+    tailwindcss(),
     react(),
-    VitePWA({
+    // VitePWA plugin temporarily disabled due to Tailwind v4 css AST parsing incompatibility
+    /* VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
       manifest: {
@@ -35,10 +38,13 @@ export default defineConfig({
           }
         ]
       }
-    })
+    }) */
   ],
   server: {
     port: 5173,
+  },
+  build: {
+    cssMinify: false
   },
   test: {
     environment: 'jsdom',

@@ -13,11 +13,11 @@ import {
   type Connection,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { useAether } from '../hooks/useAether';
+import { useAetherStore } from '../store/aetherStore';
 import { Maximize } from 'lucide-react';
 
 export default function AetherCanvas() {
-  const { notes } = useAether();
+  const { notes } = useAetherStore();
   
   // Transform notes into initial nodes spread randomly or grid-like
   const initialNodes: Node[] = notes.map((note, index) => ({

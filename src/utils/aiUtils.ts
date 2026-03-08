@@ -1,4 +1,6 @@
-import { type GoogleGenAI } from '@google/genai';
+import type { GoogleGenAI } from '@google/genai';
+import type { ZodType } from 'zod';
+import { type Result, ok, err } from './result';
 
 /**
  * Wrapper for Gemini AI generateContent with exponential backoff retry logic.
@@ -49,4 +51,48 @@ export async function generateContentWithRetry(
 export function truncateContext(text: string, maxChars: number = 40000): string {
   if (text.length <= maxChars) return text;
   return text.slice(0, maxChars) + '\n\n...[Contenido truncado por límite de tokens]';
+}
+
+/**
+ * Wrapper for generation of Structured Outputs using JSON.
+ * It forces JSON responseMimeType, parses the response, and statically validates it with Zod.
+ * Prevents hallucinations in JSON parsing.
+ */
+export async function generateStructuredContentWithRetry<T>(
+  ai: GoogleGenAI,
+  options: any,
+  zodSchema: ZodType<T>,
+  geminiSchema: any,
+  maxRetries: number = 3
+): Promise<Result<T, Error>> {
+  const structuredOptions = {
+    ...options,
+    config: {
+      ...options.config,
+      responseMimeType: 'application/json',
+      responseSchema: geminiSchema,
+    }
+  };
+
+  try {
+    const response = await generateContentWithRetry(ai, structuredOptions, maxRetries);
+    const text = response.text || '';
+    if (!text) return err(new Error('Respuesta vacía de Gemini.'));
+    
+    let parsedJson;
+    try {
+      parsedJson = JSON.parse(text);
+    } catch (e) {
+      return err(new Error('La respuesta de la IA no es un JSON válido.'));
+    }
+
+    const validation = zodSchema.safeParse(parsedJson);
+    if (!validation.success) {
+      return err(new Error('Validación Zod fallida: ' + validation.error.issues[0]?.message));
+    }
+    
+    return ok(validation.data);
+  } catch (error: any) {
+    return err(error instanceof Error ? error : new Error(String(error)));
+  }
 }

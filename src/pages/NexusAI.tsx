@@ -1,11 +1,25 @@
 import { useState, useCallback } from 'react';
-import { useAether } from '../hooks/useAether';
-import { useNexus } from '../hooks/useNexus';
+import { useAetherStore } from '../store/aetherStore';
+import { useNexusStore } from '../store/nexusStore';
 import { useNexusDB } from '../hooks/useNexusDB';
 import { GoogleGenAI } from '@google/genai';
-import { generateContentWithRetry, truncateContext } from '../utils/aiUtils';
+import { generateStructuredContentWithRetry, truncateContext } from '../utils/aiUtils';
 import { Send, Bot, User, Trash2, Key, Sparkles, Database, FileText, Shield } from 'lucide-react';
 import { safeParseJSON } from '../utils/safeStorage';
+import { type RemoteData, notAsked, loading, success, failure, isLoading } from '../utils/result';
+import { z } from 'zod';
+
+const NexusResponseSchema = z.object({
+  text: z.string().describe("La respuesta de Nexus AI en formato Markdown")
+});
+
+const nexusGeminiSchema = {
+  type: 'OBJECT',
+  properties: {
+    text: { type: 'STRING', description: 'La respuesta de Nexus AI en formato Markdown' }
+  },
+  required: ['text']
+};
 
 interface NexusMessage {
   role: 'user' | 'model';
@@ -13,15 +27,15 @@ interface NexusMessage {
 }
 
 export default function NexusAI() {
-  const { notes, geminiApiKey: apiKey, setGeminiApiKey } = useAether();
-  const { documents } = useNexus();
+  const { notes, geminiApiKey: apiKey, setGeminiApiKey } = useAetherStore();
+  const { documents } = useNexusStore();
   const { allDatabases } = useNexusDB();
 
   const [messages, setMessages] = useState<NexusMessage[]>(() => {
     return safeParseJSON<NexusMessage[]>('lti_nexus_ai_history', []);
   });
   const [input, setInput] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState<RemoteData<void, string>>(notAsked());
   const [showKeyInput, setShowKeyInput] = useState(!apiKey);
 
   const saveKey = (key: string) => {
@@ -73,13 +87,13 @@ Sé conciso pero completo. Usa formato Markdown cuando sea útil.\n\n`;
     const updatedMessages = [...messages, userMessage];
     setMessages(updatedMessages);
     setInput('');
-    setLoading(true);
+    setStatus(loading());
 
     try {
       const ai = new GoogleGenAI({ apiKey });
       const systemContext = buildSystemContext();
       
-      const response = await generateContentWithRetry(ai, {
+      const response = await generateStructuredContentWithRetry(ai, {
         model: 'gemini-2.5-flash',
         contents: [
           { role: 'user', parts: [{ text: systemContext }] },
@@ -89,19 +103,23 @@ Sé conciso pero completo. Usa formato Markdown cuando sea útil.\n\n`;
             parts: [{ text: m.content }]
           }))
         ],
-      });
+      }, NexusResponseSchema, nexusGeminiSchema);
 
-      const aiText = response.text || 'No se recibió respuesta.';
-      const aiMessage: NexusMessage = { role: 'model', content: aiText };
-      const finalMessages = [...updatedMessages, aiMessage];
-      setMessages(finalMessages);
-      localStorage.setItem('lti_nexus_ai_history', JSON.stringify(finalMessages));
+      if (response.ok) {
+        const aiText = response.value.text || 'No se recibió respuesta.';
+        const aiMessage: NexusMessage = { role: 'model', content: aiText };
+        const finalMessages = [...updatedMessages, aiMessage];
+        setMessages(finalMessages);
+        localStorage.setItem('lti_nexus_ai_history', JSON.stringify(finalMessages));
+        setStatus(success(undefined));
+      } else {
+        throw response.error;
+      }
     } catch (err: any) {
       const errorMsg: NexusMessage = { role: 'model', content: `⚠️ Error: ${err.message || 'Error desconocido'}` };
       const finalMessages = [...updatedMessages, errorMsg];
       setMessages(finalMessages);
-    } finally {
-      setLoading(false);
+      setStatus(failure(err.message));
     }
   };
 
@@ -199,7 +217,7 @@ Sé conciso pero completo. Usa formato Markdown cuando sea útil.\n\n`;
           </div>
         ))}
 
-        {loading && (
+        {isLoading(status) && (
           <div className="flex gap-3">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center shrink-0 shadow">
               <Bot size={16} />
@@ -225,11 +243,11 @@ Sé conciso pero completo. Usa formato Markdown cuando sea útil.\n\n`;
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && sendMessage()}
-            disabled={!apiKey || loading}
+            disabled={!apiKey || isLoading(status)}
           />
           <button 
             onClick={sendMessage}
-            disabled={!apiKey || loading || !input.trim()}
+            disabled={!apiKey || isLoading(status) || !input.trim()}
             className="p-3 bg-gradient-to-br from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed rounded-xl transition-all shadow-lg"
           >
             <Send size={18} />
