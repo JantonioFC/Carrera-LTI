@@ -5,6 +5,7 @@ import '@blocknote/core/fonts/inter.css';
 import { BlockNoteView } from '@blocknote/mantine';
 import '@blocknote/mantine/style.css';
 import { Search, Plus, FileText, LayoutDashboard, Clock } from 'lucide-react';
+import { esDictionary } from '../utils/blocknote-es';
 
 export default function NexusWorkspace() {
   const { documents, addDocument, getDocument, getYDoc } = useNexus();
@@ -21,6 +22,7 @@ export default function NexusWorkspace() {
     const yDoc = getYDoc(activeDocId);
     
     return BlockNoteEditor.create({
+      dictionary: esDictionary as any,
       collaboration: {
         provider: undefined as any, // We are syncing directly to IDB down below through yDoc
         fragment: yDoc.getXmlFragment("document-store"),
