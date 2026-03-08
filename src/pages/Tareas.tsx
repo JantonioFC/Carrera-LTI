@@ -1,9 +1,15 @@
-import { useState } from 'react';
-import { Plus, X, GripVertical, Calendar, Flag } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Plus, X, GripVertical, Calendar, Flag, CheckCircle2, Circle } from 'lucide-react';
 import { CURRICULUM } from '../data/lti';
 
 type KanbanStatus = 'todo' | 'inProgress' | 'done';
 type Priority = 'alta' | 'media' | 'baja';
+
+interface Subtask {
+  id: string;
+  text: string;
+  completed: boolean;
+}
 
 interface Task {
   id: string;
@@ -12,16 +18,17 @@ interface Task {
   dueDate: string;
   priority: Priority;
   status: KanbanStatus;
+  subtasks: Subtask[];
 }
 
 const INITIAL_TASKS: Task[] = [
-  { id: 't1', title: 'Leer introducción al módulo LTI', subjectId: 's1-1', dueDate: '2026-03-13', priority: 'alta', status: 'todo' },
-  { id: 't2', title: 'Diagrama de casos de uso', subjectId: 's1-2', dueDate: '2026-04-01', priority: 'alta', status: 'todo' },
-  { id: 't3', title: 'Diseñar modelo entidad-relación', subjectId: 's1-5', dueDate: '2026-05-15', priority: 'media', status: 'todo' },
-  { id: 't4', title: 'Ejercicios fundamentos de programación', subjectId: 's1-3', dueDate: '2026-04-20', priority: 'alta', status: 'inProgress' },
-  { id: 't5', title: 'Plan de pruebas funcionales', subjectId: 's1-4', dueDate: '2026-06-20', priority: 'media', status: 'inProgress' },
-  { id: 't6', title: 'Inscripción a cursos', subjectId: 's1-1', dueDate: '2026-03-09', priority: 'baja', status: 'done' },
-  { id: 't7', title: 'Configurar entorno de desarrollo', subjectId: 's1-3', dueDate: '2026-03-10', priority: 'alta', status: 'done' },
+  { id: 't1', title: 'Leer introducción al módulo LTI', subjectId: 's1-1', dueDate: '2026-03-13', priority: 'alta', status: 'todo', subtasks: [{ id: 'st1', text: 'Descargar bibliografía', completed: false }] },
+  { id: 't2', title: 'Diagrama de casos de uso', subjectId: 's1-2', dueDate: '2026-04-01', priority: 'alta', status: 'todo', subtasks: [] },
+  { id: 't3', title: 'Diseñar modelo entidad-relación', subjectId: 's1-5', dueDate: '2026-05-15', priority: 'media', status: 'todo', subtasks: [] },
+  { id: 't4', title: 'Ejercicios fundamentos de programación', subjectId: 's1-3', dueDate: '2026-04-20', priority: 'alta', status: 'inProgress', subtasks: [] },
+  { id: 't5', title: 'Plan de pruebas funcionales', subjectId: 's1-4', dueDate: '2026-06-20', priority: 'media', status: 'inProgress', subtasks: [] },
+  { id: 't6', title: 'Inscripción a cursos', subjectId: 's1-1', dueDate: '2026-03-09', priority: 'baja', status: 'done', subtasks: [] },
+  { id: 't7', title: 'Configurar entorno de desarrollo', subjectId: 's1-3', dueDate: '2026-03-10', priority: 'alta', status: 'done', subtasks: [] },
 ];
 
 const PRIORITY_STYLES: Record<Priority, string> = {
@@ -45,6 +52,7 @@ function AddTaskModal({ onAdd, onClose }: { onAdd: (t: Omit<Task, 'id'>) => void
     dueDate: '',
     priority: 'media',
     status: 'todo',
+    subtasks: [],
   });
 
   return (
@@ -113,6 +121,35 @@ export default function Tareas() {
   });
   const [showAdd, setShowAdd] = useState(false);
 
+  useEffect(() => {
+    // Check and request for notification permission
+    if ('Notification' in window && Notification.permission !== 'granted' && Notification.permission !== 'denied') {
+      Notification.requestPermission();
+    }
+
+    // Check for due tasks and notify
+    if ('Notification' in window && Notification.permission === 'granted') {
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      
+      const dueTasks = tasks.filter(t => 
+        t.status !== 'done' && 
+        t.dueDate && 
+        new Date(t.dueDate).getTime() <= tomorrow.getTime()
+      );
+
+      const hasSent = sessionStorage.getItem('lti_notified');
+      
+      if (dueTasks.length > 0 && !hasSent) {
+        new Notification('Carrera LTI - Tareas Pendientes', {
+          body: `Tienes ${dueTasks.length} tarea(s) que vencen pronto.`,
+          icon: '/pwa-192x192.png'
+        });
+        sessionStorage.setItem('lti_notified', 'true');
+      }
+    }
+  }, [tasks]);
+
   const saveTasks = (t: Task[]) => {
     setTasks(t);
     localStorage.setItem('lti_tasks', JSON.stringify(t));
@@ -127,6 +164,27 @@ export default function Tareas() {
 
   const moveTask = (id: string, status: KanbanStatus) =>
     saveTasks(tasks.map((t) => (t.id === id ? { ...t, status } : t)));
+
+  const toggleSubtask = (taskId: string, subtaskId: string) => {
+    saveTasks(tasks.map((t) => {
+      if (t.id !== taskId) return t;
+      return {
+        ...t,
+        subtasks: t.subtasks.map((st) => st.id === subtaskId ? { ...st, completed: !st.completed } : st)
+      };
+    }));
+  };
+
+  const addSubtask = (taskId: string, text: string) => {
+    if (!text.trim()) return;
+    saveTasks(tasks.map((t) => {
+      if (t.id !== taskId) return t;
+      return {
+        ...t,
+        subtasks: [...t.subtasks, { id: `st${Date.now()}`, text: text.trim(), completed: false }]
+      };
+    }));
+  };
 
   return (
     <div className="p-6 space-y-5 animate-fade-in">
@@ -178,11 +236,37 @@ export default function Tareas() {
                         </span>
                       </div>
                       {task.dueDate && (
-                        <p className="text-xs text-slate-500 ml-5 flex items-center gap-1">
+                        <p className={`text-xs ml-5 flex items-center gap-1 ${new Date(task.dueDate).getTime() < Date.now() && task.status !== 'done' ? 'text-red-400 font-bold' : 'text-slate-500'}`}>
                           <Calendar size={10} />
                           {new Date(task.dueDate + 'T12:00:00').toLocaleDateString('es-UY', { day: 'numeric', month: 'short' })}
                         </p>
                       )}
+                      
+                      {/* Subtasks */}
+                      <div className="ml-5 space-y-1.5 pt-1">
+                        {task.subtasks.map((st) => (
+                          <div key={st.id} className="flex items-start gap-2 group/st">
+                            <button onClick={() => toggleSubtask(task.id, st.id)} className="mt-0.5 text-slate-500 hover:text-lti-blue transition-colors">
+                              {st.completed ? <CheckCircle2 size={12} className="text-lti-blue" /> : <Circle size={12} />}
+                            </button>
+                            <span className={`text-xs flex-1 ${st.completed ? 'text-slate-600 line-through' : 'text-slate-300'}`}>
+                              {st.text}
+                            </span>
+                          </div>
+                        ))}
+                        <input 
+                          type="text" 
+                          placeholder="+ Agregar subtarea" 
+                          className="w-full bg-transparent border-none text-xs text-slate-400 focus:outline-none focus:text-white placeholder-slate-600"
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              addSubtask(task.id, e.currentTarget.value);
+                              e.currentTarget.value = '';
+                            }
+                          }}
+                        />
+                      </div>
+
                       {/* Move buttons */}
                       <div className="flex gap-1 ml-5">
                         {COLUMNS.filter((c) => c.id !== col.id).map((c) => (

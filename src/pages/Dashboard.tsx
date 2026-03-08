@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { Pencil, Check, X, MapPin, AlertCircle, Clock, Trash2 } from 'lucide-react';
 import {
-  CURRICULUM, SEMESTER_START, EXAM_START, EXAM_END,
+  CURRICULUM, SEMESTER_START, EXAM_START, EXAM_END, TOTAL_CREDITS,
   getDaysUntil, formatDate, formatDateShort, isDatePast,
   type PresencialEvent
 } from '../data/lti';
+import { useSubjectData } from '../hooks/useSubjectData';
+import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, CartesianGrid } from 'recharts';
 
 interface DashboardProps {
   presenciales: PresencialEvent[];
@@ -118,6 +120,10 @@ export default function Dashboard({ presenciales, onUpdatePresenciales }: Dashbo
   const [editingEvent, setEditingEvent] = useState<PresencialEvent | null>(null);
   const daysToStart = getDaysUntil(SEMESTER_START);
   const sem1 = CURRICULUM[0].subjects;
+  
+  const { getAverage, getApprovedCredits } = useSubjectData();
+  const average = getAverage();
+  const approved = getApprovedCredits();
 
   const upcomingPresenciales = presenciales
     .filter((p) => getDaysUntil(p.date) >= 0)
@@ -133,6 +139,30 @@ export default function Dashboard({ presenciales, onUpdatePresenciales }: Dashbo
     onUpdatePresenciales(presenciales.filter((p) => p.id !== id));
     setEditingEvent(null);
   };
+
+  const { data } = useSubjectData();
+
+  // Charts Data
+  const totalApproved = CURRICULUM.flatMap(s => s.subjects).filter(s => data[s.id]?.status === 'aprobada').reduce((acc, s) => acc + s.credits, 0);
+  const totalInProgress = CURRICULUM.flatMap(s => s.subjects).filter(s => data[s.id]?.status === 'en_curso').reduce((acc, s) => acc + s.credits, 0);
+  const totalMissing = TOTAL_CREDITS - totalApproved - totalInProgress;
+
+  const pieData = [
+    { name: 'Aprobados', value: totalApproved, color: '#10b981' },
+    { name: 'En curso', value: totalInProgress, color: '#3b82f6' },
+    { name: 'Pendientes', value: totalMissing, color: '#475569' },
+  ];
+
+  const barData = CURRICULUM.map(sem => {
+    const semSubjects = sem.subjects.filter(s => data[s.id]?.status === 'aprobada' && data[s.id]?.grade !== undefined);
+    const avg = semSubjects.length > 0 
+      ? semSubjects.reduce((acc, s) => acc + (data[s.id]?.grade || 0), 0) / semSubjects.length
+      : 0;
+    return {
+      name: `S${sem.number}`,
+      Promedio: Number(avg.toFixed(1))
+    };
+  });
 
   return (
     <div className="p-6 space-y-6 animate-fade-in">
@@ -156,8 +186,15 @@ export default function Dashboard({ presenciales, onUpdatePresenciales }: Dashbo
       </div>
 
       {/* Countdown + Stats */}
-      <div className="grid grid-cols-3 gap-4">
-        <div className="card p-5 col-span-1 glow-blue border-l-4 border-lti-blue">
+      <div className="grid grid-cols-4 gap-4">
+        <div className="card p-5 col-span-1 border-l-4 border-lti-blue/50">
+          <p className="text-slate-400 text-xs font-medium uppercase tracking-wider">Promedio General</p>
+          <div className="flex items-end gap-2 mt-1">
+            <p className="text-white text-2xl font-bold">{average > 0 ? average.toFixed(1) : '--'}</p>
+            <p className="text-lti-blue text-sm mb-1 font-medium">{approved > 0 ? `${approved} UC aprobadas` : 'Sin notas'}</p>
+          </div>
+        </div>
+        <div className="card p-5 col-span-1 border-l-4 border-lti-blue">
           <p className="text-slate-400 text-xs font-medium uppercase tracking-wider">Inicio del Semestre</p>
           <p className="text-white text-xl font-bold mt-1">{formatDate(SEMESTER_START)}</p>
           <p className={`text-sm mt-1 font-medium ${daysToStart > 0 ? 'text-lti-blue' : 'text-green-400'}`}>
@@ -271,6 +308,78 @@ export default function Dashboard({ presenciales, onUpdatePresenciales }: Dashbo
                 </span>
               </div>
             ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Analytics Charts */}
+      <div className="grid grid-cols-3 gap-6">
+        <div className="card p-5 col-span-1 border-t-2 border-lti-coral">
+          <h2 className="text-white font-semibold text-sm mb-4">Progreso de la Carrera</h2>
+          <div className="h-48 relative">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={pieData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={50}
+                  outerRadius={70}
+                  paddingAngle={5}
+                  dataKey="value"
+                  stroke="none"
+                >
+                  {pieData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <RechartsTooltip 
+                  contentStyle={{ backgroundColor: '#1e293b', borderColor: '#334155', borderRadius: '0.5rem', color: '#f8fafc', fontSize: '12px' }}
+                  itemStyle={{ color: '#e2e8f0' }}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+              <span className="text-3xl font-bold text-white tracking-tight">{Math.round((totalApproved / TOTAL_CREDITS) * 100)}%</span>
+              <span className="text-[10px] text-slate-400 uppercase tracking-wider mt-1">Completado</span>
+            </div>
+          </div>
+          <div className="flex justify-center gap-4 mt-2">
+            {pieData.map(d => (
+              <div key={d.name} className="flex items-center gap-1.5">
+                <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: d.color }}></div>
+                <span className="text-xs text-slate-400 font-medium">{d.name}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="card p-5 col-span-2 border-t-2 border-lti-blue">
+          <h2 className="text-white font-semibold text-sm mb-4">Promedio por Semestre</h2>
+          <div className="h-52">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={barData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" opacity={0.5} />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 12, fontWeight: 500 }} dy={10} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} domain={[0, 5]} ticks={[1, 2, 3, 4, 5]} width={40} />
+                <RechartsTooltip 
+                  cursor={{ fill: '#1e293b', opacity: 0.4 }}
+                  contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '0.5rem', color: '#f8fafc', fontSize: '12px', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
+                  itemStyle={{ color: '#e2e8f0', fontWeight: 600 }}
+                />
+                <Bar dataKey="Promedio" fill="url(#colorUv)" radius={[6, 6, 0, 0]} barSize={36}>
+                  {barData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.Promedio > 0 ? '#3b82f6' : '#334155'} />
+                  ))}
+                </Bar>
+                <defs>
+                  <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.9}/>
+                    <stop offset="95%" stopColor="#2563eb" stopOpacity={0.7}/>
+                  </linearGradient>
+                </defs>
+              </BarChart>
+            </ResponsiveContainer>
           </div>
         </div>
       </div>

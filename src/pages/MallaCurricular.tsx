@@ -1,5 +1,6 @@
 import { Award, BookOpen, Clock } from 'lucide-react';
 import { CURRICULUM, formatDateShort, TOTAL_CREDITS } from '../data/lti';
+import { useSubjectData } from '../hooks/useSubjectData';
 
 const STATUS_STYLES = {
   en_curso: 'bg-lti-blue/10 text-lti-blue border-lti-blue/30',
@@ -14,7 +15,14 @@ const STATUS_LABELS = {
 };
 
 export default function MallaCurricular() {
-  const allSubjects = CURRICULUM.flatMap((s) => s.subjects);
+  const { data } = useSubjectData();
+
+  const allSubjects = CURRICULUM.flatMap((s) => s.subjects).map(s => ({
+    ...s,
+    status: data[s.id]?.status || s.status,
+    grade: data[s.id]?.grade
+  }));
+
   const creditsDone   = allSubjects.filter((s) => s.status === 'aprobada').reduce((a, s) => a + s.credits, 0);
   const creditsActive = allSubjects.filter((s) => s.status === 'en_curso').reduce((a, s) => a + s.credits, 0);
   const creditsPending = allSubjects.filter((s) => s.status === 'pendiente').reduce((a, s) => a + s.credits, 0);
@@ -22,8 +30,7 @@ export default function MallaCurricular() {
 
   // Tecnicatura = first 4 semesters
   const tcTotal = CURRICULUM.slice(0, 4).flatMap((s) => s.subjects).reduce((a, s) => a + s.credits, 0);
-  const tcDone  = CURRICULUM.slice(0, 4).flatMap((s) => s.subjects)
-    .filter((s) => s.status === 'aprobada').reduce((a, s) => a + s.credits, 0);
+  const tcDone  = allSubjects.filter(s => s.semester <= 4 && s.status === 'aprobada').reduce((a, s) => a + s.credits, 0);
 
   return (
     <div className="p-6 space-y-5 animate-fade-in">
@@ -126,18 +133,25 @@ export default function MallaCurricular() {
 
                 {/* Subjects */}
                 <div className="space-y-1.5">
-                  {sem.subjects.map((subject) => (
-                    <div
-                      key={subject.id}
-                      className={`rounded-lg p-2 border text-xs transition-all ${STATUS_STYLES[subject.status]} ${
-                        subject.status === 'en_curso' ? 'animate-pulse-slow' : ''
-                      }`}
-                    >
-                      <div className="flex items-start justify-between gap-1">
-                        <div
-                          className="w-1.5 h-1.5 rounded-full flex-shrink-0 mt-1"
-                          style={{ backgroundColor: subject.color }}
-                        />
+                  {sem.subjects.map((baseSubject) => {
+                    const subject = allSubjects.find(s => s.id === baseSubject.id) || baseSubject;
+                    return (
+                      <div
+                        key={subject.id}
+                        className={`relative overflow-hidden rounded-lg p-2 border text-xs transition-all ${STATUS_STYLES[subject.status]} ${
+                          subject.status === 'en_curso' ? 'animate-pulse-slow' : ''
+                        }`}
+                      >
+                        {subject.status === 'aprobada' && subject.grade !== undefined && (
+                          <div className="absolute top-0 right-0 bg-green-500/20 text-green-300 px-1.5 py-0.5 rounded-bl-lg text-[10px] font-bold border-b border-l border-green-500/30">
+                            {subject.grade}
+                          </div>
+                        )}
+                        <div className="flex items-start justify-between gap-1">
+                          <div
+                            className="w-1.5 h-1.5 rounded-full flex-shrink-0 mt-1"
+                            style={{ backgroundColor: subject.color }}
+                          />
                         <p className="flex-1 font-medium leading-tight line-clamp-2" style={{ color: subject.status === 'pendiente' ? '#64748b' : undefined }}>
                           {subject.name}
                         </p>
@@ -158,11 +172,12 @@ export default function MallaCurricular() {
                         </p>
                       )}
                     </div>
-                  ))}
-                </div>
+                  );
+                })}
               </div>
-            );
-          })}
+            </div>
+          );
+        })}
         </div>
       </div>
     </div>

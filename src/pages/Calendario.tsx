@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ChevronLeft, ChevronRight, Pencil, AlertCircle, MapPin, Trash2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Pencil, AlertCircle, MapPin, Trash2, Download } from 'lucide-react';
 import {
   CURRICULUM, formatDate, getDaysUntil, isDatePast,
   SEMESTER_START, EXAM_START, EXAM_END,
@@ -10,7 +10,7 @@ interface CalendarioProps {
   presenciales: PresencialEvent[];
   onUpdatePresenciales: (p: PresencialEvent[]) => void;
 }
-
+import { downloadICS } from '../utils/icsExport';
 const MONTHS_ES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
   'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 const DAYS_SHORT = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
@@ -109,9 +109,18 @@ export default function Calendario({ presenciales, onUpdatePresenciales }: Calen
 
   return (
     <div className="p-6 space-y-5 animate-fade-in">
-      <div>
-        <h1 className="text-2xl font-bold text-white">Calendario</h1>
-        <p className="text-slate-400 text-sm mt-0.5">Semestre 1 — 2026</p>
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-white">Calendario</h1>
+          <p className="text-slate-400 text-sm mt-0.5">Semestre 1 — 2026</p>
+        </div>
+        <button 
+          onClick={() => downloadICS(presenciales)}
+          className="flex items-center gap-2 px-3 py-2 bg-navy-800 border border-navy-700 hover:border-lti-blue/50 text-slate-300 hover:text-lti-blue rounded-lg transition-all text-sm font-medium"
+        >
+          <Download size={16} />
+          Exportar a Calendar
+        </button>
       </div>
 
       {/* Upcoming presenciales sidebar + calendar */}
@@ -138,7 +147,6 @@ export default function Calendario({ presenciales, onUpdatePresenciales }: Calen
           <div className="grid grid-cols-7 gap-1">
             {cells.map((day, i) => {
               if (!day) return <div key={`empty-${i}`} />;
-              const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
               const isToday = day === today.getDate() && month === today.getMonth() && year === today.getFullYear();
               const events = getEventsForDay(day);
               return (
