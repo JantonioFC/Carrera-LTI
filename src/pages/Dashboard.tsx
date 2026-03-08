@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Pencil, Check, X, MapPin, AlertCircle, Clock, Trash2 } from 'lucide-react';
 import {
   CURRICULUM, SEMESTER_START, EXAM_START, EXAM_END, TOTAL_CREDITS,
@@ -125,9 +125,11 @@ export default function Dashboard({ presenciales, onUpdatePresenciales }: Dashbo
   const average = getAverage();
   const approved = getApprovedCredits();
 
-  const upcomingPresenciales = presenciales
-    .filter((p) => getDaysUntil(p.date) >= 0)
-    .sort((a, b) => a.date.localeCompare(b.date));
+  const upcomingPresenciales = useMemo(() => {
+    return presenciales
+      .filter((p) => getDaysUntil(p.date) >= 0)
+      .sort((a, b) => a.date.localeCompare(b.date));
+  }, [presenciales]);
 
   const handleSaveEvent = (updated: PresencialEvent) => {
     const newList = presenciales.map((p) => (p.id === updated.id ? updated : p));
@@ -147,27 +149,29 @@ export default function Dashboard({ presenciales, onUpdatePresenciales }: Dashbo
   const totalInProgress = CURRICULUM.flatMap(s => s.subjects).filter(s => data[s.id]?.status === 'en_curso').reduce((acc, s) => acc + s.credits, 0);
   const totalMissing = TOTAL_CREDITS - totalApproved - totalInProgress;
 
-  const pieData = [
+  const pieData = useMemo(() => [
     { name: 'Aprobados', value: totalApproved, color: '#10b981' },
     { name: 'En curso', value: totalInProgress, color: '#3b82f6' },
     { name: 'Pendientes', value: totalMissing, color: '#475569' },
-  ];
+  ], [totalApproved, totalInProgress, totalMissing]);
 
-  const barData = CURRICULUM.map(sem => {
-    const semSubjects = sem.subjects.filter(s => data[s.id]?.status === 'aprobada' && data[s.id]?.grade !== undefined);
-    const avg = semSubjects.length > 0 
-      ? semSubjects.reduce((acc, s) => acc + (data[s.id]?.grade || 0), 0) / semSubjects.length
-      : 0;
-    return {
-      name: `S${sem.number}`,
-      Promedio: Number(avg.toFixed(1))
-    };
-  });
+  const barData = useMemo(() => {
+    return CURRICULUM.map(sem => {
+      const semSubjects = sem.subjects.filter(s => data[s.id]?.status === 'aprobada' && data[s.id]?.grade !== undefined);
+      const avg = semSubjects.length > 0 
+        ? semSubjects.reduce((acc, s) => acc + (data[s.id]?.grade || 0), 0) / semSubjects.length
+        : 0;
+      return {
+        name: `S${sem.number}`,
+        Promedio: Number(avg.toFixed(1))
+      };
+    });
+  }, [data]);
 
   return (
     <div className="p-6 space-y-6 animate-fade-in">
       {/* Header */}
-      <div className="flex items-start justify-between">
+      <header className="flex items-start justify-between">
         <div>
           <h1 className="text-2xl font-bold text-white">Dashboard</h1>
           <p className="text-slate-400 text-sm mt-0.5">
@@ -183,10 +187,10 @@ export default function Dashboard({ presenciales, onUpdatePresenciales }: Dashbo
             ? `🎓 El semestre comienza en ${daysToStart} día${daysToStart !== 1 ? 's' : ''}`
             : '🎓 Semestre en curso'}
         </div>
-      </div>
+      </header>
 
       {/* Countdown + Stats */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         <div className="card p-5 col-span-1 border-l-4 border-lti-blue/50">
           <p className="text-slate-400 text-xs font-medium uppercase tracking-wider">Promedio General</p>
           <div className="flex items-end gap-2 mt-1">
@@ -217,13 +221,13 @@ export default function Dashboard({ presenciales, onUpdatePresenciales }: Dashbo
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Presenciales */}
         <div className="card p-5">
           <div className="flex items-center justify-between mb-4">
             <div>
               <h2 className="text-white font-semibold text-sm">Instancias Presenciales Obligatorias</h2>
-              <p className="text-slate-500 text-xs mt-0.5 flex items-center gap-1">
+              <p className="text-slate-400 text-xs mt-0.5 flex items-center gap-1">
                 <MapPin size={10} /> Sede {presenciales[0]?.sede} — Jornadas 9:00 a 17:00 hs
               </p>
             </div>
@@ -244,10 +248,10 @@ export default function Dashboard({ presenciales, onUpdatePresenciales }: Dashbo
                   }`}
                 >
                   <div className="text-center min-w-[44px]">
-                    <p className="text-xs text-slate-500 font-medium">
+                    <p className="text-xs text-slate-400 font-medium">
                       {new Date(event.date + 'T12:00:00').toLocaleDateString('es-UY', { month: 'short' }).toUpperCase()}
                     </p>
-                    <p className={`text-lg font-bold leading-none ${past ? 'text-slate-500' : 'text-white'}`}>
+                    <p className={`text-lg font-bold leading-none ${past ? 'text-slate-400' : 'text-white'}`}>
                       {new Date(event.date + 'T12:00:00').getDate()}
                     </p>
                   </div>
@@ -262,7 +266,7 @@ export default function Dashboard({ presenciales, onUpdatePresenciales }: Dashbo
                           Eval. final
                         </span>
                       )}
-                      <span className="flex items-center gap-1 text-xs text-slate-500">
+                      <span className="flex items-center gap-1 text-xs text-slate-400">
                         <Clock size={10} />
                         {event.hours}
                       </span>
@@ -275,7 +279,7 @@ export default function Dashboard({ presenciales, onUpdatePresenciales }: Dashbo
                   )}
                   <button
                     onClick={() => setEditingEvent(event)}
-                    className="p-1.5 rounded-md text-slate-500 hover:text-lti-blue hover:bg-lti-blue/10 transition-colors"
+                    className="p-1.5 rounded-md text-slate-400 hover:text-lti-blue hover:bg-lti-blue/10 transition-colors"
                     title="Editar"
                   >
                     <Pencil size={13} />
@@ -302,7 +306,7 @@ export default function Dashboard({ presenciales, onUpdatePresenciales }: Dashbo
                   style={{ backgroundColor: subject.color }}
                 />
                 <span className="text-sm text-slate-300 flex-1 truncate">{subject.name}</span>
-                <span className="text-xs text-slate-500 font-medium shrink-0">{subject.credits} cr</span>
+                <span className="text-xs text-slate-400 font-medium shrink-0">{subject.credits} cr</span>
                 <span className="px-2 py-0.5 bg-lti-blue/10 text-lti-blue text-xs rounded-full font-medium shrink-0">
                   En curso
                 </span>
@@ -313,7 +317,7 @@ export default function Dashboard({ presenciales, onUpdatePresenciales }: Dashbo
       </div>
 
       {/* Analytics Charts */}
-      <div className="grid grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="card p-5 col-span-1 border-t-2 border-lti-coral">
           <h2 className="text-white font-semibold text-sm mb-4">Progreso de la Carrera</h2>
           <div className="h-48 relative">
@@ -354,7 +358,7 @@ export default function Dashboard({ presenciales, onUpdatePresenciales }: Dashbo
           </div>
         </div>
 
-        <div className="card p-5 col-span-2 border-t-2 border-lti-blue">
+        <div className="card p-5 col-span-1 lg:col-span-2 border-t-2 border-lti-blue">
           <h2 className="text-white font-semibold text-sm mb-4">Promedio por Semestre</h2>
           <div className="h-52">
             <ResponsiveContainer width="100%" height="100%">

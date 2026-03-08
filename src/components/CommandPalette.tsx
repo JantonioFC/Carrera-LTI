@@ -1,19 +1,26 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Search, FileText, Database, BrainCircuit } from 'lucide-react';
 import { useNexus } from '../hooks/useNexus';
 import { useNexusDB } from '../hooks/useNexusDB';
 
-export function CommandPalette({ isOpen, onClose, onNavigate }: { isOpen: boolean, onClose: () => void, onNavigate: (page: string) => void }) {
+export function CommandPalette({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) {
   const [query, setQuery] = useState('');
   const { documents } = useNexus();
   const { allDatabases } = useNexusDB();
+  const navigate = useNavigate();
+
+  const navigateTo = (path: string) => {
+    navigate(path);
+    onClose();
+  };
 
   // Escuchar Cmd+K o Ctrl+K
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
-        isOpen ? onClose() : onNavigate('OPEN_PALETTE'); // Un hack: app maneja el estado
+        onClose(); // Toggle: si está abierto lo cierra, App maneja el reopen
       }
       if (e.key === 'Escape' && isOpen) {
         onClose();
@@ -21,7 +28,7 @@ export function CommandPalette({ isOpen, onClose, onNavigate }: { isOpen: boolea
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, onClose, onNavigate]);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -60,26 +67,26 @@ export function CommandPalette({ isOpen, onClose, onNavigate }: { isOpen: boolea
           {/* Section: Acciones Rápidas */}
           {query.length === 0 && (
             <div className="mb-4">
-               <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 px-3">Acciones Rápidas</div>
-               <button onClick={() => { onNavigate('nexus'); onClose(); }} className="w-full flex items-center px-3 py-3 rounded-lg hover:bg-navy-800 text-left transition-colors group">
+               <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 px-3">Acciones Rápidas</div>
+               <button onClick={() => navigateTo('/nexus')} className="w-full flex items-center px-3 py-3 rounded-lg hover:bg-navy-800 text-left transition-colors group">
                  <FileText size={18} className="text-emerald-400 mr-3" />
                  <div>
                    <div className="text-sm font-medium text-slate-200 group-hover:text-white">Nuevo Documento (Blocks)</div>
-                   <div className="text-xs text-slate-500">Crear una página de edición libre</div>
+                   <div className="text-xs text-slate-400">Crear una página de edición libre</div>
                  </div>
                </button>
-               <button onClick={() => { onNavigate('aether-chat'); onClose(); }} className="w-full flex items-center px-3 py-3 rounded-lg hover:bg-navy-800 text-left transition-colors group">
+               <button onClick={() => navigateTo('/aether/chat')} className="w-full flex items-center px-3 py-3 rounded-lg hover:bg-navy-800 text-left transition-colors group">
                  <BrainCircuit size={18} className="text-purple-400 mr-3" />
                  <div>
                    <div className="text-sm font-medium text-slate-200 group-hover:text-white">Consultar IA (Nexus AI)</div>
-                   <div className="text-xs text-slate-500">Hazle una pregunta a tu base de conocimiento</div>
+                   <div className="text-xs text-slate-400">Hazle una pregunta a tu base de conocimiento</div>
                  </div>
                </button>
-               <button onClick={() => { onNavigate('nexus-db'); onClose(); }} className="w-full flex items-center px-3 py-3 rounded-lg hover:bg-navy-800 text-left transition-colors group">
+               <button onClick={() => navigateTo('/nexus/db')} className="w-full flex items-center px-3 py-3 rounded-lg hover:bg-navy-800 text-left transition-colors group">
                  <Database size={18} className="text-lti-coral mr-3" />
                  <div>
                    <div className="text-sm font-medium text-slate-200 group-hover:text-white">Explorar Bases de Datos</div>
-                   <div className="text-xs text-slate-500">Ir al visor estructurado</div>
+                   <div className="text-xs text-slate-400">Ir al visor estructurado</div>
                  </div>
                </button>
             </div>
@@ -88,15 +95,15 @@ export function CommandPalette({ isOpen, onClose, onNavigate }: { isOpen: boolea
           {/* Section: Documentos */}
           {(query.length > 0 || documents.length > 0) && (
             <div className="mb-4">
-              <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 px-3">Documentos Blocks</div>
+              <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 px-3">Documentos Blocks</div>
               {filteredDocs.map(doc => (
-                 <button key={doc.id} onClick={() => { onNavigate('nexus'); onClose(); }} className="w-full flex items-center px-3 py-2 rounded-lg hover:bg-navy-800 text-left transition-colors group">
+                 <button key={doc.id} onClick={() => navigateTo('/nexus')} className="w-full flex items-center px-3 py-2 rounded-lg hover:bg-navy-800 text-left transition-colors group">
                     <FileText size={16} className="text-slate-400 mr-3 group-hover:text-white" />
                     <span className="text-sm text-slate-300 group-hover:text-white">{doc.title}</span>
                  </button>
               ))}
               {filteredDocs.length === 0 && (
-                 <div className="px-3 py-2 text-sm text-slate-500 italic">No hay resultados de texto</div>
+                 <div className="px-3 py-2 text-sm text-slate-400 italic">No hay resultados de texto</div>
               )}
             </div>
           )}
@@ -104,9 +111,9 @@ export function CommandPalette({ isOpen, onClose, onNavigate }: { isOpen: boolea
            {/* Section: Bases de Datos */}
            {(query.length > 0 || allDatabases.length > 0) && (
             <div>
-              <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 px-3">Tablas / Bases de Datos</div>
+              <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 px-3">Tablas / Bases de Datos</div>
               {filteredDbs.map(db => (
-                 <button key={db.id} onClick={() => { onNavigate('nexus-db'); onClose(); }} className="w-full flex items-center px-3 py-2 rounded-lg hover:bg-navy-800 text-left transition-colors group">
+                 <button key={db.id} onClick={() => navigateTo('/nexus/db')} className="w-full flex items-center px-3 py-2 rounded-lg hover:bg-navy-800 text-left transition-colors group">
                     <span className="mr-3">{db.icon}</span>
                     <span className="text-sm text-slate-300 group-hover:text-white">{db.name}</span>
                  </button>

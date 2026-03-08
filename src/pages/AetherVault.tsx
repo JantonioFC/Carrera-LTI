@@ -86,7 +86,7 @@ export default function AetherVault() {
           <div className="w-72 flex-shrink-0 flex flex-col bg-navy-950/40 border-r border-navy-700/50 transition-all">
             <div className="p-4 border-b border-navy-700/50">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={16} />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                 <input 
                   type="text" 
                   placeholder="Buscar notas..." 
@@ -107,11 +107,11 @@ export default function AetherVault() {
                   className={`w-full text-left px-3 py-2.5 rounded-md transition-colors ${activeNoteId === note.id && viewMode === 'editor' ? 'bg-lti-blue/20 text-white' : 'text-slate-400 hover:bg-navy-800 hover:text-white'}`}
                 >
                   <p className="font-medium text-sm truncate">{note.title}</p>
-                  <p className="text-xs text-slate-500 truncate mt-0.5">{new Date(note.updatedAt).toLocaleDateString()}</p>
+                  <p className="text-xs text-slate-400 truncate mt-0.5">{new Date(note.updatedAt).toLocaleDateString()}</p>
                 </button>
               ))}
               {filteredNotes.length === 0 && (
-                <p className="text-center text-slate-500 text-sm py-4">No se encontraron notas.</p>
+                <p className="text-center text-slate-400 text-sm py-4">No se encontraron notas.</p>
               )}
             </div>
           </div>
@@ -159,7 +159,7 @@ export default function AetherVault() {
                       ))}
                     </div>
                   ) : (
-                    <p className="text-sm text-slate-500">Ninguna otra nota enlaza hacia aquí todavía.</p>
+                    <p className="text-sm text-slate-400">Ninguna otra nota enlaza hacia aquí todavía.</p>
                   )}
                   
                   <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mt-8 mb-4">Metadatos</h3>
@@ -214,7 +214,7 @@ export default function AetherVault() {
                  <h4 className="text-sm font-semibold text-white mb-2">Red de Conocimiento</h4>
                  <p className="text-xs text-slate-400">Total de Nodos: {graphData.nodes.length}</p>
                  <p className="text-xs text-slate-400">Conexiones: {graphData.links.length}</p>
-                 <p className="text-[10px] text-slate-500 mt-3 italic">Tip: Haz click en un nodo para viajar térmicamente a esa nota.</p>
+                 <p className="text-[10px] text-slate-400 mt-3 italic">Tip: Haz click en un nodo para viajar térmicamente a esa nota.</p>
               </div>
             </div>
           )}

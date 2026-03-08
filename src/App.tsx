@@ -1,46 +1,42 @@
-import { useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { Menu } from 'lucide-react';
+import { ErrorBoundary } from './components/ErrorBoundary';
+import { safeParseJSON } from './utils/safeStorage';
+import LoadingSpinner from './components/LoadingSpinner';
 import Sidebar from './components/Sidebar';
-import Dashboard from './pages/Dashboard';
-import Materias from './pages/Materias';
-import Calendario from './pages/Calendario';
-import MallaCurricular from './pages/MallaCurricular';
-import Tareas from './pages/Tareas';
-import Horarios from './pages/Horarios';
-import AetherVault from './pages/AetherVault';
-import AetherCanvas from './pages/AetherCanvas';
-import AetherChat from './pages/AetherChat';
-import NexusWorkspace from './pages/NexusWorkspace';
-import NexusDatabaseView from './pages/NexusDatabase';
-import NexusAI from './pages/NexusAI';
 import { CommandPalette } from './components/CommandPalette';
 import Pomodoro from './components/Pomodoro';
 import { AetherProvider } from './hooks/useAether';
 import { NexusProvider } from './hooks/useNexus';
 import { DEFAULT_PRESENCIALES, type PresencialEvent } from './data/lti';
 
-export type Page = 'dashboard' | 'materias' | 'calendario' | 'malla' | 'tareas' | 'horarios' | 'aether' | 'aether-canvas' | 'aether-chat' | 'nexus' | 'nexus-db' | 'nexus-ai';
+// ─── Lazy-loaded pages (code splitting) ───────────────────────
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Materias = lazy(() => import('./pages/Materias'));
+const Calendario = lazy(() => import('./pages/Calendario'));
+const MallaCurricular = lazy(() => import('./pages/MallaCurricular'));
+const Tareas = lazy(() => import('./pages/Tareas'));
+const Horarios = lazy(() => import('./pages/Horarios'));
+const AetherVault = lazy(() => import('./pages/AetherVault'));
+const AetherCanvas = lazy(() => import('./pages/AetherCanvas'));
+const AetherChat = lazy(() => import('./pages/AetherChat'));
+const NexusWorkspace = lazy(() => import('./pages/NexusWorkspace'));
+const NexusDatabaseView = lazy(() => import('./pages/NexusDatabase'));
+const NexusAI = lazy(() => import('./pages/NexusAI'));
 
 function App() {
-  const [currentPage, setCurrentPage] = useState<Page>('dashboard');
   // Presenciales editables — guardadas en localStorage
   const [presenciales, setPresenciales] = useState<PresencialEvent[]>(() => {
-    const saved = localStorage.getItem('lti_eventos_presenciales');
-    return saved ? JSON.parse(saved) : DEFAULT_PRESENCIALES;
+    return safeParseJSON<PresencialEvent[]>('lti_eventos_presenciales', DEFAULT_PRESENCIALES);
   });
   
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
-
-  const handleNavigate = (page: Page | 'OPEN_PALETTE') => {
-    if (page === 'OPEN_PALETTE') {
-      setIsCommandPaletteOpen(true);
-    } else {
-      setCurrentPage(page as Page);
-    }
-  };
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const updatePresenciales = (updated: PresencialEvent[]) => {
     setPresenciales(updated);
-    localStorage.setItem('lti_presenciales', JSON.stringify(updated));
+    localStorage.setItem('lti_eventos_presenciales', JSON.stringify(updated));
   };
 
   return (
@@ -48,33 +44,62 @@ function App() {
       <CommandPalette 
         isOpen={isCommandPaletteOpen} 
         onClose={() => setIsCommandPaletteOpen(false)} 
-        onNavigate={(page) => handleNavigate(page as Page | 'OPEN_PALETTE')} 
       />
-      <div className="flex h-screen bg-navy-900 overflow-hidden">
-        <Sidebar 
-          currentPage={currentPage} 
-          onNavigate={(page) => handleNavigate(page as Page | 'OPEN_PALETTE')} 
-          presenciales={presenciales}
-          onUpdatePresenciales={updatePresenciales}
-      />
-      <main className="flex-1 overflow-y-auto overflow-x-hidden">
-        {currentPage === 'dashboard' && (
-          <Dashboard presenciales={presenciales} onUpdatePresenciales={updatePresenciales} />
+      <div className="flex flex-col md:flex-row h-screen bg-navy-900 overflow-hidden relative">
+        {/* Mobile Top Bar */}
+        <div className="md:hidden flex items-center justify-between bg-navy-950/80 backdrop-blur-md p-4 border-b border-white/5 shrink-0 relative z-20">
+          <div className="flex items-center gap-2">
+            <img src="/logo.jpg" alt="Logo" className="h-6" style={{ mixBlendMode: 'lighten' }} />
+            <span className="text-white font-bold text-sm">Carrera LTI</span>
+          </div>
+          <button onClick={() => setIsSidebarOpen(true)} className="text-white p-1 bg-navy-800 rounded-md" aria-label="Abrir menú de navegación">
+            <Menu size={20} />
+          </button>
+        </div>
+
+        {/* Overlay para móvil */}
+        {isSidebarOpen && (
+          <div 
+            className="fixed inset-0 bg-black/60 z-40 md:hidden backdrop-blur-sm" 
+            onClick={() => setIsSidebarOpen(false)}
+          />
         )}
-        {currentPage === 'materias' && <Materias />}
-        {currentPage === 'calendario' && (
-          <Calendario presenciales={presenciales} onUpdatePresenciales={updatePresenciales} />
-        )}
-        {currentPage === 'malla' && <MallaCurricular />}
-        {currentPage === 'tareas' && <Tareas />}
-        {currentPage === 'horarios' && <Horarios />}
-        {currentPage === 'aether' && <AetherVault />}
-        {currentPage === 'aether-canvas' && <AetherCanvas />}
-        {currentPage === 'aether-chat' && <AetherChat />}
-        {currentPage === 'nexus' && <NexusWorkspace />}
-        {currentPage === 'nexus-db' && <NexusDatabaseView />}
-        {currentPage === 'nexus-ai' && <NexusAI />}
-      </main>
+
+        {/* Contenedor del Sidebar */}
+        <div className={`
+          absolute inset-y-0 left-0 z-50 transform transition-transform duration-300 ease-in-out
+          md:relative md:translate-x-0
+          ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+        `}>
+          <Sidebar 
+            presenciales={presenciales}
+            onUpdatePresenciales={updatePresenciales}
+            onCloseMobile={() => setIsSidebarOpen(false)}
+          />
+        </div>
+
+        <main className="flex-1 overflow-y-auto overflow-x-hidden relative">
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSpinner />}>
+              <Routes>
+                <Route path="/" element={<Dashboard presenciales={presenciales} onUpdatePresenciales={updatePresenciales} />} />
+                <Route path="/materias" element={<Materias />} />
+                <Route path="/calendario" element={<Calendario presenciales={presenciales} onUpdatePresenciales={updatePresenciales} />} />
+                <Route path="/malla" element={<MallaCurricular />} />
+                <Route path="/tareas" element={<Tareas />} />
+                <Route path="/horarios" element={<Horarios />} />
+                <Route path="/aether" element={<AetherVault />} />
+                <Route path="/aether/canvas" element={<AetherCanvas />} />
+                <Route path="/aether/chat" element={<AetherChat />} />
+                <Route path="/nexus" element={<NexusWorkspace />} />
+                <Route path="/nexus/db" element={<NexusDatabaseView />} />
+                <Route path="/nexus/ai" element={<NexusAI />} />
+                {/* Catch-all: redirect to dashboard */}
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </Suspense>
+          </ErrorBoundary>
+        </main>
         <Pomodoro />
       </div>
     </GlobalContextWrapper>

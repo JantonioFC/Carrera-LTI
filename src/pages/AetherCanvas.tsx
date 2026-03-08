@@ -64,7 +64,7 @@ export default function AetherCanvas() {
             <Maximize size={18} className="text-lti-coral" />
             Canvas Espacial
           </h1>
-          <span className="text-xs text-slate-500">Mueve libremente tus notas cerebrales</span>
+          <span className="text-xs text-slate-400">Mueve libremente tus notas cerebrales</span>
         </div>
       </div>
 

@@ -48,7 +48,7 @@ export default function NexusDatabaseView() {
     });
   };
 
-  const updateRowData = async (rowId: string, fieldId: string, value: any) => {
+  const updateRowData = async (rowId: string, fieldId: string, value: unknown) => {
     const row = await db.rows.get(rowId);
     if (row) {
       row.data[fieldId] = value;
@@ -99,7 +99,7 @@ export default function NexusDatabaseView() {
             </button>
           ))}
           {allDatabases.length === 0 && (
-             <p className="text-xs text-slate-500 text-center py-4">No hay tablas todavía.</p>
+             <p className="text-xs text-slate-400 text-center py-4">No hay tablas todavía.</p>
           )}
         </div>
       </div>
@@ -175,7 +175,7 @@ export default function NexusDatabaseView() {
                                 />
                               )}
                               {field.type !== 'text' && field.type !== 'number' && (
-                                <span className="text-sm text-slate-500 italic">No impl.</span>
+                                <span className="text-sm text-slate-400 italic">No impl.</span>
                               )}
                             </div>
                          ))}
@@ -196,7 +196,7 @@ export default function NexusDatabaseView() {
              </div>
           </div>
         ) : (
-          <div className="h-full flex flex-col items-center justify-center text-slate-500">
+          <div className="h-full flex flex-col items-center justify-center text-slate-400">
              <Database size={48} className="mb-4 text-slate-700" />
              <p>Crea o selecciona una Base de Datos para iniciar conectando tu información.</p>
           </div>

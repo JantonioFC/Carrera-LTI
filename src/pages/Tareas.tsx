@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Plus, X, GripVertical, Calendar, Flag, CheckCircle2, Circle } from 'lucide-react';
 import { CURRICULUM } from '../data/lti';
+import { safeParseJSON } from '../utils/safeStorage';
 
 type KanbanStatus = 'todo' | 'inProgress' | 'done';
 type Priority = 'alta' | 'media' | 'baja';
@@ -116,8 +117,7 @@ function AddTaskModal({ onAdd, onClose }: { onAdd: (t: Omit<Task, 'id'>) => void
 
 export default function Tareas() {
   const [tasks, setTasks] = useState<Task[]>(() => {
-    const saved = localStorage.getItem('lti_tasks');
-    return saved ? JSON.parse(saved) : INITIAL_TASKS;
+    return safeParseJSON<Task[]>('lti_tasks', INITIAL_TASKS);
   });
   const [showAdd, setShowAdd] = useState(false);
 
@@ -236,7 +236,7 @@ export default function Tareas() {
                         </span>
                       </div>
                       {task.dueDate && (
-                        <p className={`text-xs ml-5 flex items-center gap-1 ${new Date(task.dueDate).getTime() < Date.now() && task.status !== 'done' ? 'text-red-400 font-bold' : 'text-slate-500'}`}>
+                        <p className={`text-xs ml-5 flex items-center gap-1 ${new Date(task.dueDate).getTime() < Date.now() && task.status !== 'done' ? 'text-red-400 font-bold' : 'text-slate-400'}`}>
                           <Calendar size={10} />
                           {new Date(task.dueDate + 'T12:00:00').toLocaleDateString('es-UY', { day: 'numeric', month: 'short' })}
                         </p>
@@ -246,7 +246,7 @@ export default function Tareas() {
                       <div className="ml-5 space-y-1.5 pt-1">
                         {task.subtasks.map((st) => (
                           <div key={st.id} className="flex items-start gap-2 group/st">
-                            <button onClick={() => toggleSubtask(task.id, st.id)} className="mt-0.5 text-slate-500 hover:text-lti-blue transition-colors">
+                            <button onClick={() => toggleSubtask(task.id, st.id)} className="mt-0.5 text-slate-400 hover:text-lti-blue transition-colors">
                               {st.completed ? <CheckCircle2 size={12} className="text-lti-blue" /> : <Circle size={12} />}
                             </button>
                             <span className={`text-xs flex-1 ${st.completed ? 'text-slate-600 line-through' : 'text-slate-300'}`}>
@@ -271,7 +271,7 @@ export default function Tareas() {
                       <div className="flex gap-1 ml-5">
                         {COLUMNS.filter((c) => c.id !== col.id).map((c) => (
                           <button key={c.id} onClick={() => moveTask(task.id, c.id)}
-                            className="text-[10px] text-slate-500 hover:text-white px-2 py-0.5 rounded bg-navy-800 hover:bg-navy-700 transition-colors">
+                            className="text-[10px] text-slate-400 hover:text-white px-2 py-0.5 rounded bg-navy-800 hover:bg-navy-700 transition-colors">
                             → {c.label}
                           </button>
                         ))}

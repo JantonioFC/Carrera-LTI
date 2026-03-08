@@ -1,63 +1,71 @@
 import {
-  LayoutDashboard, BookMarked, Calendar, Map, CheckSquare, Cloud, CloudOff, RefreshCw, LayoutTemplate, BrainCircuit, Maximize, BotMessageSquare, Database, Sparkles
+  LayoutDashboard, BookMarked, Calendar, Map, CheckSquare, Cloud, CloudOff, RefreshCw, LayoutTemplate, BrainCircuit, Maximize, BotMessageSquare, Database, Sparkles, X
 } from 'lucide-react';
-import type { Page } from '../App';
+import { NavLink } from 'react-router-dom';
 import { useCloudSync } from '../hooks/useCloudSync';
 import type { PresencialEvent } from '../data/lti';
 
 interface SidebarProps {
-  currentPage: Page;
-  onNavigate: (page: Page) => void;
   presenciales: PresencialEvent[];
   onUpdatePresenciales: (events: PresencialEvent[]) => void;
+  onCloseMobile?: () => void;
 }
 
-const navItems: { id: Page; label: string; icon: React.ReactNode }[] = [
-  { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
-  { id: 'materias', label: 'U.C.', icon: <BookMarked size={20} /> },
-  { id: 'calendario', label: 'Calendario', icon: <Calendar size={20} /> },
-  { id: 'malla', label: 'Malla Curricular', icon: <Map size={20} /> },
-  { id: 'tareas', label: 'Tareas', icon: <CheckSquare size={20} /> },
-  { id: 'horarios', label: 'Horarios', icon: <LayoutTemplate size={20} /> },
-  { id: 'aether', label: 'Aether (Segundo Cerebro)', icon: <BrainCircuit size={20} className="text-lti-coral" /> },
-  { id: 'aether-canvas', label: 'Canvas Espacial', icon: <Maximize size={20} className="text-lti-blue" /> },
-  { id: 'aether-chat', label: 'Asistente Aether', icon: <BotMessageSquare size={20} className="text-purple-400" /> },
-  { id: 'nexus', label: 'Nexus Editor (Bloques)', icon: <Database size={20} className="text-emerald-400" /> },
-  { id: 'nexus-db', label: 'Nexus Tables (DB)', icon: <LayoutTemplate size={20} className="text-emerald-500" /> },
-  { id: 'nexus-ai', label: 'Nexus AI', icon: <Sparkles size={20} className="text-purple-400" /> },
+const navItems: { path: string; label: string; icon: React.ReactNode }[] = [
+  { path: '/', label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
+  { path: '/materias', label: 'U.C.', icon: <BookMarked size={20} /> },
+  { path: '/calendario', label: 'Calendario', icon: <Calendar size={20} /> },
+  { path: '/malla', label: 'Malla Curricular', icon: <Map size={20} /> },
+  { path: '/tareas', label: 'Tareas', icon: <CheckSquare size={20} /> },
+  { path: '/horarios', label: 'Horarios', icon: <LayoutTemplate size={20} /> },
+  { path: '/aether', label: 'Aether (Segundo Cerebro)', icon: <BrainCircuit size={20} className="text-lti-coral" /> },
+  { path: '/aether/canvas', label: 'Canvas Espacial', icon: <Maximize size={20} className="text-lti-blue" /> },
+  { path: '/aether/chat', label: 'Asistente Aether', icon: <BotMessageSquare size={20} className="text-purple-400" /> },
+  { path: '/nexus', label: 'Nexus Editor (Bloques)', icon: <Database size={20} className="text-emerald-400" /> },
+  { path: '/nexus/db', label: 'Nexus Tables (DB)', icon: <LayoutTemplate size={20} className="text-emerald-500" /> },
+  { path: '/nexus/ai', label: 'Nexus AI', icon: <Sparkles size={20} className="text-purple-400" /> },
 ];
 
-export default function Sidebar({ currentPage, onNavigate, presenciales, onUpdatePresenciales }: SidebarProps) {
+export default function Sidebar({ presenciales, onUpdatePresenciales, onCloseMobile }: SidebarProps) {
   const { syncNow, restoreFromCloud, syncStatus, isConfigured } = useCloudSync(presenciales, onUpdatePresenciales);
 
   return (
-    <aside className="w-56 flex-shrink-0 bg-navy-950 border-r border-navy-700/50 flex flex-col">
+    <aside className="w-64 md:w-56 h-full bg-navy-950/80 backdrop-blur-xl border-r border-white/5 flex flex-col shadow-2xl md:shadow-none">
       {/* Logo */}
-      <div className="p-5 border-b border-navy-700/50 flex items-center justify-center">
+      <div className="p-5 border-b border-navy-700/50 flex items-center justify-between">
         <img 
           src="/logo.jpg" 
           alt="URU/IA.LABS Marca" 
-          className="w-full max-w-[160px] h-auto object-contain"
+          className="max-w-[140px] h-auto object-contain"
           style={{ mixBlendMode: 'lighten' }}
         />
+        {onCloseMobile && (
+          <button onClick={onCloseMobile} className="md:hidden text-slate-400 hover:text-white p-1" aria-label="Cerrar menú de navegación">
+            <X size={20} />
+          </button>
+        )}
       </div>
 
       {/* Nav */}
       <nav className="flex-1 p-3 space-y-1">
-        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider px-3 py-2">
+        <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider px-3 py-2">
           Navegación
         </p>
         {navItems.map((item) => (
-          <button
-            key={item.id}
-            onClick={() => onNavigate(item.id)}
-            className={`w-full sidebar-item text-left text-sm font-medium ${
-              currentPage === item.id ? 'sidebar-item-active text-white' : ''
-            }`}
+          <NavLink
+            key={item.path}
+            to={item.path}
+            end={item.path === '/'}
+            onClick={() => onCloseMobile?.()}
+            className={({ isActive }) =>
+              `w-full sidebar-item text-left text-sm font-medium flex items-center gap-2 ${
+                isActive ? 'sidebar-item-active text-white' : ''
+              }`
+            }
           >
             {item.icon}
             <span>{item.label}</span>
-          </button>
+          </NavLink>
         ))}
       </nav>
 
@@ -85,7 +93,7 @@ export default function Sidebar({ currentPage, onNavigate, presenciales, onUpdat
             </button>
           </div>
         ) : (
-          <div className="flex items-center gap-2 text-xs text-slate-500 justify-center">
+          <div className="flex items-center gap-2 text-xs text-slate-400 justify-center">
             <CloudOff size={14} />
             <span>Nube Desactivada</span>
           </div>
@@ -100,7 +108,7 @@ export default function Sidebar({ currentPage, onNavigate, presenciales, onUpdat
       {/* Footer */}
       <div className="p-3 border-t border-navy-700/50">
         <div className="px-3 py-2">
-          <p className="text-xs text-slate-500">Generación 2026</p>
+          <p className="text-xs text-slate-400">Generación 2026</p>
           <p className="text-xs text-slate-600">Plan 2024 — Res. 127-24</p>
         </div>
       </div>

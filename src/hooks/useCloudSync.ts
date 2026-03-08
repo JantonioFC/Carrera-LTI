@@ -64,15 +64,21 @@ export function useCloudSync(
       return; 
     }
 
-    setSyncStatus('syncing');
-    const success = await syncDataToCloud(userId, appData);
-    
-    if (success) {
-      localStorage.removeItem('lti_sync_queue');
-      setSyncStatus('success');
-      setTimeout(() => setSyncStatus('idle'), 3000);
-    } else {
-      // Fallback
+    try {
+      setSyncStatus('syncing');
+      const success = await syncDataToCloud(userId, appData);
+      
+      if (success) {
+        localStorage.removeItem('lti_sync_queue');
+        setSyncStatus('success');
+        setTimeout(() => setSyncStatus('idle'), 3000);
+      } else {
+        // Fallback
+        localStorage.setItem('lti_sync_queue', JSON.stringify(appData));
+        setSyncStatus('error');
+      }
+    } catch (error) {
+      console.error('Error syncing to cloud:', error);
       localStorage.setItem('lti_sync_queue', JSON.stringify(appData));
       setSyncStatus('error');
     }
@@ -83,23 +89,28 @@ export function useCloudSync(
     if (!userId) return;
     setSyncStatus('syncing');
     
-    const remoteData = await getDataFromCloud(userId);
-    if (remoteData) {
-      // Restore subjects
-      if (remoteData.subjectData) {
-        Object.entries(remoteData.subjectData).forEach(([id, data]) => {
-          updateSubject(id, data as Partial<SubjectData>);
-        });
+    try {
+      const remoteData = await getDataFromCloud(userId);
+      if (remoteData) {
+        // Restore subjects
+        if (remoteData.subjectData) {
+          Object.entries(remoteData.subjectData).forEach(([id, data]) => {
+            updateSubject(id, data as Partial<SubjectData>);
+          });
+        }
+        
+        // Restore presenciales
+        if (remoteData.presenciales) {
+          setPresenciales(remoteData.presenciales);
+        }
+        
+        setSyncStatus('success');
+        setTimeout(() => setSyncStatus('idle'), 3000);
+      } else {
+        setSyncStatus('error');
       }
-      
-      // Restore presenciales
-      if (remoteData.presenciales) {
-        setPresenciales(remoteData.presenciales);
-      }
-      
-      setSyncStatus('success');
-      setTimeout(() => setSyncStatus('idle'), 3000);
-    } else {
+    } catch (error) {
+      console.error('Error restoring from cloud:', error);
       setSyncStatus('error');
     }
   };

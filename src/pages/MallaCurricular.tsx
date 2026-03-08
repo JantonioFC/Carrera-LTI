@@ -5,7 +5,7 @@ import { useSubjectData } from '../hooks/useSubjectData';
 const STATUS_STYLES = {
   en_curso: 'bg-lti-blue/10 text-lti-blue border-lti-blue/30',
   aprobada: 'bg-green-500/10 text-green-400 border-green-500/30',
-  pendiente: 'bg-navy-700/60 text-slate-500 border-navy-600/30',
+  pendiente: 'bg-navy-700/60 text-slate-400 border-navy-600/30',
 };
 
 const STATUS_LABELS = {
@@ -68,7 +68,7 @@ export default function MallaCurricular() {
             <p className="text-xs font-semibold uppercase tracking-wider">Obtenidos</p>
           </div>
           <p className="text-3xl font-bold text-white">{creditsDone}</p>
-          <p className="text-xs text-slate-500">créditos aprobados</p>
+          <p className="text-xs text-slate-400">créditos aprobados</p>
         </div>
 
         {/* En curso */}
@@ -78,7 +78,7 @@ export default function MallaCurricular() {
             <p className="text-xs font-semibold uppercase tracking-wider">En Curso</p>
           </div>
           <p className="text-3xl font-bold text-white">{creditsActive}</p>
-          <p className="text-xs text-slate-500">créditos cursando</p>
+          <p className="text-xs text-slate-400">créditos cursando</p>
         </div>
 
         {/* Pendientes */}
@@ -88,7 +88,7 @@ export default function MallaCurricular() {
             <p className="text-xs font-semibold uppercase tracking-wider">Pendientes</p>
           </div>
           <p className="text-3xl font-bold text-white">{creditsPending}</p>
-          <p className="text-xs text-slate-500">créditos restantes</p>
+          <p className="text-xs text-slate-400">créditos restantes</p>
         </div>
       </div>
 
@@ -124,7 +124,7 @@ export default function MallaCurricular() {
                   <p className={`text-xs font-bold ${isCurrent ? 'text-white' : 'text-slate-400'}`}>
                     {sem.label}
                   </p>
-                  <p className={`text-xs ${isCurrent ? 'text-sky-100' : 'text-slate-500'}`}>
+                  <p className={`text-xs ${isCurrent ? 'text-sky-100' : 'text-slate-400'}`}>
                     {semCredits} créditos
                     {sem.number === 4 && <span className="block text-yellow-300 text-xs">★ Tecnicatura</span>}
                     {sem.number === 8 && <span className="block text-yellow-300 text-xs">★ Licenciatura</span>}
@@ -161,7 +161,7 @@ export default function MallaCurricular() {
                         <span className={`px-1.5 py-0.5 rounded-full text-xs font-semibold ${
                           subject.status === 'en_curso' ? 'bg-lti-blue text-white text-[10px]' :
                           subject.status === 'aprobada' ? 'bg-green-500 text-white text-[10px]' :
-                          'bg-navy-600 text-slate-500 text-[10px]'
+                          'bg-navy-600 text-slate-400 text-[10px]'
                         }`}>
                           {STATUS_LABELS[subject.status]}
                         </span>

@@ -8,6 +8,8 @@ import {
   useSensors,
   DragOverlay,
   defaultDropAnimationSideEffects,
+  DragStartEvent,
+  DragOverEvent
 } from '@dnd-kit/core';
 import {
   arrayMove,
@@ -17,8 +19,9 @@ import {
   useSortable
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { CURRICULUM, WEEKDAY_SHORT } from '../data/lti';
+import { CURRICULUM, WEEKDAY_SHORT, type Subject } from '../data/lti';
 import { GripVertical } from 'lucide-react';
+import { safeParseJSON } from '../utils/safeStorage';
 
 const DAYS = [1, 2, 3, 4, 5, 6]; // Lun a Sáb
 
@@ -28,7 +31,7 @@ interface ScheduleItem {
   day: number | null; // null means in the "bank"
 }
 
-function SortableItem({ id, subject }: { id: string, subject: any }) {
+function SortableItem({ id, subject }: { id: string, subject: Subject | undefined }) {
   const {
     attributes,
     listeners,
@@ -50,7 +53,7 @@ function SortableItem({ id, subject }: { id: string, subject: any }) {
       style={style}
       className="bg-navy-900/60 border border-navy-700/50 rounded-lg p-2 flex items-center gap-2 mb-2 group touch-none"
     >
-      <div {...attributes} {...listeners} className="cursor-grab p-1 text-slate-500 hover:text-white transition-colors">
+      <div {...attributes} {...listeners} className="cursor-grab p-1 text-slate-400 hover:text-white transition-colors">
         <GripVertical size={14} />
       </div>
       <div className="flex-1 min-w-0">
@@ -65,7 +68,7 @@ function SortableItem({ id, subject }: { id: string, subject: any }) {
   );
 }
 
-function DroppableColumn({ day, items, allSubjects }: { day: number | null, items: ScheduleItem[], allSubjects: any[] }) {
+function DroppableColumn({ day, items, allSubjects }: { day: number | null, items: ScheduleItem[], allSubjects: Subject[] }) {
   const { setNodeRef } = useSortable({
     id: `col-${day}`,
     data: {
@@ -94,10 +97,9 @@ function DroppableColumn({ day, items, allSubjects }: { day: number | null, item
 export default function Horarios() {
   const sem1 = CURRICULUM[0].subjects; // Mocking current semester
   const [items, setItems] = useState<ScheduleItem[]>(() => {
-    const saved = localStorage.getItem('lti_schedule');
-    if (saved) return JSON.parse(saved);
-    // Initialize bank with 1 block per subject
-    return sem1.map(s => ({ id: `blk-${s.id}`, subjectId: s.id, day: null }));
+    return safeParseJSON<ScheduleItem[]>('lti_schedule',
+      sem1.map(s => ({ id: `blk-${s.id}`, subjectId: s.id, day: null }))
+    );
   });
   
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -113,11 +115,11 @@ export default function Horarios() {
     })
   );
 
-  const handleDragStart = (event: any) => {
-    setActiveId(event.active.id);
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveId(String(event.active.id));
   };
 
-  const handleDragOver = (event: any) => {
+  const handleDragOver = (event: DragOverEvent) => {
     const { active, over } = event;
     if (!over) return;
 
@@ -150,8 +152,8 @@ export default function Horarios() {
       }
 
       if (isOverColumn) {
-        if (activeItem.day !== over.data.current.day) {
-          activeItem.day = over.data.current.day;
+        if (activeItem.day !== over.data.current?.day) {
+          activeItem.day = over.data.current?.day;
           let newItems = [...prevItems];
           newItems[activeIndex] = activeItem;
           return arrayMove(newItems, activeIndex, prevItems.length - 1);

@@ -60,7 +60,7 @@ export default function NexusWorkspace() {
 
         <div className="p-3">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={14} />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
             <input 
               type="text" 
               placeholder="Buscar..." 
@@ -72,7 +72,7 @@ export default function NexusWorkspace() {
         </div>
 
         <div className="flex-1 overflow-y-auto p-2">
-          <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 px-2 flex items-center gap-1">
+          <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 px-2 flex items-center gap-1">
             <FileText size={12} /> Espacio Privado
           </div>
           <div className="space-y-0.5">
@@ -82,7 +82,7 @@ export default function NexusWorkspace() {
                 onClick={() => setActiveDocId(doc.id)}
                 className={`w-full text-left px-2 py-1.5 rounded-md text-sm transition-colors flex items-center gap-2 ${activeDocId === doc.id ? 'bg-navy-800 text-white font-medium' : 'text-slate-400 hover:bg-navy-800/50 hover:text-white'}`}
               >
-                <FileText size={14} className={activeDocId === doc.id ? 'text-lti-blue' : 'text-slate-500'} />
+                <FileText size={14} className={activeDocId === doc.id ? 'text-lti-blue' : 'text-slate-400'} />
                 <span className="truncate">{doc.title}</span>
               </button>
             ))}
@@ -90,7 +90,7 @@ export default function NexusWorkspace() {
         </div>
         
         <div className="p-4 border-t border-navy-700/50">
-           <div className="flex items-center gap-2 text-xs text-slate-500">
+           <div className="flex items-center gap-2 text-xs text-slate-400">
                <Clock size={14} />
                <span>Sincronizado vía Local CRDT</span>
            </div>
@@ -118,7 +118,7 @@ export default function NexusWorkspace() {
             />
           </div>
         ) : (
-          <div className="h-full flex items-center justify-center text-slate-500">
+          <div className="h-full flex items-center justify-center text-slate-400">
             Selecciona o crea un documento para comenzar a editar.
           </div>
         )}

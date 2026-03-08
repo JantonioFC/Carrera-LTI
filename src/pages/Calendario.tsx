@@ -140,7 +140,7 @@ export default function Calendario({ presenciales, onUpdatePresenciales }: Calen
           {/* Day headers */}
           <div className="grid grid-cols-7 mb-2">
             {DAYS_SHORT.map((d) => (
-              <div key={d} className="text-center text-xs font-semibold text-slate-500 py-1">{d}</div>
+              <div key={d} className="text-center text-xs font-semibold text-slate-400 py-1">{d}</div>
             ))}
           </div>
           {/* Cells */}
@@ -167,7 +167,7 @@ export default function Calendario({ presenciales, onUpdatePresenciales }: Calen
                       </div>
                     ))}
                     {events.length > 2 && (
-                      <p className="text-[9px] text-slate-500">+{events.length - 2}</p>
+                      <p className="text-[9px] text-slate-400">+{events.length - 2}</p>
                     )}
                   </div>
                 </div>
@@ -204,10 +204,10 @@ export default function Calendario({ presenciales, onUpdatePresenciales }: Calen
                   past ? 'border-navy-700/20 opacity-50' : 'border-navy-700/40 hover:border-lti-orange/30 transition-colors'
                 }`}>
                   <div className="flex items-start justify-between gap-2">
-                    <p className={`font-semibold ${past ? 'text-slate-500' : 'text-white'}`}>
+                    <p className={`font-semibold ${past ? 'text-slate-400' : 'text-white'}`}>
                       {formatDate(p.date)}
                     </p>
-                    <button onClick={() => setEditingEvent(p)} className="text-slate-500 hover:text-lti-blue transition-colors flex-shrink-0">
+                    <button onClick={() => setEditingEvent(p)} className="text-slate-400 hover:text-lti-blue transition-colors flex-shrink-0">
                       <Pencil size={12} />
                     </button>
                   </div>
@@ -217,7 +217,7 @@ export default function Calendario({ presenciales, onUpdatePresenciales }: Calen
                       <AlertCircle size={10} /> Eval. final
                     </span>
                   )}
-                  {!past && <p className="text-slate-500">En {days} días</p>}
+                  {!past && <p className="text-slate-400">En {days} días</p>}
                 </div>
               );
             })}

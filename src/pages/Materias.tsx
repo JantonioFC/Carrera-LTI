@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { CURRICULUM, formatDateShort, type Subject } from '../data/lti';
 import { useSubjectData, type SubjectData, type SubjectResource } from '../hooks/useSubjectData';
 import { Pencil, Trash2, Plus, Link as LinkIcon } from 'lucide-react';
@@ -8,12 +8,13 @@ export default function Materias() {
   const { data, updateSubject } = useSubjectData();
   const [editingSubject, setEditingSubject] = useState<Subject | null>(null);
 
-  // Mezclar currículum estático con el estado global local
-  const subjectsWithData = sem1.subjects.map(s => ({
+  // Mezclar currículum estático con el estado global local y memoizar
+  const subjectsWithData = useMemo(() => sem1.subjects.map(s => ({
     ...s,
     status: data[s.id]?.status || s.status
-  }));
-  const totalCredits = subjectsWithData.reduce((a, s) => a + s.credits, 0);
+  })), [sem1.subjects, data]);
+
+  const totalCredits = useMemo(() => subjectsWithData.reduce((a, s) => a + s.credits, 0), [subjectsWithData]);
 
   return (
     <>
@@ -45,7 +46,7 @@ export default function Materias() {
                 <h3 className="text-white font-semibold text-sm leading-tight">
                   {subject.name}
                 </h3>
-                <p className="text-xs text-slate-500 mt-0.5">{subject.area}</p>
+                <p className="text-xs text-slate-400 mt-0.5">{subject.area}</p>
               </div>
               <div
                 className="px-2 py-0.5 rounded-full text-xs font-bold flex-shrink-0"
@@ -218,7 +219,7 @@ function EditSubjectModal({
             {/* List */}
             <div className="space-y-2 mb-4">
               {resources.length === 0 ? (
-                <p className="text-xs text-slate-500 italic">No hay recursos agregados.</p>
+                <p className="text-xs text-slate-400 italic">No hay recursos agregados.</p>
               ) : (
                 resources.map(res => (
                   <div key={res.id} className="flex items-center gap-2 p-2 rounded-lg bg-navy-900 border border-navy-600/50">
@@ -226,7 +227,7 @@ function EditSubjectModal({
                     <a href={res.url} target="_blank" rel="noreferrer" className="text-sm text-slate-300 hover:text-white truncate flex-1 hover:underline">
                       {res.name}
                     </a>
-                    <button onClick={() => handleRemoveResource(res.id)} className="p-1.5 text-slate-500 hover:text-red-400 hover:bg-red-400/10 rounded-md transition-colors">
+                    <button onClick={() => handleRemoveResource(res.id)} className="p-1.5 text-slate-400 hover:text-red-400 hover:bg-red-400/10 rounded-md transition-colors">
                       <Trash2 size={14} />
                     </button>
                   </div>

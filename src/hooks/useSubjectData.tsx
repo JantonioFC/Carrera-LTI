@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { SubjectStatus } from '../data/lti';
+import { safeParseJSON } from '../utils/safeStorage';
 
 export interface SubjectResource {
   id: string;
@@ -27,8 +28,7 @@ const SubjectDataContext = createContext<SubjectDataContextType | undefined>(und
 
 export function SubjectDataProvider({ children }: { children: React.ReactNode }) {
   const [data, setData] = useState<SubjectDataMap>(() => {
-    const saved = localStorage.getItem('lti_subject_data');
-    return saved ? JSON.parse(saved) : {};
+    return safeParseJSON<SubjectDataMap>('lti_subject_data', {});
   });
 
   useEffect(() => {

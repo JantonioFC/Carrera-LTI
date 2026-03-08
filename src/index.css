@@ -42,7 +42,7 @@
 
 @layer utilities {
   .card {
-    @apply bg-navy-800 rounded-xl border border-navy-700/50 shadow-lg;
+    @apply bg-navy-800/60 backdrop-blur-md rounded-xl border border-white/5 shadow-xl;
   }
 
   .card-hover {

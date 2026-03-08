@@ -3,7 +3,9 @@ import { useAether } from '../hooks/useAether';
 import { useNexus } from '../hooks/useNexus';
 import { useNexusDB } from '../hooks/useNexusDB';
 import { GoogleGenAI } from '@google/genai';
+import { generateContentWithRetry, truncateContext } from '../utils/aiUtils';
 import { Send, Bot, User, Trash2, Key, Sparkles, Database, FileText, Shield } from 'lucide-react';
+import { safeParseJSON } from '../utils/safeStorage';
 
 interface NexusMessage {
   role: 'user' | 'model';
@@ -11,22 +13,19 @@ interface NexusMessage {
 }
 
 export default function NexusAI() {
-  const { notes } = useAether();
+  const { notes, geminiApiKey: apiKey, setGeminiApiKey } = useAether();
   const { documents } = useNexus();
   const { allDatabases } = useNexusDB();
 
-  const [apiKey, setApiKey] = useState(() => localStorage.getItem('lti_gemini_api_key') || '');
   const [messages, setMessages] = useState<NexusMessage[]>(() => {
-    const saved = localStorage.getItem('lti_nexus_ai_history');
-    return saved ? JSON.parse(saved) : [];
+    return safeParseJSON<NexusMessage[]>('lti_nexus_ai_history', []);
   });
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [showKeyInput, setShowKeyInput] = useState(!apiKey);
 
   const saveKey = (key: string) => {
-    setApiKey(key);
-    localStorage.setItem('lti_gemini_api_key', key);
+    setGeminiApiKey(key);
     setShowKeyInput(false);
   };
 
@@ -64,7 +63,7 @@ Sé conciso pero completo. Usa formato Markdown cuando sea útil.\n\n`;
       context += '\n';
     }
 
-    return context;
+    return truncateContext(context, 40000); // 40k chars limit
   }, [notes, documents, allDatabases]);
 
   const sendMessage = async () => {
@@ -80,11 +79,12 @@ Sé conciso pero completo. Usa formato Markdown cuando sea útil.\n\n`;
       const ai = new GoogleGenAI({ apiKey });
       const systemContext = buildSystemContext();
       
-      const response = await ai.models.generateContent({
+      const response = await generateContentWithRetry(ai, {
         model: 'gemini-2.5-flash',
         contents: [
           { role: 'user', parts: [{ text: systemContext }] },
-          ...updatedMessages.map(m => ({
+          // Limit chat history to last 10 messages for token usage optimization
+          ...updatedMessages.slice(-10).map(m => ({
             role: m.role as 'user' | 'model',
             parts: [{ text: m.content }]
           }))
@@ -151,10 +151,10 @@ Sé conciso pero completo. Usa formato Markdown cuando sea útil.\n\n`;
           <Key size={16} className="text-yellow-400 shrink-0" />
           <input 
             type="password"
-            placeholder="Ingresa tu clave de Google AI Studio..."
+            placeholder="Ingresa tu clave de Google AI Studio (se borra al cerrar el navegador)..."
             className="flex-1 bg-navy-800 border border-navy-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-purple-500 transition-colors"
             value={apiKey}
-            onChange={(e) => setApiKey(e.target.value)}
+            onChange={(e) => setGeminiApiKey(e.target.value)}
           />
           <button onClick={() => saveKey(apiKey)} className="px-4 py-2 bg-purple-600 hover:bg-purple-500 rounded-lg text-sm font-medium transition-colors">
             Guardar

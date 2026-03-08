@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useAether } from '../hooks/useAether';
 import { GoogleGenAI } from '@google/genai';
+import { generateContentWithRetry, truncateContext } from '../utils/aiUtils';
 import { Key, Send, Bot, User, Trash2, Brain } from 'lucide-react';
 import MDEditor from '@uiw/react-md-editor';
 
@@ -40,7 +41,8 @@ export default function AetherChat() {
       const ai = new GoogleGenAI({ apiKey: geminiApiKey });
 
       // Build context from notes (Simplified local RAG)
-      const contextText = notes.map(n => `Nota: ${n.title}\nContenido:\n${n.content}\n---`).join('\n\n');
+      const maxContextLength = 30000;
+      const contextText = truncateContext(notes.map(n => `Nota: ${n.title}\nContenido:\n${n.content}\n---`).join('\n\n'), maxContextLength);
       
       const systemInstruction = `Eres Aether, un asistente de IA de "Segundo Cerebro". 
 Tu objetivo es ayudar al usuario a recordar, conectar y generar ideas basadas EXCLUSIVAMENTE en sus propias notas (a menos que pida conocimiento general explícitamente).
@@ -49,8 +51,8 @@ Responde en formato Markdown. Sé conciso y referencía los nombres de las notas
 Aquí están las notas actuales del usuario en su bóveda:
 ${contextText}`;
 
-      // Call Gemini API (gemini-2.5-flash is fast and usually default or gemini-2.0-flash)
-      const response = await ai.models.generateContent({
+      // Call Gemini API 
+      const response = await generateContentWithRetry(ai, {
         model: 'gemini-2.5-flash',
         contents: userText,
         config: {
@@ -110,7 +112,7 @@ ${contextText}`;
               Guardar y Conectar
             </button>
           </form>
-          <p className="mt-4 text-xs text-slate-500 text-center">
+          <p className="mt-4 text-xs text-slate-400 text-center">
             Puedes obtener una clave gratuita en <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noreferrer" className="text-lti-blue hover:underline">Google AI Studio</a>.
           </p>
         </div>
