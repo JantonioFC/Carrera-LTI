@@ -1,209 +1,205 @@
 {
-  "main": {
-    "id": "5f172e0dddb2db74",
-    "type": "split",
-    "children": [
-      {
-        "id": "7265ff970668e2cc",
-        "type": "tabs",
-        "children": [
-          {
-            "id": "431a1e07b8324c55",
-            "type": "leaf",
-            "state": {
-              "type": "kanban",
-              "state": {
-                "file": "Tareas/Tablero-Semestre.md",
-                "kanbanViewState": {
-                  "kanban-plugin": "board",
-                  "list-collapse": [
-                    false,
-                    false,
-                    false
-                  ]
-                }
-              },
-              "icon": "lucide-trello",
-              "title": "Tablero-Semestre"
-            }
-          }
-        ]
-      }
-    ],
-    "direction": "vertical"
-  },
-  "left": {
-    "id": "8187a282e2785fbc",
-    "type": "split",
-    "children": [
-      {
-        "id": "a32d734d9bffe8ed",
-        "type": "tabs",
-        "children": [
-          {
-            "id": "9aebb5f0c8fb9b95",
-            "type": "leaf",
-            "state": {
-              "type": "file-explorer",
-              "state": {
-                "sortOrder": "alphabetical",
-                "autoReveal": false
-              },
-              "icon": "lucide-folder-closed",
-              "title": "Explorador de archivos"
-            }
-          },
-          {
-            "id": "3e77d026a0db2737",
-            "type": "leaf",
-            "state": {
-              "type": "search",
-              "state": {
-                "query": "",
-                "matchingCase": false,
-                "explainSearch": false,
-                "collapseAll": false,
-                "extraContext": false,
-                "sortOrder": "alphabetical"
-              },
-              "icon": "lucide-search",
-              "title": "Buscar"
-            }
-          },
-          {
-            "id": "2a952411d579c059",
-            "type": "leaf",
-            "state": {
-              "type": "bookmarks",
-              "state": {},
-              "icon": "lucide-bookmark",
-              "title": "Marcadores"
-            }
-          }
-        ]
-      }
-    ],
-    "direction": "horizontal",
-    "width": 300
-  },
-  "right": {
-    "id": "2a8ddaa69bbfef8c",
-    "type": "split",
-    "children": [
-      {
-        "id": "339796ac92353bdb",
-        "type": "tabs",
-        "children": [
-          {
-            "id": "cb235da401e33fbd",
-            "type": "leaf",
-            "state": {
-              "type": "backlink",
-              "state": {
-                "collapseAll": false,
-                "extraContext": false,
-                "sortOrder": "alphabetical",
-                "showSearch": false,
-                "searchQuery": "",
-                "backlinkCollapsed": false,
-                "unlinkedCollapsed": true
-              },
-              "icon": "links-coming-in",
-              "title": "Enlaces entrantes"
-            }
-          },
-          {
-            "id": "91b743b379a85f72",
-            "type": "leaf",
-            "state": {
-              "type": "outgoing-link",
-              "state": {
-                "linksCollapsed": false,
-                "unlinkedCollapsed": true
-              },
-              "icon": "links-going-out",
-              "title": "Enlaces salientes"
-            }
-          },
-          {
-            "id": "de6609de1cacd301",
-            "type": "leaf",
-            "state": {
-              "type": "tag",
-              "state": {
-                "sortOrder": "frequency",
-                "useHierarchy": true,
-                "showSearch": false,
-                "searchQuery": ""
-              },
-              "icon": "lucide-tags",
-              "title": "Etiquetas"
-            }
-          },
-          {
-            "id": "36e0aa1bcfe8d127",
-            "type": "leaf",
-            "state": {
-              "type": "outline",
-              "state": {
-                "followCursor": false,
-                "showSearch": false,
-                "searchQuery": ""
-              },
-              "icon": "lucide-list",
-              "title": "Esquema"
-            }
-          },
-          {
-            "id": "89d30158ee68d639",
-            "type": "leaf",
-            "state": {
-              "type": "calendar",
-              "state": {},
-              "icon": "calendar-with-checkmark",
-              "title": "Calendar"
-            }
-          }
-        ]
-      }
-    ],
-    "direction": "horizontal",
-    "width": 300,
-    "collapsed": true
-  },
-  "left-ribbon": {
-    "hiddenItems": {
-      "switcher:Abrir selector rápido": false,
-      "graph:Abrir vista gráfica": false,
-      "canvas:Crear nuevo lienzo": false,
-      "daily-notes:Abrir la nota de hoy": false,
-      "templates:Insertar plantilla": false,
-      "command-palette:Abrir paleta de comandos": false,
-      "obsidian-kanban:Create new board": false,
-      "templater-obsidian:Templater": false,
-      "yet-another-obsidian-synchronizer:YAOS": false
-    }
-  },
-  "active": "431a1e07b8324c55",
-  "lastOpenFiles": [
-    "Tareas/Tablero-Semestre.md",
-    "Asignaturas/30-Derecho",
-    "Asignaturas/20-Filosofia",
-    "Asignaturas/10-Ingles",
-    "Preparar examen de filosofia.md",
-    "_templates/plantilla_nota_clase.md",
-    "_templates/Nuevo Documento de texto.txt",
-    "_templates/plantilla_tarea.md",
-    "_templates",
-    "Nueva carpeta",
-    "Tareas",
-    "Asignaturas",
-    "Untitled.md",
-    "02-mi-semestre/Dashboard Principal.md",
-    "02-mi-semestre/_templates/plantilla_nota_clase.md",
-    "02-mi-semestre/_templates/plantilla_tarea.md",
-    "02-mi-semestre/Sin título.md",
-    "02-mi-semestre/Tareas",
-    "02-mi-semestre/asignaturas"
-  ]
+	"main": {
+		"id": "5f172e0dddb2db74",
+		"type": "split",
+		"children": [
+			{
+				"id": "7265ff970668e2cc",
+				"type": "tabs",
+				"children": [
+					{
+						"id": "431a1e07b8324c55",
+						"type": "leaf",
+						"state": {
+							"type": "kanban",
+							"state": {
+								"file": "Tareas/Tablero-Semestre.md",
+								"kanbanViewState": {
+									"kanban-plugin": "board",
+									"list-collapse": [false, false, false]
+								}
+							},
+							"icon": "lucide-trello",
+							"title": "Tablero-Semestre"
+						}
+					}
+				]
+			}
+		],
+		"direction": "vertical"
+	},
+	"left": {
+		"id": "8187a282e2785fbc",
+		"type": "split",
+		"children": [
+			{
+				"id": "a32d734d9bffe8ed",
+				"type": "tabs",
+				"children": [
+					{
+						"id": "9aebb5f0c8fb9b95",
+						"type": "leaf",
+						"state": {
+							"type": "file-explorer",
+							"state": {
+								"sortOrder": "alphabetical",
+								"autoReveal": false
+							},
+							"icon": "lucide-folder-closed",
+							"title": "Explorador de archivos"
+						}
+					},
+					{
+						"id": "3e77d026a0db2737",
+						"type": "leaf",
+						"state": {
+							"type": "search",
+							"state": {
+								"query": "",
+								"matchingCase": false,
+								"explainSearch": false,
+								"collapseAll": false,
+								"extraContext": false,
+								"sortOrder": "alphabetical"
+							},
+							"icon": "lucide-search",
+							"title": "Buscar"
+						}
+					},
+					{
+						"id": "2a952411d579c059",
+						"type": "leaf",
+						"state": {
+							"type": "bookmarks",
+							"state": {},
+							"icon": "lucide-bookmark",
+							"title": "Marcadores"
+						}
+					}
+				]
+			}
+		],
+		"direction": "horizontal",
+		"width": 300
+	},
+	"right": {
+		"id": "2a8ddaa69bbfef8c",
+		"type": "split",
+		"children": [
+			{
+				"id": "339796ac92353bdb",
+				"type": "tabs",
+				"children": [
+					{
+						"id": "cb235da401e33fbd",
+						"type": "leaf",
+						"state": {
+							"type": "backlink",
+							"state": {
+								"collapseAll": false,
+								"extraContext": false,
+								"sortOrder": "alphabetical",
+								"showSearch": false,
+								"searchQuery": "",
+								"backlinkCollapsed": false,
+								"unlinkedCollapsed": true
+							},
+							"icon": "links-coming-in",
+							"title": "Enlaces entrantes"
+						}
+					},
+					{
+						"id": "91b743b379a85f72",
+						"type": "leaf",
+						"state": {
+							"type": "outgoing-link",
+							"state": {
+								"linksCollapsed": false,
+								"unlinkedCollapsed": true
+							},
+							"icon": "links-going-out",
+							"title": "Enlaces salientes"
+						}
+					},
+					{
+						"id": "de6609de1cacd301",
+						"type": "leaf",
+						"state": {
+							"type": "tag",
+							"state": {
+								"sortOrder": "frequency",
+								"useHierarchy": true,
+								"showSearch": false,
+								"searchQuery": ""
+							},
+							"icon": "lucide-tags",
+							"title": "Etiquetas"
+						}
+					},
+					{
+						"id": "36e0aa1bcfe8d127",
+						"type": "leaf",
+						"state": {
+							"type": "outline",
+							"state": {
+								"followCursor": false,
+								"showSearch": false,
+								"searchQuery": ""
+							},
+							"icon": "lucide-list",
+							"title": "Esquema"
+						}
+					},
+					{
+						"id": "89d30158ee68d639",
+						"type": "leaf",
+						"state": {
+							"type": "calendar",
+							"state": {},
+							"icon": "calendar-with-checkmark",
+							"title": "Calendar"
+						}
+					}
+				]
+			}
+		],
+		"direction": "horizontal",
+		"width": 300,
+		"collapsed": true
+	},
+	"left-ribbon": {
+		"hiddenItems": {
+			"switcher:Abrir selector rápido": false,
+			"graph:Abrir vista gráfica": false,
+			"canvas:Crear nuevo lienzo": false,
+			"daily-notes:Abrir la nota de hoy": false,
+			"templates:Insertar plantilla": false,
+			"command-palette:Abrir paleta de comandos": false,
+			"obsidian-kanban:Create new board": false,
+			"templater-obsidian:Templater": false,
+			"yet-another-obsidian-synchronizer:YAOS": false
+		}
+	},
+	"active": "431a1e07b8324c55",
+	"lastOpenFiles": [
+		"Tareas/Tablero-Semestre.md",
+		"Asignaturas/30-Derecho",
+		"Asignaturas/20-Filosofia",
+		"Asignaturas/10-Ingles",
+		"Preparar examen de filosofia.md",
+		"_templates/plantilla_nota_clase.md",
+		"_templates/Nuevo Documento de texto.txt",
+		"_templates/plantilla_tarea.md",
+		"_templates",
+		"Nueva carpeta",
+		"Tareas",
+		"Asignaturas",
+		"Untitled.md",
+		"02-mi-semestre/Dashboard Principal.md",
+		"02-mi-semestre/_templates/plantilla_nota_clase.md",
+		"02-mi-semestre/_templates/plantilla_tarea.md",
+		"02-mi-semestre/Sin título.md",
+		"02-mi-semestre/Tareas",
+		"02-mi-semestre/asignaturas"
+	]
 }

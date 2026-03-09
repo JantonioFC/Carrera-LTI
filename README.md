@@ -126,7 +126,7 @@ Nexus AI y Asistente Aether requieren una **API Key de Google AI Studio** (gratu
 
 1. Ir a [aistudio.google.com](https://aistudio.google.com)
 2. Click en **"Get API Key"** → **"Create API Key"**
-3. Pegar la clave en la app (se guarda solo en tu `localStorage`)
+3. Pegar la clave en la app (se guarda de forma segura e indefinida en la base de datos local IndexedDB de tu navegador)
 
 ---
 
