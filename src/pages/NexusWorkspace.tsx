@@ -13,9 +13,11 @@ const BlockNoteView = lazy(() =>
 import { Clock, FileText, LayoutDashboard, Plus, Search } from "lucide-react";
 import { esDictionary } from "../utils/blocknote-es";
 
+import type { NexusDocumentId } from "../store/nexusStore";
+
 export default function NexusWorkspace() {
 	const { documents, addDocument, getDocument, getYDoc } = useNexusStore();
-	const [activeDocId, setActiveDocId] = useState<string | null>(
+	const [activeDocId, setActiveDocId] = useState<NexusDocumentId | null>(
 		documents[0]?.id || null,
 	);
 	const [searchQuery, setSearchQuery] = useState("");

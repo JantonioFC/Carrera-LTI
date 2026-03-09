@@ -11,7 +11,7 @@ import {
 	Plus,
 	Search,
 } from "lucide-react";
-import { useAetherStore } from "../store/aetherStore";
+import { useAetherStore, type AetherNoteId } from "../store/aetherStore";
 
 export default function AetherVault() {
 	const {
@@ -22,7 +22,7 @@ export default function AetherVault() {
 		getGraphData,
 		findBacklinks,
 	} = useAetherStore();
-	const [activeNoteId, setActiveNoteId] = useState<string | null>(
+	const [activeNoteId, setActiveNoteId] = useState<AetherNoteId | null>(
 		notes[0]?.id || null,
 	);
 	const [viewMode, setViewMode] = useState<"editor" | "graph">("editor");
@@ -274,7 +274,7 @@ export default function AetherVault() {
 									linkColor={() => "rgba(255,255,255,0.2)"}
 									backgroundColor="#0d1117"
 									onNodeClick={(node) => {
-										setActiveNoteId(node.id as string);
+										setActiveNoteId(node.id as AetherNoteId);
 										setViewMode("editor");
 									}}
 									nodeCanvasObject={(node, ctx, globalScale) => {
