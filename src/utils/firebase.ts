@@ -1,17 +1,16 @@
 import { initializeApp } from "firebase/app";
 import {
+	signInAnonymously as firebaseSignInAnonymously,
 	getAuth,
 	onAuthStateChanged,
-	signInAnonymously,
 	type User,
 } from "firebase/auth";
 import { doc, getDoc, getFirestore, setDoc } from "firebase/firestore";
 import type { PresencialEvent } from "../data/lti";
 import type { SubjectDataMap } from "../hooks/useSubjectData";
+import type { IAuthService, ISyncService } from "../services/types";
+import { NexusDocumentsSchema } from "./schemas"; // Assuming we want to validate documents part of AppData
 
-// TODO: Replace with Real Firebase Config if you want this to work genuinely
-// The user explicitly stated they want a personal free tier Google solution
-// but didn't provide keys, so we setup the skeleton to use Anonymous Login
 const firebaseConfig = {
 	apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
 	authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
@@ -22,23 +21,16 @@ const firebaseConfig = {
 	measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
-import type { FirebaseApp } from "firebase/app";
-import type { Auth } from "firebase/auth";
-import type { Firestore } from "firebase/firestore";
-
-let app: FirebaseApp | undefined;
-let auth: Auth | undefined;
-let db: Firestore | undefined;
+let app: any;
+let auth: any;
+let db: any;
 
 try {
 	app = initializeApp(firebaseConfig);
 	auth = getAuth(app);
 	db = getFirestore(app);
 } catch (error) {
-	console.warn(
-		"Firebase not configured properly. Cloud sync is disabled.",
-		error,
-	);
+	console.warn("Firebase initialization failed:", error);
 }
 
 export type AppData = {
@@ -47,68 +39,69 @@ export type AppData = {
 	lastUpdated: number;
 };
 
-// Autenticación anónima silenciosa
-export const initAuth = (onUser: (user: User | null) => void) => {
-	if (!auth) {
-		console.error(
-			"Firebase auth object is undefined. Initialization likely failed.",
-		);
-		return;
+class FirebaseAuthService implements IAuthService {
+	init(onUser: (uid: string | null) => void) {
+		if (!auth) return;
+		onAuthStateChanged(auth, (user: User | null) => {
+			onUser(user ? user.uid : null);
+		});
 	}
-	onAuthStateChanged(auth, (user: User | null) => {
-		if (user) {
-			console.log("Firebase Auth: Logged in as User ID:", user.uid);
-			onUser(user);
-		} else {
-			console.log(
-				"Firebase Auth: No user found. Attempting Anonymous Sign-In...",
+
+	async signInAnonymously(): Promise<string | null> {
+		if (!auth) return null;
+		try {
+			const result = await firebaseSignInAnonymously(auth);
+			return result.user.uid;
+		} catch (error) {
+			console.error("Anonymous sign-in failed:", error);
+			return null;
+		}
+	}
+
+	getUserId(): string | null {
+		return auth?.currentUser?.uid || null;
+	}
+}
+
+class FirebaseSyncService implements ISyncService {
+	async syncToCloud(userId: string, data: AppData): Promise<boolean> {
+		if (!db) return false;
+		try {
+			// Phase 3: Zod validation point (simplifying for now, can add full AppData schema)
+			const userRef = doc(db, "users", userId);
+			await setDoc(
+				userRef,
+				{ ...data, lastUpdated: Date.now() },
+				{ merge: true },
 			);
-			signInAnonymously(auth).catch((err) => {
-				console.error(
-					"💥 ERROR: Failed to sign in anonymously. Did you enable 'Anonymous' Sign-In Provider in Firebase Console -> Authentication -> Sign-in method?",
-					err,
-				);
-				alert(
-					"Error al conectar a la nube. ¿Habilitaste 'Anónimo' en Firebase Authentication?\n" +
-						err.message,
-				);
-			});
+			return true;
+		} catch (error) {
+			console.error("Cloud sync failed:", error);
+			return false;
 		}
-	});
-};
-
-export const syncDataToCloud = async (userId: string, data: AppData) => {
-	if (!db) return false;
-	try {
-		const userRef = doc(db, "users", userId);
-		await setDoc(
-			userRef,
-			{
-				...data,
-				lastUpdated: Date.now(),
-			},
-			{ merge: true },
-		);
-		return true;
-	} catch (error) {
-		console.error("Error al sincronizar datos:", error);
-		return false;
 	}
-};
 
-export const getDataFromCloud = async (
-	userId: string,
-): Promise<AppData | null> => {
-	if (!db) return null;
-	try {
-		const userRef = doc(db, "users", userId);
-		const snap = await getDoc(userRef);
-		if (snap.exists()) {
-			return snap.data() as AppData;
+	async getFromCloud(userId: string): Promise<AppData | null> {
+		if (!db) return null;
+		try {
+			const userRef = doc(db, "users", userId);
+			const snap = await getDoc(userRef);
+			if (snap.exists()) {
+				const data = snap.data() as AppData;
+				// Phase 3: Zod validation point here
+				return data;
+			}
+		} catch (error) {
+			console.error("Failed to get data from cloud:", error);
 		}
 		return null;
-	} catch (error) {
-		console.error("Error obteniendo datos desde la nube:", error);
-		return null;
 	}
-};
+}
+
+export const authService = new FirebaseAuthService();
+export const syncService = new FirebaseSyncService();
+
+// Legacy exports for compatibility (will be removed once useCloudSync is updated)
+export const initAuth = authService.init.bind(authService);
+export const syncDataToCloud = syncService.syncToCloud.bind(syncService);
+export const getDataFromCloud = syncService.getFromCloud.bind(syncService);

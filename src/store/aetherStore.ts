@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from "uuid";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
+import { findSimilarNotes, generateEmbedding } from "../utils/embeddings";
 import { idbStorage } from "../utils/idbStorage";
 
 export type AetherNoteId = `note_${string}`;
@@ -14,6 +15,7 @@ export interface AetherNote {
 	createdAt: number;
 	updatedAt: number;
 	tags: string[];
+	embedding?: number[];
 }
 
 export interface GraphLink {
@@ -47,6 +49,8 @@ interface AetherActions {
 	getGraphData: () => GraphData;
 	findBacklinks: (nodeId: AetherNoteId) => AetherNote[];
 	setGeminiApiKey: (key: string) => void;
+	ingestNote: (id: AetherNoteId) => Promise<void>;
+	semanticSearch: (query: string, limit?: number) => Promise<AetherNote[]>;
 	addChatMessage: (
 		msg: Omit<ChatMessage, "id" | "timestamp"> | ChatMessage,
 	) => ChatMessageId;
@@ -145,6 +149,35 @@ export const useAetherStore = create<AetherState & AetherActions>()(
 					set((state) => {
 						state.geminiApiKey = key;
 					});
+				},
+
+				ingestNote: async (id) => {
+					const { notes, geminiApiKey } = get();
+					const note = notes.find((n) => n.id === id);
+					if (!note || !geminiApiKey) return;
+
+					const textToEmbed = `${note.title}\n\n${note.content}`;
+					const embedding = await generateEmbedding(geminiApiKey, textToEmbed);
+
+					if (embedding) {
+						set((state) => {
+							const n = state.notes.find((n) => n.id === id);
+							if (n) {
+								n.embedding = embedding;
+								n.updatedAt = Date.now();
+							}
+						});
+					}
+				},
+
+				semanticSearch: async (query, limit = 3) => {
+					const { notes, geminiApiKey } = get();
+					if (!geminiApiKey || !query) return [];
+
+					const queryVector = await generateEmbedding(geminiApiKey, query);
+					if (!queryVector) return [];
+
+					return findSimilarNotes(queryVector, notes, limit);
 				},
 
 				addChatMessage: (msg) => {

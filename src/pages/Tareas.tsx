@@ -14,14 +14,17 @@ import { safeParseJSON } from "../utils/safeStorage";
 type KanbanStatus = "todo" | "inProgress" | "done";
 type Priority = "alta" | "media" | "baja";
 
+export type TaskId = `t${string}`;
+export type SubtaskId = `st${string}`;
+
 interface Subtask {
-	id: string;
+	id: SubtaskId;
 	text: string;
 	completed: boolean;
 }
 
 interface Task {
-	id: string;
+	id: TaskId;
 	title: string;
 	subjectId: string;
 	dueDate: string;
@@ -215,17 +218,17 @@ export default function Tareas() {
 	};
 
 	const addTask = (task: Omit<Task, "id">) => {
-		saveTasks([...tasks, { ...task, id: `t${Date.now()}` }]);
+		saveTasks([...tasks, { ...task, id: `t${Date.now()}` as TaskId }]);
 		setShowAdd(false);
 	};
 
-	const deleteTask = (id: string) =>
+	const deleteTask = (id: TaskId) =>
 		saveTasks(tasks.filter((t) => t.id !== id));
 
-	const moveTask = (id: string, status: KanbanStatus) =>
+	const moveTask = (id: TaskId, status: KanbanStatus) =>
 		saveTasks(tasks.map((t) => (t.id === id ? { ...t, status } : t)));
 
-	const toggleSubtask = (taskId: string, subtaskId: string) => {
+	const toggleSubtask = (taskId: TaskId, subtaskId: SubtaskId) => {
 		saveTasks(
 			tasks.map((t) => {
 				if (t.id !== taskId) return t;
@@ -239,7 +242,7 @@ export default function Tareas() {
 		);
 	};
 
-	const addSubtask = (taskId: string, text: string) => {
+	const addSubtask = (taskId: TaskId, text: string) => {
 		if (!text.trim()) return;
 		saveTasks(
 			tasks.map((t) => {
@@ -248,7 +251,11 @@ export default function Tareas() {
 					...t,
 					subtasks: [
 						...t.subtasks,
-						{ id: `st${Date.now()}`, text: text.trim(), completed: false },
+						{
+							id: `st${Date.now()}` as SubtaskId,
+							text: text.trim(),
+							completed: false,
+						},
 					],
 				};
 			}),

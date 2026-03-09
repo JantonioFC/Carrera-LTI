@@ -23,6 +23,7 @@ export default function AetherChat() {
 		addChatMessage,
 		appendChatMessage,
 		clearChatHistory,
+		semanticSearch,
 	} = useAetherStore();
 	const [inputKey, setInputKey] = useState("");
 	const [prompt, setPrompt] = useState("");
@@ -69,10 +70,16 @@ export default function AetherChat() {
 			// Configure API Key locally in the Singleton
 			apiBackend.updateApiKey(geminiApiKey);
 
-			// Build context string (the client handles CoT injection and truncating)
-			const contextText = notes
-				.map((n) => `Nota: ${n.title}\nContenido:\n${n.content}\n---`)
-				.join("\n\n");
+			// Semantic Retrieval (RAG)
+			const relevantNotes = await semanticSearch(userText, 5);
+
+			// Build context string from retrieved notes
+			const contextText =
+				relevantNotes.length > 0
+					? relevantNotes
+							.map((n) => `Nota: ${n.title}\nContenido:\n${n.content}\n---`)
+							.join("\n\n")
+					: "No se encontraron notas relevantes directamente en la búsqueda semántica.";
 
 			// Call Gemini API streaming method
 			const msgId = addChatMessage({

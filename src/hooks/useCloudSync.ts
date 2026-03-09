@@ -1,12 +1,7 @@
-import type { User } from "firebase/auth";
 import { useEffect, useState } from "react";
 import type { PresencialEvent } from "../data/lti";
-import {
-	type AppData,
-	getDataFromCloud,
-	initAuth,
-	syncDataToCloud,
-} from "../utils/firebase";
+import { type AppData, authService, syncService } from "../utils/firebase";
+import { AppDataSchema } from "../utils/schemas";
 import { type SubjectData, useSubjectData } from "./useSubjectData";
 
 export function useCloudSync(
@@ -19,34 +14,44 @@ export function useCloudSync(
 		"idle" | "syncing" | "success" | "error"
 	>("idle");
 
-	// Inicializar auth
+	// Inicializar auth usando el servicio desacoplado
 	useEffect(() => {
-		initAuth((user: User | null) => {
-			if (user) {
-				setUserId(user.uid);
+		authService.init((uid: string | null) => {
+			if (uid) {
+				setUserId(uid);
 			}
 		});
 	}, []);
 
 	// Procesar cola en segundo plano cuando vuelva la conexión
 	useEffect(() => {
-		const handleOnline = () => {
+		const handleOnline = async () => {
 			const queuedData = localStorage.getItem("lti_sync_queue");
 			if (queuedData && userId) {
 				try {
-					const parsed = JSON.parse(queuedData) as AppData;
+					const rawData = JSON.parse(queuedData);
+
+					// Validación con Zod antes de subir a la nube (ADR-002)
+					const validation = AppDataSchema.safeParse(rawData);
+					if (!validation.success) {
+						console.error("Invalid queued data schema:", validation.error);
+						return;
+					}
+
 					setSyncStatus("syncing");
-					syncDataToCloud(userId, parsed).then((success) => {
-						if (success) {
-							localStorage.removeItem("lti_sync_queue");
-							setSyncStatus("success");
-							setTimeout(() => setSyncStatus("idle"), 3000);
-						} else {
-							setSyncStatus("error");
-						}
-					});
+					const success = await syncService.syncToCloud(
+						userId,
+						validation.data,
+					);
+					if (success) {
+						localStorage.removeItem("lti_sync_queue");
+						setSyncStatus("success");
+						setTimeout(() => setSyncStatus("idle"), 3000);
+					} else {
+						setSyncStatus("error");
+					}
 				} catch (e) {
-					console.error(e);
+					console.error("Online sync handler failed:", e);
 				}
 			}
 		};
@@ -65,28 +70,35 @@ export function useCloudSync(
 			lastUpdated: Date.now(),
 		};
 
+		// Validación antes de encolar o enviar
+		const validation = AppDataSchema.safeParse(appData);
+		if (!validation.success) {
+			console.error("Failed to validate AppData for sync:", validation.error);
+			setSyncStatus("error");
+			return;
+		}
+
 		// Si estamos offline o el sync inmediato falla, encolamos
 		if (!navigator.onLine) {
-			localStorage.setItem("lti_sync_queue", JSON.stringify(appData));
+			localStorage.setItem("lti_sync_queue", JSON.stringify(validation.data));
 			return;
 		}
 
 		try {
 			setSyncStatus("syncing");
-			const success = await syncDataToCloud(userId, appData);
+			const success = await syncService.syncToCloud(userId, validation.data);
 
 			if (success) {
 				localStorage.removeItem("lti_sync_queue");
 				setSyncStatus("success");
 				setTimeout(() => setSyncStatus("idle"), 3000);
 			} else {
-				// Fallback
-				localStorage.setItem("lti_sync_queue", JSON.stringify(appData));
+				localStorage.setItem("lti_sync_queue", JSON.stringify(validation.data));
 				setSyncStatus("error");
 			}
 		} catch (error) {
 			console.error("Error syncing to cloud:", error);
-			localStorage.setItem("lti_sync_queue", JSON.stringify(appData));
+			localStorage.setItem("lti_sync_queue", JSON.stringify(validation.data));
 			setSyncStatus("error");
 		}
 	};
@@ -97,18 +109,28 @@ export function useCloudSync(
 		setSyncStatus("syncing");
 
 		try {
-			const remoteData = await getDataFromCloud(userId);
+			const remoteData = await syncService.getFromCloud(userId);
 			if (remoteData) {
+				// Validación de datos remotos (ADR-002)
+				const validation = AppDataSchema.safeParse(remoteData);
+				if (!validation.success) {
+					console.error("Remote data failed validation:", validation.error);
+					setSyncStatus("error");
+					return;
+				}
+
+				const validatedData = validation.data;
+
 				// Restore subjects
-				if (remoteData.subjectData) {
-					Object.entries(remoteData.subjectData).forEach(([id, data]) => {
-						updateSubject(id, data as Partial<SubjectData>);
+				if (validatedData.subjectData) {
+					Object.entries(validatedData.subjectData).forEach(([id, data]) => {
+						updateSubject(id, data as any);
 					});
 				}
 
 				// Restore presenciales
-				if (remoteData.presenciales) {
-					setPresenciales(remoteData.presenciales);
+				if (validatedData.presenciales) {
+					setPresenciales(validatedData.presenciales as PresencialEvent[]);
 				}
 
 				setSyncStatus("success");
@@ -127,6 +149,6 @@ export function useCloudSync(
 		restoreFromCloud,
 		syncStatus,
 		userId,
-		isConfigured: !!userId, // Si firebase está bien configurado y hay usuario anónimo
+		isConfigured: !!userId,
 	};
 }

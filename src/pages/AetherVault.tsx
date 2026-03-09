@@ -4,14 +4,21 @@ const MDEditor = lazy(() => import("@uiw/react-md-editor"));
 const ForceGraph2D = lazy(() => import("react-force-graph-2d"));
 
 import {
+	Brain,
 	ChevronLeft,
 	ChevronRight,
 	FileText,
+	Loader2,
 	Network,
 	Plus,
 	Search,
+	Sparkles,
 } from "lucide-react";
-import { type AetherNoteId, useAetherStore } from "../store/aetherStore";
+import {
+	type AetherNote,
+	type AetherNoteId,
+	useAetherStore,
+} from "../store/aetherStore";
 
 export default function AetherVault() {
 	const {
@@ -21,6 +28,8 @@ export default function AetherVault() {
 		deleteNote,
 		getGraphData,
 		findBacklinks,
+		ingestNote,
+		semanticSearch,
 	} = useAetherStore();
 	const [activeNoteId, setActiveNoteId] = useState<AetherNoteId | null>(
 		notes[0]?.id || null,
@@ -28,12 +37,38 @@ export default function AetherVault() {
 	const [viewMode, setViewMode] = useState<"editor" | "graph">("editor");
 	const [searchQuery, setSearchQuery] = useState("");
 	const [sidebarOpen, setSidebarOpen] = useState(true);
+	const [similarNotes, setSimilarNotes] = useState<AetherNote[]>([]);
+	const [isIngesting, setIsIngesting] = useState(false);
 
 	// Sync active note with hook
 	const activeNote = useMemo(
 		() => notes.find((n) => n.id === activeNoteId),
 		[notes, activeNoteId],
 	);
+
+	useEffect(() => {
+		const fetchSimilar = async () => {
+			if (activeNote?.embedding && activeNote.content.length > 10) {
+				const results = await semanticSearch(activeNote.content, 5);
+				setSimilarNotes(results.filter((n) => n.id !== activeNoteId));
+			} else {
+				setSimilarNotes([]);
+			}
+		};
+		fetchSimilar();
+	}, [
+		activeNoteId,
+		activeNote?.embedding,
+		semanticSearch,
+		activeNote?.content,
+	]);
+
+	const handleIngest = async () => {
+		if (!activeNoteId) return;
+		setIsIngesting(true);
+		await ingestNote(activeNoteId);
+		setIsIngesting(false);
+	};
 	const graphData = useMemo(() => getGraphData(), [getGraphData]);
 	const backlinks = activeNoteId ? findBacklinks(activeNoteId) : [];
 
@@ -203,6 +238,53 @@ export default function AetherVault() {
 
 							{/* Right Context Panel (Backlinks) */}
 							<div className="w-64 border-l border-navy-700/50 bg-navy-950/20 p-4 overflow-y-auto hidden lg:block">
+								<div className="mb-6">
+									<button
+										onClick={handleIngest}
+										disabled={isIngesting || !activeNote?.content}
+										className={`w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg border text-xs font-semibold transition-all ${activeNote?.embedding ? "border-green-500/30 bg-green-500/10 text-green-400" : "border-lti-blue/30 bg-lti-blue/10 text-lti-blue hover:bg-lti-blue/20"}`}
+									>
+										{isIngesting ? (
+											<Loader2 size={14} className="animate-spin" />
+										) : activeNote?.embedding ? (
+											<Brain size={14} />
+										) : (
+											<Sparkles size={14} />
+										)}
+										{isIngesting
+											? "Ingestando..."
+											: activeNote?.embedding
+												? "Analizada por IA"
+												: "Analizar con IA"}
+									</button>
+								</div>
+
+								<h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4">
+									Relacionado por IA ({similarNotes.length})
+								</h3>
+								{similarNotes.length > 0 ? (
+									<div className="space-y-3 mb-8">
+										{similarNotes.map((bl) => (
+											<div
+												key={bl.id}
+												onClick={() => setActiveNoteId(bl.id)}
+												className="p-3 bg-lti-blue/5 rounded-lg border border-lti-blue/20 cursor-pointer hover:border-lti-blue transition-colors group"
+											>
+												<p className="text-sm font-medium text-lti-blue group-hover:underline">
+													{bl.title}
+												</p>
+												<p className="text-xs text-slate-400 mt-1 line-clamp-2">
+													{bl.content.slice(0, 100)}...
+												</p>
+											</div>
+										))}
+									</div>
+								) : (
+									<p className="text-sm text-slate-400 mb-8">
+										No hay relaciones detectadas.
+									</p>
+								)}
+
 								<h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4">
 									Backlinks ({backlinks.length})
 								</h3>

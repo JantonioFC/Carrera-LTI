@@ -1,19 +1,23 @@
 import { z } from "zod";
 
 // ─── Aether ───────────────────────────────────────────────────
+export const AetherNoteIdSchema = z.string().brand<"AetherNoteId">();
+export const ChatMessageIdSchema = z.string().brand<"ChatMessageId">();
+
 export const AetherNoteSchema = z.object({
-	id: z.string(),
+	id: z.string().startsWith("note_"),
 	title: z.string(),
 	content: z.string(),
 	createdAt: z.number(),
 	updatedAt: z.number(),
 	tags: z.array(z.string()),
+	embedding: z.array(z.number()).optional(),
 });
 
 export const AetherNotesSchema = z.array(AetherNoteSchema);
 
 export const ChatMessageSchema = z.object({
-	id: z.string(),
+	id: z.string().startsWith("msg_"),
 	role: z.enum(["user", "model"]),
 	text: z.string(),
 	timestamp: z.number(),
@@ -23,7 +27,7 @@ export const ChatHistorySchema = z.array(ChatMessageSchema);
 
 // ─── Nexus ────────────────────────────────────────────────────
 export const NexusDocumentSchema = z.object({
-	id: z.string(),
+	id: z.string().startsWith("doc_"),
 	title: z.string(),
 	createdAt: z.number(),
 	updatedAt: z.number(),
@@ -41,13 +45,13 @@ export const NexusMessagesSchema = z.array(NexusMessageSchema);
 
 // ─── Tareas ───────────────────────────────────────────────────
 export const SubtaskSchema = z.object({
-	id: z.string(),
+	id: z.string().startsWith("st"),
 	text: z.string(),
 	completed: z.boolean(),
 });
 
 export const TaskSchema = z.object({
-	id: z.string(),
+	id: z.string().startsWith("t"),
 	title: z.string(),
 	subjectId: z.string(),
 	dueDate: z.string(),
@@ -93,3 +97,10 @@ export const SubjectDataSchema = z.object({
 });
 
 export const SubjectDataMapSchema = z.record(z.string(), SubjectDataSchema);
+
+// ─── Sync Data ────────────────────────────────────────────────
+export const AppDataSchema = z.object({
+	subjectData: SubjectDataMapSchema,
+	presenciales: PresencialesSchema,
+	lastUpdated: z.number(),
+});
