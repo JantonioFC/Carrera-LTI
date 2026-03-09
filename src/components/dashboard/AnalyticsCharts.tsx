@@ -1,14 +1,14 @@
 import {
-	PieChart,
-	Pie,
-	Cell,
-	ResponsiveContainer,
-	BarChart,
 	Bar,
+	BarChart,
+	CartesianGrid,
+	Cell,
+	Pie,
+	PieChart,
+	Tooltip as RechartsTooltip,
+	ResponsiveContainer,
 	XAxis,
 	YAxis,
-	Tooltip as RechartsTooltip,
-	CartesianGrid,
 } from "recharts";
 import { TOTAL_CREDITS } from "../../data/lti";
 
@@ -18,12 +18,18 @@ interface AnalyticsChartsProps {
 	totalApproved: number;
 }
 
-export function AnalyticsCharts({ pieData, barData, totalApproved }: AnalyticsChartsProps) {
+export function AnalyticsCharts({
+	pieData,
+	barData,
+	totalApproved,
+}: AnalyticsChartsProps) {
 	return (
 		<div className="@container">
 			<div className="grid grid-cols-1 @lg:grid-cols-3 gap-6">
 				<div className="card p-5 col-span-1 border-t-2 border-lti-coral">
-					<h2 className="text-white font-semibold text-sm mb-4">Progreso de la Carrera</h2>
+					<h2 className="text-white font-semibold text-sm mb-4">
+						Progreso de la Carrera
+					</h2>
 					<div className="h-48 relative">
 						<ResponsiveContainer width="100%" height="100%">
 							<PieChart>
@@ -78,10 +84,15 @@ export function AnalyticsCharts({ pieData, barData, totalApproved }: AnalyticsCh
 				</div>
 
 				<div className="card p-5 col-span-1 lg:col-span-2 border-t-2 border-lti-blue">
-					<h2 className="text-white font-semibold text-sm mb-4">Promedio por Semestre</h2>
+					<h2 className="text-white font-semibold text-sm mb-4">
+						Promedio por Semestre
+					</h2>
 					<div className="h-52">
 						<ResponsiveContainer width="100%" height="100%">
-							<BarChart data={barData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+							<BarChart
+								data={barData}
+								margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+							>
 								<CartesianGrid
 									strokeDasharray="3 3"
 									vertical={false}
@@ -115,7 +126,12 @@ export function AnalyticsCharts({ pieData, barData, totalApproved }: AnalyticsCh
 									}}
 									itemStyle={{ color: "#e2e8f0", fontWeight: 600 }}
 								/>
-								<Bar dataKey="Promedio" fill="url(#colorUv)" radius={[6, 6, 0, 0]} barSize={36}>
+								<Bar
+									dataKey="Promedio"
+									fill="url(#colorUv)"
+									radius={[6, 6, 0, 0]}
+									barSize={36}
+								>
 									{barData.map((entry, index) => (
 										<Cell
 											key={`cell-${index}`}

@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { Play, Pause, RotateCcw, Coffee, BrainCircuit } from "lucide-react";
+import { BrainCircuit, Coffee, Pause, Play, RotateCcw } from "lucide-react";
+import { useEffect, useState } from "react";
 
 type TimerMode = "focus" | "break";
 

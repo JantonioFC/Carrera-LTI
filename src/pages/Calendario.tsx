@@ -1,29 +1,31 @@
-import { useState } from "react";
 import {
+	AlertCircle,
 	ChevronLeft,
 	ChevronRight,
-	Pencil,
-	AlertCircle,
-	MapPin,
-	Trash2,
 	Download,
+	MapPin,
+	Pencil,
+	Trash2,
 } from "lucide-react";
+import { useState } from "react";
 import {
 	CURRICULUM,
+	EXAM_END,
+	EXAM_START,
 	formatDate,
 	getDaysUntil,
 	isDatePast,
-	SEMESTER_START,
-	EXAM_START,
-	EXAM_END,
 	type PresencialEvent,
+	SEMESTER_START,
 } from "../data/lti";
 
 interface CalendarioProps {
 	presenciales: PresencialEvent[];
 	onUpdatePresenciales: (p: PresencialEvent[]) => void;
 }
+
 import { downloadICS } from "../utils/icsExport";
+
 const MONTHS_ES = [
 	"Enero",
 	"Febrero",
@@ -294,7 +296,7 @@ export default function Calendario({
 												key={idx}
 												className="text-[9px] leading-tight px-1 py-0.5 rounded truncate font-medium cursor-default"
 												style={{
-													backgroundColor: ev.color + "25",
+													backgroundColor: `${ev.color}25`,
 													color: ev.color,
 												}}
 												title={ev.label}

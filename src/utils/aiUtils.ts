@@ -1,6 +1,6 @@
 import type { GoogleGenAI } from "@google/genai";
 import type { ZodType } from "zod";
-import { type Result, ok, err } from "./result";
+import { err, ok, type Result } from "./result";
 
 /**
  * Wrapper for Gemini AI generateContent with exponential backoff retry logic.
@@ -31,7 +31,7 @@ export async function generateContentWithRetry(
 
 			if (isRetryable && attempt < maxRetries - 1) {
 				attempt++;
-				const delayMs = Math.pow(2, attempt - 1) * 1000 + Math.random() * 500; // Exponential backoff with jitter
+				const delayMs = 2 ** (attempt - 1) * 1000 + Math.random() * 500; // Exponential backoff with jitter
 				console.warn(
 					`[Gemini API] Error ${status || "Network"}. Intento ${attempt}/${maxRetries} en ${Math.round(delayMs)}ms...`,
 				);
@@ -55,9 +55,7 @@ export function truncateContext(
 	maxChars: number = 40000,
 ): string {
 	if (text.length <= maxChars) return text;
-	return (
-		text.slice(0, maxChars) + "\n\n...[Contenido truncado por límite de tokens]"
-	);
+	return `${text.slice(0, maxChars)}\n\n...[Contenido truncado por límite de tokens]`;
 }
 
 /**
@@ -93,7 +91,7 @@ export async function generateStructuredContentWithRetry<T>(
 		let parsedJson;
 		try {
 			parsedJson = JSON.parse(text);
-		} catch (e) {
+		} catch (_e) {
 			return err(new Error("La respuesta de la IA no es un JSON válido."));
 		}
 
@@ -101,7 +99,7 @@ export async function generateStructuredContentWithRetry<T>(
 		if (!validation.success) {
 			return err(
 				new Error(
-					"Validación Zod fallida: " + validation.error.issues[0]?.message,
+					`Validación Zod fallida: ${validation.error.issues[0]?.message}`,
 				),
 			);
 		}

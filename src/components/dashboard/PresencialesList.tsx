@@ -1,12 +1,15 @@
-import { MapPin, AlertCircle, Clock, Pencil } from "lucide-react";
-import { type PresencialEvent, isDatePast, getDaysUntil } from "../../data/lti";
+import { AlertCircle, Clock, MapPin, Pencil } from "lucide-react";
+import { getDaysUntil, isDatePast, type PresencialEvent } from "../../data/lti";
 
 interface PresencialesListProps {
 	presenciales: PresencialEvent[];
 	onEdit: (event: PresencialEvent) => void;
 }
 
-export function PresencialesList({ presenciales, onEdit }: PresencialesListProps) {
+export function PresencialesList({
+	presenciales,
+	onEdit,
+}: PresencialesListProps) {
 	return (
 		<div className="card p-5">
 			<div className="flex items-center justify-between mb-4">
@@ -15,7 +18,8 @@ export function PresencialesList({ presenciales, onEdit }: PresencialesListProps
 						Instancias Presenciales Obligatorias
 					</h2>
 					<p className="text-slate-400 text-xs mt-0.5 flex items-center gap-1">
-						<MapPin size={10} /> Sede {presenciales[0]?.sede} — Jornadas 9:00 a 17:00 hs
+						<MapPin size={10} /> Sede {presenciales[0]?.sede} — Jornadas 9:00 a
+						17:00 hs
 					</p>
 				</div>
 			</div>
@@ -36,14 +40,14 @@ export function PresencialesList({ presenciales, onEdit }: PresencialesListProps
 						>
 							<div className="text-center min-w-[44px]">
 								<p className="text-xs text-slate-400 font-medium">
-									{new Date(event.date + "T12:00:00")
+									{new Date(`${event.date}T12:00:00`)
 										.toLocaleDateString("es-UY", { month: "short" })
 										.toUpperCase()}
 								</p>
 								<p
 									className={`text-lg font-bold leading-none ${past ? "text-slate-400" : "text-white"}`}
 								>
-									{new Date(event.date + "T12:00:00").getDate()}
+									{new Date(`${event.date}T12:00:00`).getDate()}
 								</p>
 							</div>
 							<div className="flex-1 min-w-0">

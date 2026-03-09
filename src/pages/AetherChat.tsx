@@ -1,20 +1,18 @@
-import { useState, useRef, useEffect } from "react";
-import { useAetherStore } from "../store/aetherStore";
-import { apiBackend } from "../services/aiClient";
-import { Key, Bot, Trash2, Brain } from "lucide-react";
-
+import { Bot, Brain, Key, Trash2 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { ChatBubble } from "../components/chat/ChatBubble";
 import { ChatInputArea } from "../components/chat/ChatInputArea";
 import { ChatSkeleton } from "../components/chat/ChatSkeleton";
+import { apiBackend } from "../services/aiClient";
+import { useAetherStore } from "../store/aetherStore";
 import {
-	type RemoteData,
-	notAsked,
-	loading,
-	success,
 	failure,
 	isLoading,
+	loading,
+	notAsked,
+	type RemoteData,
+	success,
 } from "../utils/result";
-
 
 export default function AetherChat() {
 	const {
@@ -49,7 +47,7 @@ export default function AetherChat() {
 
 	useEffect(() => {
 		scrollToBottom();
-	}, [chatHistory, status]);
+	}, [scrollToBottom]);
 
 	const handleSaveKey = (e: React.FormEvent) => {
 		e.preventDefault();
@@ -82,13 +80,9 @@ export default function AetherChat() {
 				text: "",
 			});
 
-			await apiBackend.askAetherStream(
-				userText,
-				contextText,
-				(chunk) => {
-					appendChatMessage(msgId, chunk);
-				}
-			);
+			await apiBackend.askAetherStream(userText, contextText, (chunk) => {
+				appendChatMessage(msgId, chunk);
+			});
 
 			setStatus(success(undefined));
 		} catch (error: any) {
@@ -110,7 +104,11 @@ export default function AetherChat() {
 
 	// Prevent form from flashing before IndexedDB completes
 	if (!isHydrated) {
-		return <div className="h-full flex items-center justify-center bg-navy-900"><ChatSkeleton flavor="aether" /></div>
+		return (
+			<div className="h-full flex items-center justify-center bg-navy-900">
+				<ChatSkeleton flavor="aether" />
+			</div>
+		);
 	}
 
 	if (!geminiApiKey) {
@@ -213,7 +211,12 @@ export default function AetherChat() {
 					</div>
 				) : (
 					chatHistory.map((msg) => (
-						<ChatBubble key={msg.id} role={msg.role} text={msg.text} flavor="aether" />
+						<ChatBubble
+							key={msg.id}
+							role={msg.role}
+							text={msg.text}
+							flavor="aether"
+						/>
 					))
 				)}
 
@@ -223,13 +226,13 @@ export default function AetherChat() {
 
 			{/* Input Area */}
 			<div>
-				<ChatInputArea 
-					prompt={prompt} 
-					setPrompt={setPrompt} 
-					onSubmit={handleSendMessage} 
-					isLoading={isLoading(status)} 
-					disabledMsg="Pregúntale a tu segundo cerebro..." 
-					flavor="aether" 
+				<ChatInputArea
+					prompt={prompt}
+					setPrompt={setPrompt}
+					onSubmit={handleSendMessage}
+					isLoading={isLoading(status)}
+					disabledMsg="Pregúntale a tu segundo cerebro..."
+					flavor="aether"
 				/>
 				<div className="text-center pb-2 bg-navy-950/50">
 					<button

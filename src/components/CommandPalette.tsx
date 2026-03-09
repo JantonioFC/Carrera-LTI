@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
+import { BrainCircuit, Database, FileText, Search } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, FileText, Database, BrainCircuit } from "lucide-react";
-import { useNexusStore } from "../store/nexusStore";
 import { useNexusDB } from "../hooks/useNexusDB";
+import { useNexusStore } from "../store/nexusStore";
 
 export function CommandPalette({
 	isOpen,
@@ -60,7 +60,6 @@ export function CommandPalette({
 					<Search size={20} className="text-slate-400 mr-3" />
 					<input
 						type="text"
-						autoFocus
 						placeholder="Buscar documentos, bases de datos o comandos..."
 						className="flex-1 bg-transparent text-lg text-white focus:outline-none placeholder-slate-500"
 						value={query}

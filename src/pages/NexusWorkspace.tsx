@@ -1,6 +1,6 @@
-import { useState, useMemo, lazy, Suspense } from "react";
-import { useNexusStore } from "../store/nexusStore";
 import { BlockNoteEditor } from "@blocknote/core";
+import { lazy, Suspense, useMemo, useState } from "react";
+import { useNexusStore } from "../store/nexusStore";
 import "@blocknote/core/fonts/inter.css";
 import "@blocknote/mantine/style.css";
 
@@ -9,7 +9,8 @@ const BlockNoteView = lazy(() =>
 		default: module.BlockNoteView,
 	})),
 );
-import { Search, Plus, FileText, LayoutDashboard, Clock } from "lucide-react";
+
+import { Clock, FileText, LayoutDashboard, Plus, Search } from "lucide-react";
 import { esDictionary } from "../utils/blocknote-es";
 
 export default function NexusWorkspace() {
@@ -21,7 +22,7 @@ export default function NexusWorkspace() {
 
 	const activeDoc = useMemo(
 		() => (activeDocId ? getDocument(activeDocId) : null),
-		[activeDocId, documents, getDocument],
+		[activeDocId, getDocument],
 	);
 
 	// Initialize BlockNote Editor connected to Yjs Document

@@ -1,16 +1,17 @@
-import { useState, useMemo, useEffect, lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 
 const MDEditor = lazy(() => import("@uiw/react-md-editor"));
 const ForceGraph2D = lazy(() => import("react-force-graph-2d"));
-import { useAetherStore } from "../store/aetherStore";
+
 import {
-	Search,
-	Plus,
-	Network,
-	FileText,
 	ChevronLeft,
 	ChevronRight,
+	FileText,
+	Network,
+	Plus,
+	Search,
 } from "lucide-react";
+import { useAetherStore } from "../store/aetherStore";
 
 export default function AetherVault() {
 	const {
@@ -33,7 +34,7 @@ export default function AetherVault() {
 		() => notes.find((n) => n.id === activeNoteId),
 		[notes, activeNoteId],
 	);
-	const graphData = useMemo(() => getGraphData(), [notes]);
+	const graphData = useMemo(() => getGraphData(), [getGraphData]);
 	const backlinks = activeNoteId ? findBacklinks(activeNoteId) : [];
 
 	const filteredNotes = notes.filter(
@@ -66,7 +67,7 @@ export default function AetherVault() {
 		window.addEventListener("resize", updateDimensions);
 		setTimeout(updateDimensions, 100);
 		return () => window.removeEventListener("resize", updateDimensions);
-	}, [viewMode, sidebarOpen]);
+	}, []);
 
 	return (
 		<div

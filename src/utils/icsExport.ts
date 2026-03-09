@@ -4,14 +4,13 @@ export function downloadICS(
 	events: PresencialEvent[],
 	filename: string = "carrera-lti-presenciales.ics",
 ) {
-	let icsContent =
-		[
-			"BEGIN:VCALENDAR",
-			"VERSION:2.0",
-			"PRODID:-//URU/IA.LABS//Carrera LTI//ES",
-			"CALSCALE:GREGORIAN",
-			"METHOD:PUBLISH",
-		].join("\n") + "\n";
+	let icsContent = `${[
+		"BEGIN:VCALENDAR",
+		"VERSION:2.0",
+		"PRODID:-//URU/IA.LABS//Carrera LTI//ES",
+		"CALSCALE:GREGORIAN",
+		"METHOD:PUBLISH",
+	].join("\n")}\n`;
 
 	events.forEach((event) => {
 		// Convert YYYY-MM-DD to YYYYMMDD
@@ -19,19 +18,18 @@ export function downloadICS(
 
 		// Asumimos eventos de todo el día para simplificar, o del día específico
 		// pero con el horario en la descripción
-		icsContent +=
-			[
-				"BEGIN:VEVENT",
-				`UID:${event.id}@carrera-lti`,
-				`DTSTAMP:${new Date().toISOString().replace(/[-:]/g, "").split(".")[0]}Z`,
-				`DTSTART;VALUE=DATE:${dateStr}`,
-				// DTEND for all-day is exclusive, so it should be the next day
-				`DTEND;VALUE=DATE:${getTomorrowDateStr(event.date)}`,
-				`SUMMARY:Instancia Presencial UTEC: ${event.activity}`,
-				`DESCRIPTION:Sede: ${event.sede}\\nHorario: ${event.hours}${event.includesEval ? "\\n¡Incluye evaluación final!" : ""}`,
-				`LOCATION:UTEC Sede ${event.sede}`,
-				"END:VEVENT",
-			].join("\n") + "\n";
+		icsContent += `${[
+			"BEGIN:VEVENT",
+			`UID:${event.id}@carrera-lti`,
+			`DTSTAMP:${new Date().toISOString().replace(/[-:]/g, "").split(".")[0]}Z`,
+			`DTSTART;VALUE=DATE:${dateStr}`,
+			// DTEND for all-day is exclusive, so it should be the next day
+			`DTEND;VALUE=DATE:${getTomorrowDateStr(event.date)}`,
+			`SUMMARY:Instancia Presencial UTEC: ${event.activity}`,
+			`DESCRIPTION:Sede: ${event.sede}\\nHorario: ${event.hours}${event.includesEval ? "\\n¡Incluye evaluación final!" : ""}`,
+			`LOCATION:UTEC Sede ${event.sede}`,
+			"END:VEVENT",
+		].join("\n")}\n`;
 	});
 
 	icsContent += "END:VCALENDAR";
@@ -48,7 +46,7 @@ export function downloadICS(
 
 // Helper to get next day in YYYYMMDD for all-day event DTEND
 function getTomorrowDateStr(dateString: string): string {
-	const d = new Date(dateString + "T12:00:00");
+	const d = new Date(`${dateString}T12:00:00`);
 	d.setDate(d.getDate() + 1);
 	const year = d.getFullYear();
 	const month = String(d.getMonth() + 1).padStart(2, "0");

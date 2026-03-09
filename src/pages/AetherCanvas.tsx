@@ -1,20 +1,20 @@
-import { useCallback, useState } from "react";
 import {
-	ReactFlow,
-	Controls,
-	Background,
-	applyNodeChanges,
-	applyEdgeChanges,
 	addEdge,
-	type Node,
-	type Edge,
-	type NodeChange,
-	type EdgeChange,
+	applyEdgeChanges,
+	applyNodeChanges,
+	Background,
 	type Connection,
+	Controls,
+	type Edge,
+	type EdgeChange,
+	type Node,
+	type NodeChange,
+	ReactFlow,
 } from "@xyflow/react";
+import { useCallback, useState } from "react";
 import "@xyflow/react/dist/style.css";
-import { useAetherStore } from "../store/aetherStore";
 import { Maximize } from "lucide-react";
+import { useAetherStore } from "../store/aetherStore";
 
 export default function AetherCanvas() {
 	const { notes } = useAetherStore();

@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
-import { SubjectStatus } from "../data/lti";
+import type React from "react";
+import { createContext, useContext, useEffect, useState } from "react";
+import type { SubjectStatus } from "../data/lti";
 import { safeParseJSON } from "../utils/safeStorage";
 
 export interface SubjectResource {

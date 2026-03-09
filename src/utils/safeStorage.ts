@@ -4,7 +4,7 @@
  */
 
 import type { ZodType } from "zod";
-import { type Result, ok, err } from "./result";
+import { err, ok, type Result } from "./result";
 
 /**
  * Lee y parsea un valor de localStorage retornando un Result.

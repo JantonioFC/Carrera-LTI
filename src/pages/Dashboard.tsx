@@ -1,13 +1,20 @@
-import { useState, useMemo } from "react";
-import { type PresencialEvent, CURRICULUM, SEMESTER_START, getDaysUntil } from "../data/lti";
-import { useSubjectData } from "../hooks/useSubjectData";
-import { calculateProgressStats, calculateSemesterAverages } from "../domain/progressAnalysis";
-
+import { useMemo, useState } from "react";
+import { AnalyticsCharts } from "../components/dashboard/AnalyticsCharts";
 import { DashboardSummary } from "../components/dashboard/DashboardSummary";
+import { EditPresencialModal } from "../components/dashboard/EditPresencialModal";
 import { PresencialesList } from "../components/dashboard/PresencialesList";
 import { SemesterSubjects } from "../components/dashboard/SemesterSubjects";
-import { AnalyticsCharts } from "../components/dashboard/AnalyticsCharts";
-import { EditPresencialModal } from "../components/dashboard/EditPresencialModal";
+import {
+	CURRICULUM,
+	getDaysUntil,
+	type PresencialEvent,
+	SEMESTER_START,
+} from "../data/lti";
+import {
+	calculateProgressStats,
+	calculateSemesterAverages,
+} from "../domain/progressAnalysis";
+import { useSubjectData } from "../hooks/useSubjectData";
 
 interface DashboardProps {
 	presenciales: PresencialEvent[];
@@ -18,7 +25,9 @@ export default function Dashboard({
 	presenciales,
 	onUpdatePresenciales,
 }: DashboardProps) {
-	const [editingEvent, setEditingEvent] = useState<PresencialEvent | null>(null);
+	const [editingEvent, setEditingEvent] = useState<PresencialEvent | null>(
+		null,
+	);
 	const daysToStart = getDaysUntil(SEMESTER_START);
 	const sem1 = CURRICULUM[0].subjects;
 
@@ -91,26 +100,26 @@ export default function Dashboard({
 			</header>
 
 			{/* Countdown + Stats */}
-			<DashboardSummary 
-				average={average} 
-				approved={approved} 
-				upcomingPresenciales={upcomingPresenciales} 
+			<DashboardSummary
+				average={average}
+				approved={approved}
+				upcomingPresenciales={upcomingPresenciales}
 			/>
 
 			<div className="@container">
 				<div className="grid grid-cols-1 @lg:grid-cols-2 gap-6">
-					<PresencialesList 
-						presenciales={presenciales} 
-						onEdit={setEditingEvent} 
+					<PresencialesList
+						presenciales={presenciales}
+						onEdit={setEditingEvent}
 					/>
 					<SemesterSubjects subjects={sem1} />
 				</div>
 			</div>
 
-			<AnalyticsCharts 
-				pieData={pieData} 
-				barData={barData} 
-				totalApproved={totalApproved} 
+			<AnalyticsCharts
+				pieData={pieData}
+				barData={barData}
+				totalApproved={totalApproved}
 			/>
 
 			{/* Edit modal */}

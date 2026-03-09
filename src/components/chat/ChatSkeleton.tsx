@@ -7,7 +7,7 @@ interface ChatSkeletonProps {
 export function ChatSkeleton({ flavor = "aether" }: ChatSkeletonProps) {
 	const isAether = flavor === "aether";
 
-	const botIconContainer = isAether 
+	const botIconContainer = isAether
 		? "w-8 h-8 rounded-full bg-lti-coral/20 flex flex-shrink-0 items-center justify-center self-end"
 		: "w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center shrink-0 shadow";
 
@@ -25,9 +25,15 @@ export function ChatSkeleton({ flavor = "aether" }: ChatSkeletonProps) {
 				<Bot size={16} className={botIconColor} />
 			</div>
 			<div className={bubbleClass}>
-				<div className={`w-2 h-2 ${dotClass} rounded-full animate-bounce [animation-delay:-0.3s]`}></div>
-				<div className={`w-2 h-2 ${dotClass} rounded-full animate-bounce [animation-delay:-0.15s]`}></div>
-				<div className={`w-2 h-2 ${dotClass} rounded-full animate-bounce`}></div>
+				<div
+					className={`w-2 h-2 ${dotClass} rounded-full animate-bounce [animation-delay:-0.3s]`}
+				></div>
+				<div
+					className={`w-2 h-2 ${dotClass} rounded-full animate-bounce [animation-delay:-0.15s]`}
+				></div>
+				<div
+					className={`w-2 h-2 ${dotClass} rounded-full animate-bounce`}
+				></div>
 			</div>
 		</div>
 	);

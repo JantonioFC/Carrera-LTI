@@ -1,15 +1,15 @@
-import { lazy, Suspense, useState } from "react";
-import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import { Menu } from "lucide-react";
-import { ErrorBoundary } from "./components/ErrorBoundary";
-import { safeParseJSON } from "./utils/safeStorage";
-import LoadingSpinner from "./components/LoadingSpinner";
-import Sidebar from "./components/Sidebar";
+import { lazy, Suspense, useState } from "react";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { CommandPalette } from "./components/CommandPalette";
-import Pomodoro from "./components/Pomodoro";
+import { ErrorBoundary } from "./components/ErrorBoundary";
+import LoadingSpinner from "./components/LoadingSpinner";
 import { PageTransition } from "./components/PageTransition";
+import Pomodoro from "./components/Pomodoro";
+import Sidebar from "./components/Sidebar";
 import { DEFAULT_PRESENCIALES, type PresencialEvent } from "./data/lti";
+import { safeParseJSON } from "./utils/safeStorage";
 
 // ─── Lazy-loaded pages (code splitting) ───────────────────────
 const Dashboard = lazy(() => import("./pages/Dashboard"));
@@ -110,7 +110,14 @@ function App() {
 											</PageTransition>
 										}
 									/>
-									<Route path="/materias" element={<PageTransition><Materias /></PageTransition>} />
+									<Route
+										path="/materias"
+										element={
+											<PageTransition>
+												<Materias />
+											</PageTransition>
+										}
+									/>
 									<Route
 										path="/calendario"
 										element={
@@ -122,15 +129,78 @@ function App() {
 											</PageTransition>
 										}
 									/>
-									<Route path="/malla" element={<PageTransition><MallaCurricular /></PageTransition>} />
-									<Route path="/tareas" element={<PageTransition><Tareas /></PageTransition>} />
-									<Route path="/horarios" element={<PageTransition><Horarios /></PageTransition>} />
-									<Route path="/aether" element={<PageTransition><AetherVault /></PageTransition>} />
-									<Route path="/aether/canvas" element={<PageTransition><AetherCanvas /></PageTransition>} />
-									<Route path="/aether/chat" element={<PageTransition><AetherChat /></PageTransition>} />
-									<Route path="/nexus" element={<PageTransition><NexusWorkspace /></PageTransition>} />
-									<Route path="/nexus/db" element={<PageTransition><NexusDatabaseView /></PageTransition>} />
-									<Route path="/nexus/ai" element={<PageTransition><NexusAI /></PageTransition>} />
+									<Route
+										path="/malla"
+										element={
+											<PageTransition>
+												<MallaCurricular />
+											</PageTransition>
+										}
+									/>
+									<Route
+										path="/tareas"
+										element={
+											<PageTransition>
+												<Tareas />
+											</PageTransition>
+										}
+									/>
+									<Route
+										path="/horarios"
+										element={
+											<PageTransition>
+												<Horarios />
+											</PageTransition>
+										}
+									/>
+									<Route
+										path="/aether"
+										element={
+											<PageTransition>
+												<AetherVault />
+											</PageTransition>
+										}
+									/>
+									<Route
+										path="/aether/canvas"
+										element={
+											<PageTransition>
+												<AetherCanvas />
+											</PageTransition>
+										}
+									/>
+									<Route
+										path="/aether/chat"
+										element={
+											<PageTransition>
+												<AetherChat />
+											</PageTransition>
+										}
+									/>
+									<Route
+										path="/nexus"
+										element={
+											<PageTransition>
+												<NexusWorkspace />
+											</PageTransition>
+										}
+									/>
+									<Route
+										path="/nexus/db"
+										element={
+											<PageTransition>
+												<NexusDatabaseView />
+											</PageTransition>
+										}
+									/>
+									<Route
+										path="/nexus/ai"
+										element={
+											<PageTransition>
+												<NexusAI />
+											</PageTransition>
+										}
+									/>
 									{/* Catch-all: redirect to dashboard */}
 									<Route path="*" element={<Navigate to="/" replace />} />
 								</Routes>

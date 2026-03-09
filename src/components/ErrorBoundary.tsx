@@ -1,5 +1,5 @@
-import React from "react";
 import { AlertTriangle, RefreshCw } from "lucide-react";
+import React from "react";
 
 interface ErrorBoundaryProps {
 	children: React.ReactNode;

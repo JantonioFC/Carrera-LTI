@@ -15,7 +15,7 @@ export function ChatInputArea({
 	onSubmit,
 	isLoading,
 	disabledMsg = "Configura tu API Key primero...",
-	flavor = "aether"
+	flavor = "aether",
 }: ChatInputAreaProps) {
 	const isAether = flavor === "aether";
 
@@ -35,7 +35,9 @@ export function ChatInputArea({
 		<div className={wrapperClass}>
 			<form
 				onSubmit={onSubmit}
-				className={isAether ? "max-w-4xl mx-auto relative" : "flex items-center gap-3"}
+				className={
+					isAether ? "max-w-4xl mx-auto relative" : "flex items-center gap-3"
+				}
 			>
 				<input
 					type="text"

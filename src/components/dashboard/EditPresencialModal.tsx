@@ -1,7 +1,7 @@
-import { useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
-import { Check, X, Trash2 } from "lucide-react";
-import { type PresencialEvent } from "../../data/lti";
+import { Check, Trash2, X } from "lucide-react";
+import { useState } from "react";
+import type { PresencialEvent } from "../../data/lti";
 
 interface EditPresencialModalProps {
 	event: PresencialEvent;
@@ -28,7 +28,10 @@ export function EditPresencialModal({
 							Editar Instancia Presencial
 						</Dialog.Title>
 						<Dialog.Close asChild>
-							<button className="text-slate-400 hover:text-white transition-colors" aria-label="Cerrar">
+							<button
+								className="text-slate-400 hover:text-white transition-colors"
+								aria-label="Cerrar"
+							>
 								<X size={20} />
 							</button>
 						</Dialog.Close>

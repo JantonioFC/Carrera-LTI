@@ -1,17 +1,17 @@
-import { useState } from "react";
-import { useNexusDB, db } from "../hooks/useNexusDB";
-import { v4 as uuidv4 } from "uuid";
 import {
+	Calendar as CalendarIcon,
 	Database,
+	Hash,
+	LayoutDashboard,
+	Link2,
+	ListFilter,
 	Plus,
 	Table2,
 	Type,
-	Hash,
-	Calendar as CalendarIcon,
-	Link2,
-	ListFilter,
-	LayoutDashboard,
 } from "lucide-react";
+import { useState } from "react";
+import { v4 as uuidv4 } from "uuid";
+import { db, useNexusDB } from "../hooks/useNexusDB";
 
 export default function NexusDatabaseView() {
 	const { allDatabases } = useNexusDB();

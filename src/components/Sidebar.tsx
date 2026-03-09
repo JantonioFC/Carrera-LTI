@@ -1,23 +1,23 @@
 import {
-	LayoutDashboard,
 	BookMarked,
+	BotMessageSquare,
+	BrainCircuit,
 	Calendar,
-	Map,
 	CheckSquare,
 	Cloud,
 	CloudOff,
-	RefreshCw,
-	LayoutTemplate,
-	BrainCircuit,
-	Maximize,
-	BotMessageSquare,
 	Database,
+	LayoutDashboard,
+	LayoutTemplate,
+	Map,
+	Maximize,
+	RefreshCw,
 	Sparkles,
 	X,
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
-import { useCloudSync } from "../hooks/useCloudSync";
 import type { PresencialEvent } from "../data/lti";
+import { useCloudSync } from "../hooks/useCloudSync";
 
 interface SidebarProps {
 	presenciales: PresencialEvent[];

@@ -1,4 +1,3 @@
-"use strict";
 var __create = Object.create;
 var __defProp = Object.defineProperty;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
@@ -28,7 +27,7 @@ var __export = (target, all) => {
 };
 var __copyProps = (to, from, except, desc) => {
 	if ((from && typeof from === "object") || typeof from === "function") {
-		for (let key of __getOwnPropNames(from))
+		for (const key of __getOwnPropNames(from))
 			if (!__hasOwnProp.call(to, key) && key !== except)
 				__defProp(to, key, {
 					get: () => from[key],
@@ -60,7 +59,7 @@ var __publicField = (obj, key, value) => {
 // node_modules/dayjs/dayjs.min.js
 var require_dayjs_min = __commonJS({
 	"node_modules/dayjs/dayjs.min.js"(exports, module2) {
-		!(function (t, e) {
+		!((t, e) => {
 			"object" == typeof exports && "undefined" != typeof module2
 				? (module2.exports = e())
 				: "function" == typeof define && define.amd
@@ -68,8 +67,7 @@ var require_dayjs_min = __commonJS({
 					: ((t =
 							"undefined" != typeof globalThis ? globalThis : t || self).dayjs =
 							e());
-		})(exports, function () {
-			"use strict";
+		})(exports, () => {
 			var t = 1e3,
 				e = 6e4,
 				n = 36e5,
@@ -98,13 +96,13 @@ var require_dayjs_min = __commonJS({
 						"January_February_March_April_May_June_July_August_September_October_November_December".split(
 							"_",
 						),
-					ordinal: function (t2) {
+					ordinal: (t2) => {
 						var e2 = ["th", "st", "nd", "rd"],
 							n2 = t2 % 100;
 						return "[" + t2 + (e2[(n2 - 20) % 10] || e2[n2] || e2[0]) + "]";
 					},
 				},
-				m = function (t2, e2, n2) {
+				m = (t2, e2, n2) => {
 					var r2 = String(t2);
 					return !r2 || r2.length >= e2
 						? t2
@@ -112,7 +110,7 @@ var require_dayjs_min = __commonJS({
 				},
 				v = {
 					s: m,
-					z: function (t2) {
+					z: (t2) => {
 						var e2 = -t2.utcOffset(),
 							n2 = Math.abs(e2),
 							r2 = Math.floor(n2 / 60),
@@ -127,29 +125,20 @@ var require_dayjs_min = __commonJS({
 							u2 = e2.clone().add(r2 + (s2 ? -1 : 1), c);
 						return +(-(r2 + (n2 - i2) / (s2 ? i2 - u2 : u2 - i2)) || 0);
 					},
-					a: function (t2) {
-						return t2 < 0 ? Math.ceil(t2) || 0 : Math.floor(t2);
-					},
-					p: function (t2) {
-						return (
-							{ M: c, y: h, w: o, d: a, D: d, h: u, m: s, s: i, ms: r, Q: f }[
-								t2
-							] ||
-							String(t2 || "")
-								.toLowerCase()
-								.replace(/s$/, "")
-						);
-					},
-					u: function (t2) {
-						return void 0 === t2;
-					},
+					a: (t2) => (t2 < 0 ? Math.ceil(t2) || 0 : Math.floor(t2)),
+					p: (t2) =>
+						({ M: c, y: h, w: o, d: a, D: d, h: u, m: s, s: i, ms: r, Q: f })[
+							t2
+						] ||
+						String(t2 || "")
+							.toLowerCase()
+							.replace(/s$/, ""),
+					u: (t2) => void 0 === t2,
 				},
 				g = "en",
 				D = {};
 			D[g] = M;
-			var p = function (t2) {
-					return t2 instanceof b;
-				},
+			var p = (t2) => t2 instanceof b,
 				S = function t2(e2, n2, r2) {
 					var i2;
 					if (!e2) return g;
@@ -172,22 +161,21 @@ var require_dayjs_min = __commonJS({
 				O = v;
 			(O.l = S),
 				(O.i = p),
-				(O.w = function (t2, e2) {
-					return w(t2, {
+				(O.w = (t2, e2) =>
+					w(t2, {
 						locale: e2.$L,
 						utc: e2.$u,
 						x: e2.$x,
 						$offset: e2.$offset,
-					});
-				});
-			var b = (function () {
+					}));
+			var b = (() => {
 					function M2(t2) {
 						(this.$L = S(t2.locale, null, true)), this.parse(t2);
 					}
 					var m2 = M2.prototype;
 					return (
 						(m2.parse = function (t2) {
-							(this.$d = (function (t3) {
+							(this.$d = ((t3) => {
 								var e2 = t3.date,
 									n2 = t3.utc;
 								if (null === e2) return /* @__PURE__ */ new Date(NaN);
@@ -237,9 +225,7 @@ var require_dayjs_min = __commonJS({
 								(this.$s = t2.getSeconds()),
 								(this.$ms = t2.getMilliseconds());
 						}),
-						(m2.$utils = function () {
-							return O;
-						}),
+						(m2.$utils = () => O),
 						(m2.isValid = function () {
 							return !(this.$d.toString() === l);
 						}),
@@ -263,27 +249,25 @@ var require_dayjs_min = __commonJS({
 							return this.$d.getTime();
 						}),
 						(m2.startOf = function (t2, e2) {
-							var n2 = this,
-								r2 = !!O.u(e2) || e2,
+							var r2 = !!O.u(e2) || e2,
 								f2 = O.p(t2),
-								l2 = function (t3, e3) {
+								l2 = (t3, e3) => {
 									var i2 = O.w(
-										n2.$u ? Date.UTC(n2.$y, e3, t3) : new Date(n2.$y, e3, t3),
-										n2,
+										this.$u
+											? Date.UTC(this.$y, e3, t3)
+											: new Date(this.$y, e3, t3),
+										this,
 									);
 									return r2 ? i2 : i2.endOf(a);
 								},
-								$2 = function (t3, e3) {
-									return O.w(
-										n2
-											.toDate()
-											[t3].apply(
-												n2.toDate("s"),
-												(r2 ? [0, 0, 0, 0] : [23, 59, 59, 999]).slice(e3),
-											),
-										n2,
-									);
-								},
+								$2 = (t3, e3) =>
+									O.w(
+										this.toDate()[t3].apply(
+											this.toDate("s"),
+											(r2 ? [0, 0, 0, 0] : [23, 59, 59, 999]).slice(e3),
+										),
+										this,
+									),
 								y2 = this.$W,
 								M3 = this.$M,
 								m3 = this.$D,
@@ -293,10 +277,11 @@ var require_dayjs_min = __commonJS({
 									return r2 ? l2(1, 0) : l2(31, 11);
 								case c:
 									return r2 ? l2(1, M3) : l2(0, M3 + 1);
-								case o:
+								case o: {
 									var g2 = this.$locale().weekStart || 0,
 										D2 = (y2 < g2 ? y2 + 7 : y2) - g2;
 									return l2(r2 ? m3 - D2 : m3 + (6 - D2), M3);
+								}
 								case a:
 								case d:
 									return $2(v2 + "Hours", 0);
@@ -343,13 +328,12 @@ var require_dayjs_min = __commonJS({
 							return this[O.p(t2)]();
 						}),
 						(m2.add = function (r2, f2) {
-							var d2,
-								l2 = this;
+							var d2;
 							r2 = Number(r2);
 							var $2 = O.p(f2),
-								y2 = function (t2) {
-									var e2 = w(l2);
-									return O.w(e2.date(e2.date() + Math.round(t2 * r2)), l2);
+								y2 = (t2) => {
+									var e2 = w(this);
+									return O.w(e2.date(e2.date() + Math.round(t2 * r2)), this);
 								};
 							if ($2 === c) return this.set(c, this.$M + r2);
 							if ($2 === h) return this.set(h, this.$y + r2);
@@ -365,8 +349,7 @@ var require_dayjs_min = __commonJS({
 							return this.add(-1 * t2, e2);
 						}),
 						(m2.format = function (t2) {
-							var e2 = this,
-								n2 = this.$locale();
+							var n2 = this.$locale();
 							if (!this.isValid()) return n2.invalidDate || l;
 							var r2 = t2 || "YYYY-MM-DDTHH:mm:ssZ",
 								i2 = O.z(this),
@@ -376,27 +359,25 @@ var require_dayjs_min = __commonJS({
 								o2 = n2.weekdays,
 								c2 = n2.months,
 								f2 = n2.meridiem,
-								h2 = function (t3, n3, i3, s3) {
-									return (t3 && (t3[n3] || t3(e2, r2))) || i3[n3].slice(0, s3);
-								},
-								d2 = function (t3) {
-									return O.s(s2 % 12 || 12, t3, "0");
-								},
+								h2 = (t3, n3, i3, s3) =>
+									(t3 && (t3[n3] || t3(this, r2))) || i3[n3].slice(0, s3),
+								d2 = (t3) => O.s(s2 % 12 || 12, t3, "0"),
 								$2 =
 									f2 ||
-									function (t3, e3, n3) {
+									((t3, e3, n3) => {
 										var r3 = t3 < 12 ? "AM" : "PM";
 										return n3 ? r3.toLowerCase() : r3;
-									};
-							return r2.replace(y, function (t3, r3) {
-								return (
+									});
+							return r2.replace(
+								y,
+								(t3, r3) =>
 									r3 ||
-									(function (t4) {
+									((t4) => {
 										switch (t4) {
 											case "YY":
-												return String(e2.$y).slice(-2);
+												return String(this.$y).slice(-2);
 											case "YYYY":
-												return O.s(e2.$y, 4, "0");
+												return O.s(this.$y, 4, "0");
 											case "M":
 												return a2 + 1;
 											case "MM":
@@ -406,17 +387,17 @@ var require_dayjs_min = __commonJS({
 											case "MMMM":
 												return h2(c2, a2);
 											case "D":
-												return e2.$D;
+												return this.$D;
 											case "DD":
-												return O.s(e2.$D, 2, "0");
+												return O.s(this.$D, 2, "0");
 											case "d":
-												return String(e2.$W);
+												return String(this.$W);
 											case "dd":
-												return h2(n2.weekdaysMin, e2.$W, o2, 2);
+												return h2(n2.weekdaysMin, this.$W, o2, 2);
 											case "ddd":
-												return h2(n2.weekdaysShort, e2.$W, o2, 3);
+												return h2(n2.weekdaysShort, this.$W, o2, 3);
 											case "dddd":
-												return o2[e2.$W];
+												return o2[this.$W];
 											case "H":
 												return String(s2);
 											case "HH":
@@ -434,33 +415,29 @@ var require_dayjs_min = __commonJS({
 											case "mm":
 												return O.s(u2, 2, "0");
 											case "s":
-												return String(e2.$s);
+												return String(this.$s);
 											case "ss":
-												return O.s(e2.$s, 2, "0");
+												return O.s(this.$s, 2, "0");
 											case "SSS":
-												return O.s(e2.$ms, 3, "0");
+												return O.s(this.$ms, 3, "0");
 											case "Z":
 												return i2;
 										}
 										return null;
 									})(t3) ||
-									i2.replace(":", "")
-								);
-							});
+									i2.replace(":", ""),
+							);
 						}),
 						(m2.utcOffset = function () {
 							return 15 * -Math.round(this.$d.getTimezoneOffset() / 15);
 						}),
 						(m2.diff = function (r2, d2, l2) {
 							var $2,
-								y2 = this,
 								M3 = O.p(d2),
 								m3 = w(r2),
 								v2 = (m3.utcOffset() - this.utcOffset()) * e,
 								g2 = this - m3,
-								D2 = function () {
-									return O.m(y2, m3);
-								};
+								D2 = () => O.m(this, m3);
 							switch (M3) {
 								case h:
 									$2 = D2() / 12;
@@ -533,19 +510,15 @@ var require_dayjs_min = __commonJS({
 					["$M", c],
 					["$y", h],
 					["$D", d],
-				].forEach(function (t2) {
+				].forEach((t2) => {
 					_[t2[1]] = function (e2) {
 						return this.$g(e2, t2[0], t2[1]);
 					};
 				}),
-				(w.extend = function (t2, e2) {
-					return t2.$i || (t2(e2, b, w), (t2.$i = true)), w;
-				}),
+				(w.extend = (t2, e2) => (t2.$i || (t2(e2, b, w), (t2.$i = true)), w)),
 				(w.locale = S),
 				(w.isDayjs = p),
-				(w.unix = function (t2) {
-					return w(1e3 * t2);
-				}),
+				(w.unix = (t2) => w(1e3 * t2)),
 				(w.en = D[g]),
 				(w.Ls = D),
 				(w.p = {}),
@@ -564,7 +537,7 @@ var require_ms = __commonJS({
 		var d = h * 24;
 		var w = d * 7;
 		var y = d * 365.25;
-		module2.exports = function (val, options) {
+		module2.exports = (val, options) => {
 			options = options || {};
 			var type = typeof val;
 			if (type === "string" && val.length > 0) {
@@ -1034,7 +1007,7 @@ var require_browser = __commonJS({
 		}
 		module2.exports = require_common()(exports);
 		var { formatters } = module2.exports;
-		formatters.j = function (v) {
+		formatters.j = (v) => {
 			try {
 				return JSON.stringify(v);
 			} catch (error) {
@@ -1047,12 +1020,9 @@ var require_browser = __commonJS({
 // node_modules/@kwsites/file-exists/dist/src/index.js
 var require_src = __commonJS({
 	"node_modules/@kwsites/file-exists/dist/src/index.js"(exports) {
-		"use strict";
 		var __importDefault =
 			(exports && exports.__importDefault) ||
-			function (mod) {
-				return mod && mod.__esModule ? mod : { default: mod };
-			};
+			((mod) => (mod && mod.__esModule ? mod : { default: mod }));
 		Object.defineProperty(exports, "__esModule", { value: true });
 		var fs_1 = require("fs");
 		var debug_1 = __importDefault(require_browser());
@@ -1097,9 +1067,8 @@ var require_src = __commonJS({
 // node_modules/@kwsites/file-exists/dist/index.js
 var require_dist = __commonJS({
 	"node_modules/@kwsites/file-exists/dist/index.js"(exports) {
-		"use strict";
 		function __export3(m) {
-			for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+			for (var p in m) if (!Object.hasOwn(exports, p)) exports[p] = m[p];
 		}
 		Object.defineProperty(exports, "__esModule", { value: true });
 		__export3(require_src());
@@ -1109,7 +1078,6 @@ var require_dist = __commonJS({
 // node_modules/@kwsites/promise-deferred/dist/index.js
 var require_dist2 = __commonJS({
 	"node_modules/@kwsites/promise-deferred/dist/index.js"(exports) {
-		"use strict";
 		Object.defineProperty(exports, "__esModule", { value: true });
 		exports.createDeferred = exports.deferred = void 0;
 		function deferred2() {
@@ -1783,7 +1751,7 @@ var __reExport = (target, module2, copyDefault, desc) => {
 		(module2 && typeof module2 === "object") ||
 		typeof module2 === "function"
 	) {
-		for (let key of __getOwnPropNames2(module2))
+		for (const key of __getOwnPropNames2(module2))
 			if (
 				!__hasOwnProp2.call(target, key) &&
 				(copyDefault || key !== "default")
@@ -2485,8 +2453,8 @@ function isCleanOptionsArray(input) {
 }
 function getCleanOptions(input) {
 	let cleanMode;
-	let options = [];
-	let valid = { cleanMode: false, options: true };
+	const options = [];
+	const valid = { cleanMode: false, options: true };
 	input
 		.replace(/[^a-z]i/g, "")
 		.split("")
@@ -2513,7 +2481,7 @@ function isKnownOption(option) {
 	return /^-[a-z]$/i.test(option) && CleanOptionValues.has(option.charAt(1));
 }
 function isInteractiveMode(option) {
-	if (/^-[^\-]/.test(option)) {
+	if (/^-[^-]/.test(option)) {
 		return option.indexOf("i") > 0;
 	}
 	return option === "--interactive";
@@ -2622,7 +2590,7 @@ var init_ConfigList = __esm({
 			}
 			addValue(file, key, value) {
 				const values = this.addFile(file);
-				if (!values.hasOwnProperty(key)) {
+				if (!Object.hasOwn(values, key)) {
 					values[key] = value;
 				} else if (Array.isArray(values[key])) {
 					values[key].push(value);
@@ -2635,7 +2603,7 @@ var init_ConfigList = __esm({
 	},
 });
 function asConfigScope(scope, fallback) {
-	if (typeof scope === "string" && GitConfigScope.hasOwnProperty(scope)) {
+	if (typeof scope === "string" && Object.hasOwn(GitConfigScope, scope)) {
 		return scope;
 	}
 	return fallback;
@@ -3651,7 +3619,7 @@ var init_parse_diff_summary = __esm({
 		init_utils();
 		statParser = [
 			new LineParser(
-				/(.+)\s+\|\s+(\d+)(\s+[+\-]+)?$/,
+				/(.+)\s+\|\s+(\d+)(\s+[+-]+)?$/,
 				(result, [file, changes, alterations = ""]) => {
 					result.files.push({
 						file: file.trim(),
@@ -3738,19 +3706,19 @@ var init_parse_diff_summary = __esm({
 		];
 		diffSummaryParsers = {
 			[""]:
-			/* NONE */
+				/* NONE */
 				statParser,
 			["--stat"]:
-			/* STAT */
+				/* STAT */
 				statParser,
 			["--numstat"]:
-			/* NUM_STAT */
+				/* NUM_STAT */
 				numStatParser,
 			["--name-status"]:
-			/* NAME_STATUS */
+				/* NAME_STATUS */
 				nameStatusParser,
 			["--name-only"]:
-			/* NAME_ONLY */
+				/* NAME_ONLY */
 				nameOnlyParser,
 		};
 	},
@@ -3770,20 +3738,18 @@ function createListLogSummaryParser(
 	logFormat = "",
 ) {
 	const parseDiffResult = getDiffParser(logFormat);
-	return function (stdOut) {
-		const all = toLinesWithContent(stdOut, true, START_BOUNDARY).map(
-			function (item) {
-				const lineDetail = item.trim().split(COMMIT_BOUNDARY);
-				const listLogLine = lineBuilder(
-					lineDetail[0].trim().split(splitter),
-					fields,
-				);
-				if (lineDetail.length > 1 && !!lineDetail[1].trim()) {
-					listLogLine.diff = parseDiffResult(lineDetail[1]);
-				}
-				return listLogLine;
-			},
-		);
+	return (stdOut) => {
+		const all = toLinesWithContent(stdOut, true, START_BOUNDARY).map((item) => {
+			const lineDetail = item.trim().split(COMMIT_BOUNDARY);
+			const listLogLine = lineBuilder(
+				lineDetail[0].trim().split(splitter),
+				fields,
+			);
+			if (lineDetail.length > 1 && !!lineDetail[1].trim()) {
+				listLogLine.diff = parseDiffResult(lineDetail[1]);
+			}
+			return listLogLine;
+		});
 		return {
 			all,
 			latest: (all.length && all[0]) || null,
@@ -4609,7 +4575,7 @@ var init_StatusSummary = __esm({
 				},
 			],
 		]);
-		parseStatusSummary = function (text) {
+		parseStatusSummary = (text) => {
 			const lines = text.split(NULL);
 			const status = new StatusSummary();
 			for (let i = 0, l = lines.length; i < l; ) {
@@ -5368,7 +5334,7 @@ function parseGetRemotes(text) {
 function parseGetRemotesVerbose(text) {
 	const remotes = {};
 	forEach(text, ([name, url, purpose]) => {
-		if (!remotes.hasOwnProperty(name)) {
+		if (!Object.hasOwn(remotes, name)) {
 			remotes[name] = {
 				name,
 				refs: { fetch: "", push: "" },
@@ -5525,10 +5491,10 @@ var init_TagList = __esm({
 				this.latest = latest;
 			}
 		};
-		parseTagList = function (data, customSort = false) {
+		parseTagList = (data, customSort = false) => {
 			const tags = data.split("\n").map(trimmed).filter(Boolean);
 			if (!customSort) {
-				tags.sort(function (tagA, tagB) {
+				tags.sort((tagA, tagB) => {
 					const partsA = tagA.split(".");
 					const partsB = tagB.split(".");
 					if (partsA.length === 1 || partsB.length === 1) {
@@ -5729,10 +5695,9 @@ var require_git = __commonJS2({
 			);
 		};
 		Git2.prototype.checkoutLatestTag = function (then) {
-			var git = this;
-			return this.pull(function () {
-				git.tags(function (err, tags) {
-					git.checkout(tags.latest, then);
+			return this.pull(() => {
+				this.tags((err, tags) => {
+					this.checkout(tags.latest, then);
 				});
 			});
 		};
@@ -6243,7 +6208,7 @@ function completionDetectionPlugin({ onClose = true, onExit = 50 } = {}) {
 				var _a2, _b;
 				const events = createEvents();
 				let deferClose = true;
-				let quickClose = () => void (deferClose = false);
+				const quickClose = () => void (deferClose = false);
 				(_a2 = spawned.stdout) == null ? void 0 : _a2.on("data", quickClose);
 				(_b = spawned.stderr) == null ? void 0 : _b.on("data", quickClose);
 				spawned.on("error", quickClose);
@@ -6601,12 +6566,10 @@ var UnmergedFilesView = class extends import_obsidian3.Modal {
 						});
 						const list = this.contentEl.createEl("ul");
 						files.forEach((file) =>
-							list
-								.createEl("li")
-								.createEl("strong", {
-									text: file,
-									cls: "yaos-conflicting-files",
-								}),
+							list.createEl("li").createEl("strong", {
+								text: file,
+								cls: "yaos-conflicting-files",
+							}),
 						);
 					} else {
 						this.contentEl.createEl("h3", {

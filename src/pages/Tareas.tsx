@@ -1,13 +1,13 @@
-import { useState, useEffect } from "react";
 import {
-	Plus,
-	X,
-	GripVertical,
 	Calendar,
-	Flag,
 	CheckCircle2,
 	Circle,
+	Flag,
+	GripVertical,
+	Plus,
+	X,
 } from "lucide-react";
+import { useEffect, useState } from "react";
 import { CURRICULUM } from "../data/lti";
 import { safeParseJSON } from "../utils/safeStorage";
 
@@ -318,7 +318,7 @@ export default function Tareas() {
 													<span
 														className="text-xs px-2 py-0.5 rounded-full font-medium"
 														style={{
-															backgroundColor: subject.color + "20",
+															backgroundColor: `${subject.color}20`,
 															color: subject.color,
 														}}
 													>
@@ -338,7 +338,7 @@ export default function Tareas() {
 												>
 													<Calendar size={10} />
 													{new Date(
-														task.dueDate + "T12:00:00",
+														`${task.dueDate}T12:00:00`,
 													).toLocaleDateString("es-UY", {
 														day: "numeric",
 														month: "short",

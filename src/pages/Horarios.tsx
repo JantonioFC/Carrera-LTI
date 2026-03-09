@@ -1,26 +1,26 @@
-import { useState } from "react";
 import {
-	DndContext,
 	closestCorners,
+	DndContext,
+	type DragOverEvent,
+	DragOverlay,
+	type DragStartEvent,
+	defaultDropAnimationSideEffects,
 	KeyboardSensor,
 	PointerSensor,
 	useSensor,
 	useSensors,
-	DragOverlay,
-	defaultDropAnimationSideEffects,
-	DragStartEvent,
-	DragOverEvent,
 } from "@dnd-kit/core";
 import {
 	arrayMove,
 	SortableContext,
 	sortableKeyboardCoordinates,
-	verticalListSortingStrategy,
 	useSortable,
+	verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { CURRICULUM, WEEKDAY_SHORT, type Subject } from "../data/lti";
 import { GripVertical } from "lucide-react";
+import { useState } from "react";
+import { CURRICULUM, type Subject, WEEKDAY_SHORT } from "../data/lti";
 import { safeParseJSON } from "../utils/safeStorage";
 
 const DAYS = [1, 2, 3, 4, 5, 6]; // Lun a Sáb
@@ -74,7 +74,7 @@ function SortableItem({
 					<span
 						className="text-[10px] px-1.5 py-0.5 rounded-full"
 						style={{
-							backgroundColor: subject?.color + "20",
+							backgroundColor: `${subject?.color}20`,
 							color: subject?.color,
 						}}
 					>
@@ -170,7 +170,7 @@ export default function Horarios() {
 
 		setItems((prevItems) => {
 			const activeIndex = prevItems.findIndex((t) => t.id === activeId);
-			let activeItem = { ...prevItems[activeIndex] };
+			const activeItem = { ...prevItems[activeIndex] };
 
 			if (isOverTask) {
 				const overIndex = prevItems.findIndex((t) => t.id === overId);
@@ -178,7 +178,7 @@ export default function Horarios() {
 
 				if (activeItem.day !== overItem.day) {
 					activeItem.day = overItem.day;
-					let newItems = [...prevItems];
+					const newItems = [...prevItems];
 					newItems[activeIndex] = activeItem;
 					return arrayMove(newItems, activeIndex, overIndex);
 				}
@@ -188,7 +188,7 @@ export default function Horarios() {
 			if (isOverColumn) {
 				if (activeItem.day !== over.data.current?.day) {
 					activeItem.day = over.data.current?.day;
-					let newItems = [...prevItems];
+					const newItems = [...prevItems];
 					newItems[activeIndex] = activeItem;
 					return arrayMove(newItems, activeIndex, prevItems.length - 1);
 				}

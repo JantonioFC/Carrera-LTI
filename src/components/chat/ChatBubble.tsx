@@ -1,5 +1,5 @@
-import { Bot, User } from "lucide-react";
 import MDEditor from "@uiw/react-md-editor";
+import { Bot, User } from "lucide-react";
 import rehypeSanitize from "rehype-sanitize";
 
 interface ChatBubbleProps {
@@ -11,7 +11,7 @@ interface ChatBubbleProps {
 export function ChatBubble({ role, text, flavor = "aether" }: ChatBubbleProps) {
 	const isAether = flavor === "aether";
 
-	const botIconContainer = isAether 
+	const botIconContainer = isAether
 		? "w-8 h-8 rounded-full bg-lti-coral/20 flex flex-shrink-0 items-center justify-center self-end"
 		: "w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-indigo-600 flex flex-shrink-0 items-center justify-center self-end mt-1 shadow";
 
@@ -31,13 +31,17 @@ export function ChatBubble({ role, text, flavor = "aether" }: ChatBubbleProps) {
 		: "bg-lti-blue text-white rounded-br-md";
 
 	return (
-		<div className={`flex gap-4 ${role === "user" ? "justify-end" : "justify-start"}`}>
+		<div
+			className={`flex gap-4 ${role === "user" ? "justify-end" : "justify-start"}`}
+		>
 			{role === "model" && (
 				<div className={botIconContainer}>
 					<Bot size={16} className={botIconColor} />
 				</div>
 			)}
-			<div className={`max-w-[85%] px-5 py-4 ${isAether ? 'rounded-2xl' : 'rounded-2xl text-sm leading-relaxed whitespace-pre-wrap'} ${role === "user" ? userBubbleStyle : botBubbleStyle}`}>
+			<div
+				className={`max-w-[85%] px-5 py-4 ${isAether ? "rounded-2xl" : "rounded-2xl text-sm leading-relaxed whitespace-pre-wrap"} ${role === "user" ? userBubbleStyle : botBubbleStyle}`}
+			>
 				{role === "user" ? (
 					<p className="whitespace-pre-wrap">{text}</p>
 				) : (

@@ -1,4 +1,4 @@
-import { type Subject } from "../../data/lti";
+import type { Subject } from "../../data/lti";
 
 interface SemesterSubjectsProps {
 	subjects: Subject[];

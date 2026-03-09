@@ -1,5 +1,3 @@
-"use strict";
-
 var obsidian = require("obsidian");
 
 function _interopDefaultLegacy(e) {
@@ -1176,7 +1174,7 @@ async function tryToCreateWeeklyNote(date, inNewSplit, settings, cb) {
 
 function noop() {}
 function assign(tar, src) {
-	// @ts-ignore
+	// @ts-expect-error
 	for (const k in src) tar[k] = src[k];
 	return tar;
 }
@@ -1303,7 +1301,7 @@ function attr(node, attribute, value) {
 		node.setAttribute(attribute, value);
 }
 function set_attributes(node, attributes) {
-	// @ts-ignore
+	// @ts-expect-error
 	const descriptors = Object.getOwnPropertyDescriptors(node.__proto__);
 	for (const key in attributes) {
 		if (attributes[key] == null) {
@@ -2189,7 +2187,7 @@ function create_fragment$5(ctx) {
 			current = true;
 		},
 		p(ctx, [dirty]) {
-			let previous_block_index = current_block_type_index;
+			const previous_block_index = current_block_type_index;
 			current_block_type_index = select_block_type(ctx);
 
 			if (current_block_type_index === previous_block_index) {
@@ -2381,7 +2379,7 @@ function create_default_slot$1(ctx) {
 			each_blocks[i] = null;
 		});
 
-	let div1_levels = [
+	const div1_levels = [
 		{
 			class:
 				(div1_class_value = `day ${/*metadata*/ ctx[7].classes.join(" ")}`),
@@ -2761,7 +2759,7 @@ function instance$3($$self, $$props, $$invalidate) {
 	let { direction } = $$props;
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	let isMobile = window.app.isMobile;
+	const isMobile = window.app.isMobile;
 
 	$$self.$$set = ($$props) => {
 		if ("onClick" in $$props) $$invalidate(0, (onClick = $$props.onClick));
@@ -2942,7 +2940,7 @@ function instance$2($$self, $$props, $$invalidate) {
 	const todayDisplayStr = today.calendar().split(/\d|\s/)[0];
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	let isMobile = window.app.isMobile;
+	const isMobile = window.app.isMobile;
 
 	$$self.$$set = ($$props) => {
 		if ("displayedMonth" in $$props)
@@ -3659,7 +3657,7 @@ function create_each_block(key_1, ctx) {
 	let tr;
 	let t0;
 	let each_blocks = [];
-	let each_1_lookup = new Map();
+	const each_1_lookup = new Map();
 	let t1;
 	let current;
 	let if_block = /*showWeekNums*/ ctx[1] && create_if_block(ctx);
@@ -3667,8 +3665,8 @@ function create_each_block(key_1, ctx) {
 	const get_key = (ctx) => /*day*/ ctx[21].format();
 
 	for (let i = 0; i < each_value_1.length; i += 1) {
-		let child_ctx = get_each_context_1(ctx, each_value_1, i);
-		let key = get_key(child_ctx);
+		const child_ctx = get_each_context_1(ctx, each_value_1, i);
+		const key = get_key(child_ctx);
 		each_1_lookup.set(
 			key,
 			(each_blocks[i] = create_each_block_1(key, child_ctx)),
@@ -3795,7 +3793,7 @@ function create_fragment$7(ctx) {
 	let t4;
 	let tbody;
 	let each_blocks = [];
-	let each2_lookup = new Map();
+	const each2_lookup = new Map();
 	let current;
 
 	nav = new Nav({
@@ -3810,7 +3808,7 @@ function create_fragment$7(ctx) {
 
 	let if_block0 = /*showWeekNums*/ ctx[1] && create_if_block_2();
 	let each_value_3 = /*month*/ ctx[14][1].days;
-	let each_blocks_2 = [];
+	const each_blocks_2 = [];
 
 	for (let i = 0; i < each_value_3.length; i += 1) {
 		each_blocks_2[i] = create_each_block_3(
@@ -3820,7 +3818,7 @@ function create_fragment$7(ctx) {
 
 	let if_block1 = /*showWeekNums*/ ctx[1] && create_if_block_1();
 	let each_value_2 = /*daysOfWeek*/ ctx[15];
-	let each_blocks_1 = [];
+	const each_blocks_1 = [];
 
 	for (let i = 0; i < each_value_2.length; i += 1) {
 		each_blocks_1[i] = create_each_block_2(
@@ -3832,8 +3830,8 @@ function create_fragment$7(ctx) {
 	const get_key = (ctx) => /*week*/ ctx[18].weekNum;
 
 	for (let i = 0; i < each_value.length; i += 1) {
-		let child_ctx = get_each_context(ctx, each_value, i);
-		let key = get_key(child_ctx);
+		const child_ctx = get_each_context(ctx, each_value, i);
+		const key = get_key(child_ctx);
 		each2_lookup.set(key, (each_blocks[i] = create_each_block(key, child_ctx)));
 	}
 
@@ -4056,7 +4054,7 @@ function instance$7($$self, $$props, $$invalidate) {
 	let daysOfWeek;
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	let isMobile = window.app.isMobile;
+	const isMobile = window.app.isMobile;
 
 	function incrementDisplayedMonth() {
 		$$invalidate(0, (displayedMonth = displayedMonth.clone().add(1, "month")));
@@ -4263,7 +4261,7 @@ function create_fragment(ctx) {
 		/*calendarbase_displayedMonth_binding*/ ctx[12](value);
 	}
 
-	let calendarbase_props = {
+	const calendarbase_props = {
 		sources: /*sources*/ ctx[1],
 		today: /*today*/ ctx[9],
 		onHoverDay: /*onHoverDay*/ ctx[2],
@@ -4373,7 +4371,7 @@ function instance($$self, $$props, $$invalidate) {
 	}
 
 	// 1 minute heartbeat to keep `today` reflecting the current day
-	let heartbeat = setInterval(() => {
+	const heartbeat = setInterval(() => {
 		tick();
 		const isViewingCurrentMonth = displayedMonth.isSame(today, "day");
 

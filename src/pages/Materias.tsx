@@ -1,11 +1,11 @@
-import { useState, useMemo } from "react";
+import { Link as LinkIcon, Pencil, Plus, Trash2 } from "lucide-react";
+import { useMemo, useState } from "react";
 import { CURRICULUM, formatDateShort, type Subject } from "../data/lti";
 import {
-	useSubjectData,
 	type SubjectData,
 	type SubjectResource,
+	useSubjectData,
 } from "../hooks/useSubjectData";
-import { Pencil, Trash2, Plus, Link as LinkIcon } from "lucide-react";
 
 export default function Materias() {
 	const sem1 = CURRICULUM[0];
@@ -19,7 +19,7 @@ export default function Materias() {
 				...s,
 				status: data[s.id]?.status || s.status,
 			})),
-		[sem1.subjects, data],
+		[data],
 	);
 
 	const totalCredits = useMemo(
@@ -70,7 +70,7 @@ export default function Materias() {
 									<div
 										className="px-2 py-0.5 rounded-full text-xs font-bold flex-shrink-0"
 										style={{
-											backgroundColor: subject.color + "20",
+											backgroundColor: `${subject.color}20`,
 											color: subject.color,
 											border: `1px solid ${subject.color}40`,
 										}}
@@ -127,7 +127,7 @@ export default function Materias() {
 											Recursos
 										</p>
 										<div className="flex flex-wrap gap-2">
-											{data[subject.id]!.resources.map((res) => (
+											{data[subject.id]?.resources.map((res) => (
 												<a
 													key={res.id}
 													href={res.url}

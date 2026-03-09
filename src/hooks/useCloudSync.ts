@@ -1,13 +1,13 @@
+import type { User } from "firebase/auth";
 import { useEffect, useState } from "react";
+import type { PresencialEvent } from "../data/lti";
 import {
+	type AppData,
+	getDataFromCloud,
 	initAuth,
 	syncDataToCloud,
-	getDataFromCloud,
-	type AppData,
 } from "../utils/firebase";
-import { useSubjectData, type SubjectData } from "./useSubjectData";
-import type { PresencialEvent } from "../data/lti";
-import type { User } from "firebase/auth";
+import { type SubjectData, useSubjectData } from "./useSubjectData";
 
 export function useCloudSync(
 	presenciales: PresencialEvent[],

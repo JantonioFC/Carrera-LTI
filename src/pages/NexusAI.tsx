@@ -1,29 +1,29 @@
-import { useState, useCallback, useEffect } from "react";
-import { useAetherStore } from "../store/aetherStore";
-import { useNexusStore } from "../store/nexusStore";
-import { useNexusDB } from "../hooks/useNexusDB";
-import { apiBackend } from "../services/aiClient";
-import { truncateContext } from "../utils/aiUtils";
 import {
-	Trash2,
-	Key,
-	Sparkles,
 	Database,
 	FileText,
+	Key,
 	Shield,
+	Sparkles,
+	Trash2,
 } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
 import { ChatBubble } from "../components/chat/ChatBubble";
 import { ChatInputArea } from "../components/chat/ChatInputArea";
 import { ChatSkeleton } from "../components/chat/ChatSkeleton";
-import { safeParseJSON } from "../utils/safeStorage";
+import { useNexusDB } from "../hooks/useNexusDB";
+import { apiBackend } from "../services/aiClient";
+import { useAetherStore } from "../store/aetherStore";
+import { useNexusStore } from "../store/nexusStore";
+import { truncateContext } from "../utils/aiUtils";
 import {
-	type RemoteData,
-	notAsked,
-	loading,
-	success,
 	failure,
 	isLoading,
+	loading,
+	notAsked,
+	type RemoteData,
+	success,
 } from "../utils/result";
+import { safeParseJSON } from "../utils/safeStorage";
 
 interface NexusMessage {
 	role: "user" | "model";
@@ -121,19 +121,19 @@ Sé conciso pero completo. Usa formato Markdown cuando sea útil.\n\n`;
 						const lastMsg = newMsgs[newMsgs.length - 1];
 						if (lastMsg && lastMsg.role === "model") {
 							// Return a new object for immutability
-							newMsgs[newMsgs.length - 1] = { ...lastMsg, content: currentText };
+							newMsgs[newMsgs.length - 1] = {
+								...lastMsg,
+								content: currentText,
+							};
 						}
 						return newMsgs;
 					});
-				}
+				},
 			);
 
 			// Save to localStorage after stream completes
 			setMessages((prev) => {
-				localStorage.setItem(
-					"lti_nexus_ai_history",
-					JSON.stringify(prev),
-				);
+				localStorage.setItem("lti_nexus_ai_history", JSON.stringify(prev));
 				return prev;
 			});
 
@@ -238,7 +238,12 @@ Sé conciso pero completo. Usa formato Markdown cuando sea útil.\n\n`;
 				)}
 
 				{messages.map((msg, i) => (
-					<ChatBubble key={i} role={msg.role} text={msg.content} flavor="nexus" />
+					<ChatBubble
+						key={i}
+						role={msg.role}
+						text={msg.content}
+						flavor="nexus"
+					/>
 				))}
 
 				{isLoading(status) && <ChatSkeleton flavor="nexus" />}
@@ -253,7 +258,11 @@ Sé conciso pero completo. Usa formato Markdown cuando sea útil.\n\n`;
 					sendMessage();
 				}}
 				isLoading={isLoading(status)}
-				disabledMsg={apiKey ? "Pregúntale a Nexus AI..." : "Configura tu API Key primero..."}
+				disabledMsg={
+					apiKey
+						? "Pregúntale a Nexus AI..."
+						: "Configura tu API Key primero..."
+				}
 				flavor="nexus"
 			/>
 		</div>

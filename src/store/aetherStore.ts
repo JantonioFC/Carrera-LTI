@@ -1,7 +1,7 @@
-import { create } from "zustand";
-import { immer } from "zustand/middleware/immer";
-import { persist, createJSONStorage } from "zustand/middleware";
 import { v4 as uuidv4 } from "uuid";
+import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
+import { immer } from "zustand/middleware/immer";
 import { idbStorage } from "../utils/idbStorage";
 
 export type AetherNoteId = `note_${string}`;
@@ -47,7 +47,9 @@ interface AetherActions {
 	getGraphData: () => GraphData;
 	findBacklinks: (nodeId: AetherNoteId) => AetherNote[];
 	setGeminiApiKey: (key: string) => void;
-	addChatMessage: (msg: Omit<ChatMessage, "id" | "timestamp"> | ChatMessage) => ChatMessageId;
+	addChatMessage: (
+		msg: Omit<ChatMessage, "id" | "timestamp"> | ChatMessage,
+	) => ChatMessageId;
 	appendChatMessage: (id: ChatMessageId, textChunk: string) => void;
 	clearChatHistory: () => void;
 }
@@ -70,110 +72,115 @@ export const useAetherStore = create<AetherState & AetherActions>()(
 				geminiApiKey: "",
 				chatHistory: [],
 
-			addNote: (title = "Nueva Nota") => {
-				const newNote: AetherNote = {
-					id: `note_${uuidv4()}` as AetherNoteId,
-					title,
-					content: "",
-					createdAt: Date.now(),
-					updatedAt: Date.now(),
-					tags: [],
-				};
-				set((state) => {
-					state.notes.unshift(newNote);
-				});
-				return newNote;
-			},
+				addNote: (title = "Nueva Nota") => {
+					const newNote: AetherNote = {
+						id: `note_${uuidv4()}` as AetherNoteId,
+						title,
+						content: "",
+						createdAt: Date.now(),
+						updatedAt: Date.now(),
+						tags: [],
+					};
+					set((state) => {
+						state.notes.unshift(newNote);
+					});
+					return newNote;
+				},
 
-			updateNote: (id, updates) => {
-				set((state) => {
-					const note = state.notes.find((n) => n.id === id);
-					if (note) {
-						Object.assign(note, updates);
-						note.updatedAt = Date.now();
-					}
-				});
-			},
-
-			deleteNote: (id) => {
-				set((state) => {
-					state.notes = state.notes.filter((note) => note.id !== id);
-				});
-			},
-
-			getNote: (id) => {
-				return get().notes.find((n) => n.id === id);
-			},
-
-			getGraphData: () => {
-				const { notes } = get();
-				const nodes = notes.map((n) => ({ id: n.id, name: n.title, val: 1 }));
-				const links: GraphLink[] = [];
-
-				notes.forEach((note) => {
-					const referencedTitles = extractLinks(note.content);
-					referencedTitles.forEach((targetTitle) => {
-						const targetNote = notes.find(
-							(n) => n.title.toLowerCase() === targetTitle.toLowerCase(),
-						);
-						if (targetNote) {
-							links.push({ source: note.id, target: targetNote.id });
+				updateNote: (id, updates) => {
+					set((state) => {
+						const note = state.notes.find((n) => n.id === id);
+						if (note) {
+							Object.assign(note, updates);
+							note.updatedAt = Date.now();
 						}
 					});
-				});
+				},
 
-				return { nodes, links };
-			},
+				deleteNote: (id) => {
+					set((state) => {
+						state.notes = state.notes.filter((note) => note.id !== id);
+					});
+				},
 
-			findBacklinks: (nodeId) => {
-				const { notes, getNote } = get();
-				const currentNote = getNote(nodeId);
-				if (!currentNote) return [];
+				getNote: (id) => {
+					return get().notes.find((n) => n.id === id);
+				},
 
-				return notes.filter((n) => {
-					if (n.id === nodeId) return false;
-					const refs = extractLinks(n.content);
-					return refs.some(
-						(ref) => ref.toLowerCase() === currentNote.title.toLowerCase(),
-					);
-				});
-			},
+				getGraphData: () => {
+					const { notes } = get();
+					const nodes = notes.map((n) => ({ id: n.id, name: n.title, val: 1 }));
+					const links: GraphLink[] = [];
 
-			setGeminiApiKey: (key) => {
-				set((state) => { state.geminiApiKey = key; });
-			},
+					notes.forEach((note) => {
+						const referencedTitles = extractLinks(note.content);
+						referencedTitles.forEach((targetTitle) => {
+							const targetNote = notes.find(
+								(n) => n.title.toLowerCase() === targetTitle.toLowerCase(),
+							);
+							if (targetNote) {
+								links.push({ source: note.id, target: targetNote.id });
+							}
+						});
+					});
 
-			addChatMessage: (msg) => {
-				const fullMsg: ChatMessage = "id" in msg ? msg as ChatMessage : {
-					...msg,
-					id: `msg_${uuidv4()}` as ChatMessageId,
-					timestamp: Date.now(),
-				};
-				set((state) => {
-					state.chatHistory.push(fullMsg);
-				});
-				return fullMsg.id;
-			},
+					return { nodes, links };
+				},
 
-			appendChatMessage: (id, textChunk) => {
-				set((state) => {
-					const msg = state.chatHistory.find((m) => m.id === id);
-					if (msg) {
-						msg.text += textChunk;
-					}
-				});
-			},
+				findBacklinks: (nodeId) => {
+					const { notes, getNote } = get();
+					const currentNote = getNote(nodeId);
+					if (!currentNote) return [];
 
-			clearChatHistory: () => {
-				set((state) => {
-					state.chatHistory = [];
-				});
-			},
-		};
-	}),
-	{
-		name: "aether-storage",
-		storage: createJSONStorage(() => idbStorage),
-	}
-	)
+					return notes.filter((n) => {
+						if (n.id === nodeId) return false;
+						const refs = extractLinks(n.content);
+						return refs.some(
+							(ref) => ref.toLowerCase() === currentNote.title.toLowerCase(),
+						);
+					});
+				},
+
+				setGeminiApiKey: (key) => {
+					set((state) => {
+						state.geminiApiKey = key;
+					});
+				},
+
+				addChatMessage: (msg) => {
+					const fullMsg: ChatMessage =
+						"id" in msg
+							? (msg as ChatMessage)
+							: {
+									...msg,
+									id: `msg_${uuidv4()}` as ChatMessageId,
+									timestamp: Date.now(),
+								};
+					set((state) => {
+						state.chatHistory.push(fullMsg);
+					});
+					return fullMsg.id;
+				},
+
+				appendChatMessage: (id, textChunk) => {
+					set((state) => {
+						const msg = state.chatHistory.find((m) => m.id === id);
+						if (msg) {
+							msg.text += textChunk;
+						}
+					});
+				},
+
+				clearChatHistory: () => {
+					set((state) => {
+						state.chatHistory = [];
+					});
+				},
+			};
+		}),
+		{
+			name: "aether-storage",
+			storage: createJSONStorage(() => idbStorage),
+		},
+	),
 );

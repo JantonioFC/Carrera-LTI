@@ -1,5 +1,13 @@
 import { AlertCircle } from "lucide-react";
-import { type PresencialEvent, SEMESTER_START, EXAM_START, EXAM_END, getDaysUntil, formatDate, formatDateShort } from "../../data/lti";
+import {
+	EXAM_END,
+	EXAM_START,
+	formatDate,
+	formatDateShort,
+	getDaysUntil,
+	type PresencialEvent,
+	SEMESTER_START,
+} from "../../data/lti";
 
 interface DashboardSummaryProps {
 	average: number;
@@ -7,7 +15,11 @@ interface DashboardSummaryProps {
 	upcomingPresenciales: PresencialEvent[];
 }
 
-export function DashboardSummary({ average, approved, upcomingPresenciales }: DashboardSummaryProps) {
+export function DashboardSummary({
+	average,
+	approved,
+	upcomingPresenciales,
+}: DashboardSummaryProps) {
 	const daysToStart = getDaysUntil(SEMESTER_START);
 
 	return (

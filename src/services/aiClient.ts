@@ -1,9 +1,9 @@
 import { GoogleGenAI } from "@google/genai";
+import type { ZodType } from "zod";
 import {
 	generateStructuredContentWithRetry,
 	truncateContext,
 } from "../utils/aiUtils";
-import type { ZodType } from "zod";
 
 /**
  * Limitador de Tasa Cliente (Token Bucket simple por minuto)
@@ -153,7 +153,7 @@ Acción: Retorno la lista estructurada con colores (si aplica).`;
 	async askAetherStream(
 		prompt: string,
 		contextNotes: string,
-		onChunk: (text: string) => void
+		onChunk: (text: string) => void,
 	) {
 		const ai = await this.ensureClient();
 
@@ -189,7 +189,7 @@ ${truncateContext(contextNotes, 30000)}`;
 	async askNexusStream(
 		messages: { role: string; parts: { text: string }[] }[],
 		systemContext: string,
-		onChunk: (text: string) => void
+		onChunk: (text: string) => void,
 	) {
 		const ai = await this.ensureClient();
 

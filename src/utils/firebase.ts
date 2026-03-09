@@ -1,13 +1,13 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
 import {
 	getAuth,
-	signInAnonymously,
 	onAuthStateChanged,
-	User,
+	signInAnonymously,
+	type User,
 } from "firebase/auth";
-import type { SubjectDataMap } from "../hooks/useSubjectData";
+import { doc, getDoc, getFirestore, setDoc } from "firebase/firestore";
 import type { PresencialEvent } from "../data/lti";
+import type { SubjectDataMap } from "../hooks/useSubjectData";
 
 // TODO: Replace with Real Firebase Config if you want this to work genuinely
 // The user explicitly stated they want a personal free tier Google solution
@@ -23,8 +23,8 @@ const firebaseConfig = {
 };
 
 import type { FirebaseApp } from "firebase/app";
-import type { Firestore } from "firebase/firestore";
 import type { Auth } from "firebase/auth";
+import type { Firestore } from "firebase/firestore";
 
 let app: FirebaseApp | undefined;
 let auth: Auth | undefined;
@@ -50,7 +50,9 @@ export type AppData = {
 // Autenticación anónima silenciosa
 export const initAuth = (onUser: (user: User | null) => void) => {
 	if (!auth) {
-		console.error("Firebase auth object is undefined. Initialization likely failed.");
+		console.error(
+			"Firebase auth object is undefined. Initialization likely failed.",
+		);
 		return;
 	}
 	onAuthStateChanged(auth, (user: User | null) => {
@@ -58,10 +60,18 @@ export const initAuth = (onUser: (user: User | null) => void) => {
 			console.log("Firebase Auth: Logged in as User ID:", user.uid);
 			onUser(user);
 		} else {
-			console.log("Firebase Auth: No user found. Attempting Anonymous Sign-In...");
+			console.log(
+				"Firebase Auth: No user found. Attempting Anonymous Sign-In...",
+			);
 			signInAnonymously(auth).catch((err) => {
-				console.error("💥 ERROR: Failed to sign in anonymously. Did you enable 'Anonymous' Sign-In Provider in Firebase Console -> Authentication -> Sign-in method?", err);
-				alert("Error al conectar a la nube. ¿Habilitaste 'Anónimo' en Firebase Authentication?\n" + err.message);
+				console.error(
+					"💥 ERROR: Failed to sign in anonymously. Did you enable 'Anonymous' Sign-In Provider in Firebase Console -> Authentication -> Sign-in method?",
+					err,
+				);
+				alert(
+					"Error al conectar a la nube. ¿Habilitaste 'Anónimo' en Firebase Authentication?\n" +
+						err.message,
+				);
 			});
 		}
 	});

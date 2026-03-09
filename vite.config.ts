@@ -1,7 +1,8 @@
 /// <reference types="vitest" />
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
+
 import tailwindcss from "@tailwindcss/vite";
+import react from "@vitejs/plugin-react";
+import { defineConfig } from "vite";
 // import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
@@ -48,11 +49,17 @@ export default defineConfig({
 		rollupOptions: {
 			output: {
 				manualChunks: {
-					'vendor-ai': ['@google/genai'],
-					'vendor-ui': ['framer-motion', 'recharts', 'lucide-react', '@radix-ui/react-dialog', '@uiw/react-md-editor']
-				}
-			}
-		}
+					"vendor-ai": ["@google/genai"],
+					"vendor-ui": [
+						"framer-motion",
+						"recharts",
+						"lucide-react",
+						"@radix-ui/react-dialog",
+						"@uiw/react-md-editor",
+					],
+				},
+			},
+		},
 	},
 	test: {
 		environment: "jsdom",
