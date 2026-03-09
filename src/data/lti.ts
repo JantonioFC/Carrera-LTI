@@ -3,7 +3,7 @@
 // UTEC Uruguay — Plan 2024 (Res. 127-24)
 // ============================================================
 
-export type SubjectStatus = "en_curso" | "pendiente" | "aprobada";
+export type SubjectStatus = "en_curso" | "pendiente" | "aprobada" | "reprobada";
 
 export interface Subject {
 	id: string;

@@ -34,8 +34,6 @@ export const NexusDocumentSchema = z.object({
 	tags: z.array(z.string()),
 });
 
-export const NexusDocumentsSchema = z.array(NexusDocumentSchema);
-
 export const NexusMessageSchema = z.object({
 	role: z.enum(["user", "model"]),
 	content: z.string(),
@@ -74,10 +72,12 @@ export const ScheduleItemsSchema = z.array(ScheduleItemSchema);
 // ─── Presenciales ─────────────────────────────────────────────
 export const PresencialEventSchema = z.object({
 	id: z.string(),
-	title: z.string(),
 	date: z.string(),
-	subjectId: z.string(),
-	type: z.enum(["parcial", "final", "entrega", "presentacion"]),
+	activity: z.string(),
+	area: z.string(),
+	includesEval: z.boolean(),
+	sede: z.string(),
+	hours: z.string(),
 });
 
 export const PresencialesSchema = z.array(PresencialEventSchema);
@@ -91,7 +91,7 @@ export const SubjectResourceSchema = z.object({
 });
 
 export const SubjectDataSchema = z.object({
-	status: z.enum(["pendiente", "cursando", "aprobada", "reprobada"]),
+	status: z.enum(["en_curso", "pendiente", "aprobada", "reprobada"]),
 	grade: z.number().optional(),
 	resources: z.array(SubjectResourceSchema),
 });

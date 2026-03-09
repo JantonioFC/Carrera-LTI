@@ -16,7 +16,6 @@ import {
 
 export default function AetherChat() {
 	const {
-		notes,
 		geminiApiKey,
 		setGeminiApiKey,
 		chatHistory,

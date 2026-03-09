@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import type { PresencialEvent } from "../data/lti";
 import { type AppData, authService, syncService } from "../utils/firebase";
 import { AppDataSchema } from "../utils/schemas";
-import { type SubjectData, useSubjectData } from "./useSubjectData";
+import { useSubjectData } from "./useSubjectData";
 
 export function useCloudSync(
 	presenciales: PresencialEvent[],

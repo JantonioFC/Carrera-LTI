@@ -9,7 +9,6 @@ import { doc, getDoc, getFirestore, setDoc } from "firebase/firestore";
 import type { PresencialEvent } from "../data/lti";
 import type { SubjectDataMap } from "../hooks/useSubjectData";
 import type { IAuthService, ISyncService } from "../services/types";
-import { NexusDocumentsSchema } from "./schemas"; // Assuming we want to validate documents part of AppData
 
 const firebaseConfig = {
 	apiKey: import.meta.env.VITE_FIREBASE_API_KEY,

@@ -6,12 +6,14 @@ const STATUS_STYLES = {
 	en_curso: "bg-lti-blue/10 text-lti-blue border-lti-blue/30",
 	aprobada: "bg-green-500/10 text-green-400 border-green-500/30",
 	pendiente: "bg-navy-700/60 text-slate-400 border-navy-600/30",
+	reprobada: "bg-red-500/10 text-red-400 border-red-500/30",
 };
 
 const STATUS_LABELS = {
 	en_curso: "En curso",
 	aprobada: "Aprobada",
 	pendiente: "Pendiente",
+	reprobada: "Reprobada",
 };
 
 export default function MallaCurricular() {
