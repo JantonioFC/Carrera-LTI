@@ -11,7 +11,7 @@ import {
 	Plus,
 	Search,
 } from "lucide-react";
-import { useAetherStore, type AetherNoteId } from "../store/aetherStore";
+import { type AetherNoteId, useAetherStore } from "../store/aetherStore";
 
 export default function AetherVault() {
 	const {
