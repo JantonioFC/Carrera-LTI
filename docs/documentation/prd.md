@@ -1,6 +1,6 @@
 # **PRD: Carrera LTI**
 
-**Estado:** Borrador
+**Estado:** Alpha (v1.0 - Sync Ready)
 
 **Dueño del Producto:** Juan Antonio
 
@@ -40,15 +40,18 @@ Carrera LTI es una "súper-app" académica y de productividad diseñada específ
 
 ## **5. Requisitos Funcionales**
 
-### **P0: Críticos (Base)**
+### **P0: Críticos (Base) - [IMPLEMENTADO]**
 * **RF.01:** Visualización interactiva de la Malla Curricular (8 semestres).
 * **RF.02:** Dashboard de progreso con contador de créditos (Aprobados/En Curso/Pendientes).
 * **RF.03:** Kanban de tareas avanzado con estados y prioridades.
 * **RF.04:** Gestión de Notas (Bóveda Aether) con soporte Markdown y WikiLinks.
+* **RF.08:** (Nuevo) **Sincronización Universal en la Nube** vía Firebase para todos los módulos.
 
-### **P1: Importantes (IA & UX)**
-* **RF.05:** Nexus AI: Chat con RAG nativo sobre documentos y notas del usuario.
-* **RF.06:** Grafo de Conocimiento 2D para visualización de notas relacionadas.
+### **P1: Importantes (IA & UX) - [EN DESARROLLO / PARCIAL]**
+* **RF.05:** Nexus AI: Chat con RAG nativo sobre documentos y notas del usuario. [IMPLEMENTADO]
+*   **RF.09:** Calendario Académico 2026 integrado con vistas anual, mensual y semanal. [IMPLEMENTADO]
+*   **RF.10:** (Nuevo) **Monitor de Gmail Flotante** global para seguimiento de correos académicos. [IMPLEMENTADO]
+*   **RF.06:** Grafo de Conocimiento 2D para visualización de notas relacionadas.
 * **RF.07:** Timer Pomodoro flotante global.
 
 ## **6. Requisitos No Funcionales**

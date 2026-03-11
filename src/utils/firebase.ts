@@ -8,7 +8,11 @@ import {
 import { doc, getDoc, getFirestore, setDoc } from "firebase/firestore";
 import type { PresencialEvent } from "../data/lti";
 import type { SubjectDataMap } from "../hooks/useSubjectData";
+import type { ScheduleItem } from "../pages/Horarios";
+import type { Task } from "../pages/Tareas";
 import type { IAuthService, ISyncService } from "../services/types";
+import type { AetherNote } from "../store/aetherStore";
+import type { NexusDocument } from "../store/nexusStore";
 
 const firebaseConfig = {
 	apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -35,6 +39,14 @@ try {
 export type AppData = {
 	subjectData: SubjectDataMap;
 	presenciales: PresencialEvent[];
+	calendarEvents?: Record<string, any[]>;
+	tasks?: Task[];
+	schedule?: ScheduleItem[];
+	nexusDocs?: NexusDocument[];
+	aetherNotes?: AetherNote[];
+	geminiApiKey?: string;
+	gmailClientId?: string;
+	gmailApiKey?: string;
 	lastUpdated: number;
 };
 

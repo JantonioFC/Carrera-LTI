@@ -38,6 +38,8 @@ export interface ChatMessage {
 interface AetherState {
 	notes: AetherNote[];
 	geminiApiKey: string;
+	gmailClientId: string;
+	gmailApiKey: string;
 	chatHistory: ChatMessage[];
 }
 
@@ -49,6 +51,8 @@ interface AetherActions {
 	getGraphData: () => GraphData;
 	findBacklinks: (nodeId: AetherNoteId) => AetherNote[];
 	setGeminiApiKey: (key: string) => void;
+	setGmailClientId: (id: string) => void;
+	setGmailApiKey: (key: string) => void;
 	ingestNote: (id: AetherNoteId) => Promise<void>;
 	semanticSearch: (query: string, limit?: number) => Promise<AetherNote[]>;
 	addChatMessage: (
@@ -74,6 +78,8 @@ export const useAetherStore = create<AetherState & AetherActions>()(
 			return {
 				notes: defaultNotes,
 				geminiApiKey: "",
+				gmailClientId: "",
+				gmailApiKey: "",
 				chatHistory: [],
 
 				addNote: (title = "Nueva Nota") => {
@@ -148,6 +154,16 @@ export const useAetherStore = create<AetherState & AetherActions>()(
 				setGeminiApiKey: (key) => {
 					set((state) => {
 						state.geminiApiKey = key;
+					});
+				},
+				setGmailClientId: (id) => {
+					set((state) => {
+						state.gmailClientId = id;
+					});
+				},
+				setGmailApiKey: (key) => {
+					set((state) => {
+						state.gmailApiKey = key;
 					});
 				},
 

@@ -1,5 +1,9 @@
 import { useEffect, useState } from "react";
 import type { PresencialEvent } from "../data/lti";
+import type { ScheduleItem } from "../pages/Horarios";
+import type { Task } from "../pages/Tareas";
+import { useAetherStore } from "../store/aetherStore";
+import { useNexusStore } from "../store/nexusStore";
 import { type AppData, authService, syncService } from "../utils/firebase";
 import { AppDataSchema } from "../utils/schemas";
 import { useSubjectData } from "./useSubjectData";
@@ -7,12 +11,29 @@ import { useSubjectData } from "./useSubjectData";
 export function useCloudSync(
 	presenciales: PresencialEvent[],
 	setPresenciales: (events: PresencialEvent[]) => void,
+	calendarEvents: Record<string, any[]>,
+	setCalendarEvents: (events: Record<string, any[]>) => void,
+	tasks: Task[],
+	setTasks: (tasks: Task[]) => void,
+	schedule: ScheduleItem[],
+	setSchedule: (schedule: ScheduleItem[]) => void,
 ) {
 	const { data: subjectData, updateSubject } = useSubjectData();
 	const [userId, setUserId] = useState<string | null>(null);
 	const [syncStatus, setSyncStatus] = useState<
 		"idle" | "syncing" | "success" | "error"
 	>("idle");
+
+	const {
+		notes: aetherNotes,
+		geminiApiKey,
+		setGeminiApiKey,
+		gmailClientId,
+		gmailApiKey,
+		setGmailClientId,
+		setGmailApiKey,
+	} = useAetherStore();
+	const { documents: nexusDocs } = useNexusStore();
 
 	// Inicializar auth usando el servicio desacoplado
 	useEffect(() => {
@@ -67,6 +88,14 @@ export function useCloudSync(
 		const appData: AppData = {
 			subjectData,
 			presenciales,
+			calendarEvents,
+			tasks,
+			schedule,
+			nexusDocs,
+			aetherNotes,
+			geminiApiKey,
+			gmailClientId,
+			gmailApiKey,
 			lastUpdated: Date.now(),
 		};
 
@@ -131,6 +160,42 @@ export function useCloudSync(
 				// Restore presenciales
 				if (validatedData.presenciales) {
 					setPresenciales(validatedData.presenciales as PresencialEvent[]);
+				}
+
+				// Restore calendar events
+				if (validatedData.calendarEvents) {
+					setCalendarEvents(validatedData.calendarEvents);
+				}
+
+				// Restore tasks
+				if (validatedData.tasks) {
+					setTasks(validatedData.tasks);
+				}
+
+				// Restore schedule
+				if (validatedData.schedule) {
+					setSchedule(validatedData.schedule);
+				}
+
+				// Restore API Keys
+				if (validatedData.geminiApiKey) {
+					setGeminiApiKey(validatedData.geminiApiKey);
+				}
+				if (validatedData.gmailClientId) {
+					setGmailClientId(validatedData.gmailClientId);
+				}
+				if (validatedData.gmailApiKey) {
+					setGmailApiKey(validatedData.gmailApiKey);
+				}
+
+				// Restore Aether Notes
+				if (validatedData.aetherNotes) {
+					useAetherStore.setState({ notes: [...validatedData.aetherNotes] });
+				}
+
+				// Restore Nexus Docs
+				if (validatedData.nexusDocs) {
+					useNexusStore.setState({ documents: [...validatedData.nexusDocs] });
 				}
 
 				setSyncStatus("success");

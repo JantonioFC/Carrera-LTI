@@ -9,21 +9,20 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { CURRICULUM } from "../data/lti";
-import { safeParseJSON } from "../utils/safeStorage";
 
-type KanbanStatus = "todo" | "inProgress" | "done";
-type Priority = "alta" | "media" | "baja";
+export type KanbanStatus = "todo" | "inProgress" | "done";
+export type Priority = "alta" | "media" | "baja";
 
 export type TaskId = `t${string}`;
 export type SubtaskId = `st${string}`;
 
-interface Subtask {
+export interface Subtask {
 	id: SubtaskId;
 	text: string;
 	completed: boolean;
 }
 
-interface Task {
+export interface Task {
 	id: TaskId;
 	title: string;
 	subjectId: string;
@@ -32,8 +31,6 @@ interface Task {
 	status: KanbanStatus;
 	subtasks: Subtask[];
 }
-
-const INITIAL_TASKS: Task[] = [];
 
 const PRIORITY_STYLES: Record<Priority, string> = {
 	alta: "text-red-400 bg-red-500/10 border-red-500/20",
@@ -172,10 +169,12 @@ function AddTaskModal({
 	);
 }
 
-export default function Tareas() {
-	const [tasks, setTasks] = useState<Task[]>(() => {
-		return safeParseJSON<Task[]>("lti_tasks", INITIAL_TASKS);
-	});
+interface TareasProps {
+	tasks: Task[];
+	onUpdateTasks: (tasks: Task[]) => void;
+}
+
+export default function Tareas({ tasks, onUpdateTasks }: TareasProps) {
 	const [showAdd, setShowAdd] = useState(false);
 
 	useEffect(() => {
@@ -213,8 +212,7 @@ export default function Tareas() {
 	}, [tasks]);
 
 	const saveTasks = (t: Task[]) => {
-		setTasks(t);
-		localStorage.setItem("lti_tasks", JSON.stringify(t));
+		onUpdateTasks(t);
 	};
 
 	const addTask = (task: Omit<Task, "id">) => {

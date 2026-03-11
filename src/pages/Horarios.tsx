@@ -21,11 +21,10 @@ import { CSS } from "@dnd-kit/utilities";
 import { GripVertical } from "lucide-react";
 import { useState } from "react";
 import { CURRICULUM, type Subject, WEEKDAY_SHORT } from "../data/lti";
-import { safeParseJSON } from "../utils/safeStorage";
 
 const DAYS = [1, 2, 3, 4, 5, 6]; // Lun a Sáb
 
-interface ScheduleItem {
+export interface ScheduleItem {
 	id: string; // The specific scheduled block id
 	subjectId: string;
 	day: number | null; // null means in the "bank"
@@ -127,14 +126,25 @@ function DroppableColumn({
 	);
 }
 
-export default function Horarios() {
-	const sem1 = CURRICULUM[0].subjects; // Mocking current semester
-	const [items, setItems] = useState<ScheduleItem[]>(() => {
-		return safeParseJSON<ScheduleItem[]>(
-			"lti_schedule",
-			sem1.map((s) => ({ id: `blk-${s.id}`, subjectId: s.id, day: null })),
-		);
-	});
+interface HorariosProps {
+	schedule: ScheduleItem[];
+	onUpdateSchedule: (schedule: ScheduleItem[]) => void;
+}
+
+export default function Horarios({
+	schedule,
+	onUpdateSchedule,
+}: HorariosProps) {
+	const items = schedule;
+	const setItems = (
+		newItems: ScheduleItem[] | ((prev: ScheduleItem[]) => ScheduleItem[]),
+	) => {
+		if (typeof newItems === "function") {
+			onUpdateSchedule(newItems(schedule));
+		} else {
+			onUpdateSchedule(newItems);
+		}
+	};
 
 	const [activeId, setActiveId] = useState<string | null>(null);
 
@@ -199,9 +209,9 @@ export default function Horarios() {
 
 	const handleDragEnd = () => {
 		setActiveId(null);
-		localStorage.setItem("lti_schedule", JSON.stringify(items));
 	};
 
+	const sem1 = CURRICULUM[0].subjects;
 	const activeItem = activeId ? items.find((i) => i.id === activeId) : null;
 	const activeSubject = activeItem
 		? sem1.find((s) => s.id === activeItem.subjectId)

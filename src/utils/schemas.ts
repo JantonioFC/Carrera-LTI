@@ -5,7 +5,10 @@ export const AetherNoteIdSchema = z.string().brand<"AetherNoteId">();
 export const ChatMessageIdSchema = z.string().brand<"ChatMessageId">();
 
 export const AetherNoteSchema = z.object({
-	id: z.string().startsWith("note_"),
+	id: z
+		.string()
+		.startsWith("note_")
+		.transform((v) => v as any),
 	title: z.string(),
 	content: z.string(),
 	createdAt: z.number(),
@@ -17,7 +20,10 @@ export const AetherNoteSchema = z.object({
 export const AetherNotesSchema = z.array(AetherNoteSchema);
 
 export const ChatMessageSchema = z.object({
-	id: z.string().startsWith("msg_"),
+	id: z
+		.string()
+		.startsWith("msg_")
+		.transform((v) => v as any),
 	role: z.enum(["user", "model"]),
 	text: z.string(),
 	timestamp: z.number(),
@@ -27,7 +33,10 @@ export const ChatHistorySchema = z.array(ChatMessageSchema);
 
 // ─── Nexus ────────────────────────────────────────────────────
 export const NexusDocumentSchema = z.object({
-	id: z.string().startsWith("doc_"),
+	id: z
+		.string()
+		.startsWith("doc_")
+		.transform((v) => v as any),
 	title: z.string(),
 	createdAt: z.number(),
 	updatedAt: z.number(),
@@ -43,13 +52,19 @@ export const NexusMessagesSchema = z.array(NexusMessageSchema);
 
 // ─── Tareas ───────────────────────────────────────────────────
 export const SubtaskSchema = z.object({
-	id: z.string().startsWith("st"),
+	id: z
+		.string()
+		.startsWith("st")
+		.transform((v) => v as any),
 	text: z.string(),
 	completed: z.boolean(),
 });
 
 export const TaskSchema = z.object({
-	id: z.string().startsWith("t"),
+	id: z
+		.string()
+		.startsWith("t")
+		.transform((v) => v as any),
 	title: z.string(),
 	subjectId: z.string(),
 	dueDate: z.string(),
@@ -82,6 +97,17 @@ export const PresencialEventSchema = z.object({
 
 export const PresencialesSchema = z.array(PresencialEventSchema);
 
+// ─── Calendario 2026 ──────────────────────────────────────────
+export const CalendarEventSchema = z.object({
+	title: z.string(),
+	time: z.string(),
+});
+
+export const CalendarEventsSchema = z.record(
+	z.string(),
+	z.array(CalendarEventSchema),
+);
+
 // ─── Subject Data ─────────────────────────────────────────────
 export const SubjectResourceSchema = z.object({
 	id: z.string(),
@@ -102,5 +128,13 @@ export const SubjectDataMapSchema = z.record(z.string(), SubjectDataSchema);
 export const AppDataSchema = z.object({
 	subjectData: SubjectDataMapSchema,
 	presenciales: PresencialesSchema,
+	calendarEvents: CalendarEventsSchema.optional(),
+	tasks: TasksSchema.optional(),
+	schedule: ScheduleItemsSchema.optional(),
+	nexusDocs: z.array(NexusDocumentSchema).optional(),
+	aetherNotes: AetherNotesSchema.optional(),
+	geminiApiKey: z.string().optional(),
+	gmailClientId: z.string().optional(),
+	gmailApiKey: z.string().optional(),
 	lastUpdated: z.number(),
 });

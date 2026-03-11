@@ -18,10 +18,18 @@ import {
 import { NavLink } from "react-router-dom";
 import type { PresencialEvent } from "../data/lti";
 import { useCloudSync } from "../hooks/useCloudSync";
+import type { ScheduleItem } from "../pages/Horarios";
+import type { Task } from "../pages/Tareas";
 
 interface SidebarProps {
 	presenciales: PresencialEvent[];
 	onUpdatePresenciales: (events: PresencialEvent[]) => void;
+	calendarEvents: Record<string, any[]>;
+	onUpdateCalendarEvents: (events: Record<string, any[]>) => void;
+	tasks: Task[];
+	onUpdateTasks: (tasks: Task[]) => void;
+	schedule: ScheduleItem[];
+	onUpdateSchedule: (schedule: ScheduleItem[]) => void;
 	onCloseMobile?: () => void;
 }
 
@@ -67,11 +75,23 @@ const navItems: { path: string; label: string; icon: React.ReactNode }[] = [
 export default function Sidebar({
 	presenciales,
 	onUpdatePresenciales,
+	calendarEvents,
+	onUpdateCalendarEvents,
+	tasks,
+	onUpdateTasks,
+	schedule,
+	onUpdateSchedule,
 	onCloseMobile,
 }: SidebarProps) {
 	const { syncNow, restoreFromCloud, syncStatus, isConfigured } = useCloudSync(
 		presenciales,
 		onUpdatePresenciales,
+		calendarEvents,
+		onUpdateCalendarEvents,
+		tasks,
+		onUpdateTasks,
+		schedule,
+		onUpdateSchedule,
 	);
 
 	return (

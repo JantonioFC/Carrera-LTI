@@ -3,12 +3,19 @@ import { Menu } from "lucide-react";
 import { lazy, Suspense, useState } from "react";
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { CommandPalette } from "./components/CommandPalette";
+import { GmailWidget } from "./components/dashboard/GmailWidget";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import LoadingSpinner from "./components/LoadingSpinner";
 import { PageTransition } from "./components/PageTransition";
 import Pomodoro from "./components/Pomodoro";
 import Sidebar from "./components/Sidebar";
-import { DEFAULT_PRESENCIALES, type PresencialEvent } from "./data/lti";
+import {
+	CURRICULUM,
+	DEFAULT_PRESENCIALES,
+	type PresencialEvent,
+} from "./data/lti";
+import type { ScheduleItem } from "./pages/Horarios";
+import type { Task } from "./pages/Tareas";
 import { safeParseJSON } from "./utils/safeStorage";
 
 // ─── Lazy-loaded pages (code splitting) ───────────────────────
@@ -36,12 +43,47 @@ function App() {
 		);
 	});
 
+	const [calendarEvents, setCalendarEvents] = useState<Record<string, any[]>>(
+		() => {
+			return safeParseJSON<Record<string, any[]>>("cal2026_events", {});
+		},
+	);
+
+	// Tareas
+	const [tasks, setTasks] = useState<Task[]>(() =>
+		safeParseJSON<Task[]>("lti_tasks", []),
+	);
+
+	// Horarios
+	const [schedule, setSchedule] = useState<ScheduleItem[]>(() => {
+		const sem1 = CURRICULUM[0].subjects;
+		return safeParseJSON<ScheduleItem[]>(
+			"lti_schedule",
+			sem1.map((s) => ({ id: `blk-${s.id}`, subjectId: s.id, day: null })),
+		);
+	});
+
 	const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
 	const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
 	const updatePresenciales = (updated: PresencialEvent[]) => {
 		setPresenciales(updated);
 		localStorage.setItem("lti_eventos_presenciales", JSON.stringify(updated));
+	};
+
+	const updateCalendarEvents = (updated: Record<string, any[]>) => {
+		setCalendarEvents(updated);
+		localStorage.setItem("cal2026_events", JSON.stringify(updated));
+	};
+
+	const updateTasks = (updated: Task[]) => {
+		setTasks(updated);
+		localStorage.setItem("lti_tasks", JSON.stringify(updated));
+	};
+
+	const updateSchedule = (updated: ScheduleItem[]) => {
+		setSchedule(updated);
+		localStorage.setItem("lti_schedule", JSON.stringify(updated));
 	};
 
 	return (
@@ -90,6 +132,12 @@ function App() {
 					<Sidebar
 						presenciales={presenciales}
 						onUpdatePresenciales={updatePresenciales}
+						calendarEvents={calendarEvents}
+						onUpdateCalendarEvents={updateCalendarEvents}
+						tasks={tasks}
+						onUpdateTasks={updateTasks}
+						schedule={schedule}
+						onUpdateSchedule={updateSchedule}
 						onCloseMobile={() => setIsSidebarOpen(false)}
 					/>
 				</div>
@@ -125,6 +173,8 @@ function App() {
 												<Calendario
 													presenciales={presenciales}
 													onUpdatePresenciales={updatePresenciales}
+													calendarEvents={calendarEvents}
+													onUpdateCalendarEvents={updateCalendarEvents}
 												/>
 											</PageTransition>
 										}
@@ -141,7 +191,7 @@ function App() {
 										path="/tareas"
 										element={
 											<PageTransition>
-												<Tareas />
+												<Tareas tasks={tasks} onUpdateTasks={updateTasks} />
 											</PageTransition>
 										}
 									/>
@@ -149,7 +199,10 @@ function App() {
 										path="/horarios"
 										element={
 											<PageTransition>
-												<Horarios />
+												<Horarios
+													schedule={schedule}
+													onUpdateSchedule={updateSchedule}
+												/>
 											</PageTransition>
 										}
 									/>
@@ -209,6 +262,7 @@ function App() {
 					</ErrorBoundary>
 				</main>
 				<Pomodoro />
+				<GmailWidget />
 			</div>
 		</>
 	);

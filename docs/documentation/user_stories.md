@@ -37,3 +37,33 @@
 *   **Criterios de Aceptación:**
     *   Columnas: Por hacer, En proceso, Hecho.
     *   Soporte para prioridades y fechas de vencimiento.
+
+## **5. Sincronización Universal**
+
+### **COMO** estudiante que usa laptop y tablet
+### **QUIERO** que mis tareas, notas y documentos se mantengan sincronizados automáticamente
+### **PARA** poder cambiar de dispositivo sin perder mi progreso o tener que exportar datos manualmente.
+*   **Criterios de Aceptación:**
+    *   Sincronización con Firebase Firestore.
+    *   Opción de "Restaurar desde la nube" en caso de pérdida de datos locales.
+    *   Soporte para todos los módulos (Tareas, Horarios, Aether, Nexus).
+
+## **6. Calendario Académico**
+
+### **COMO** estudiante con una agenda apretada
+### **QUIERO** visualizar mis entregas y exámenes en diferentes escalas (año, mes, semana)
+### **PARA** planificar mi tiempo de estudio con antelación.
+*   **Criterios de Aceptación:**
+    *   Vistas intercambiables de año, mes y semana.
+    *   Modal interactivo para añadir eventos rápidamente.
+    *   Persistencia de eventos en el almacenamiento local y en la nube.
+
+## **7. Monitor de Gmail (Comunicación)**
+
+### **COMO** estudiante que espera noticias de un docente
+### **QUIERO** ver mis correos académicos no leídos desde cualquier parte de la app
+### **PARA** no perder tiempo revisando pestañas externas y mantener mi enfoque.
+*   **Criterios de Aceptación:**
+    *   Botón flotante global (FAB) con indicador numérico de correos.
+    *   Panel expandible para leer fragmentos de los correos.
+    *   Soporte para múltiples dispositivos mediante sincronización de credenciales.

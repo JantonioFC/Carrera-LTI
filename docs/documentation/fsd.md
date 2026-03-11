@@ -4,9 +4,9 @@
 
 **Referencia PRD:** [prd.md](./prd.md)
 
-**Versión:** 1.0.0
+**Versión:** 1.1.0
 
-**Estado:** Borrador
+**Estado:** Alpha
 
 ## **1. Alcance y Objetivos de la Especificación**
 
@@ -15,9 +15,11 @@ Este documento detalla la lógica operativa de los módulos centrales de Carrera
 ## **2. Arquitectura Funcional**
 
 ### **2.1 Mapa de Funcionalidades**
-1. **Gestión Académica:** Dashboard, Calendario, Malla Curricular, Gestión de U.C.
+1. **Gestión Académica:** Dashboard, Calendario 2026, Malla Curricular, Gestión de U.C.
 2. **Segundo Cerebro (Aether):** Editor Markdown, Grafo, Canvas, Chat RAG.
 3. **Workspace (Nexus):** Editor de bloques, Bases de datos locales, Nexus AI.
+4. **Sincronización (Cloud Sync):** Backup en Firebase, Restauración Universal, Persistencia Híbrida.
+5. **Comunicación:** Monitor de Gmail Flotante, Notificaciones unread, Auth OAuth2.
 
 ## **3. Especificación Detallada de Módulos**
 
@@ -35,6 +37,28 @@ Este documento detalla la lógica operativa de los módulos centrales de Carrera
     1. **Retrieval (RAG):** El sistema busca fragmentos relevantes en IndexedDB mediante embeddings.
     2. **Generación:** Envío de contexto + query a Google Gemini 2.5 Flash.
 * **Seguridad:** La API Key de Gemini debe persistirse únicamente en el almacenamiento local cifrado del navegador.
+
+### **3.3 Módulo: Calendario Académico 2026**
+* **Vistas:** Soporta vista Anual, Mensual (Mini-Cards y Detalle) y Semanal.
+* **Eventos:** Gestión de eventos locales con `useCalendarEvents`.
+* **Interacción:** Modal premium interactivo para creación y edición rápida de eventos.
+
+### **3.4 Módulo: Sincronización Universal (Firebase)**
+* **Proveedor:** Firebase Firestore para persistencia en tiempo real.
+* **Lógica de Sincronización:**
+    1. **Consolidación:** El hook `useCloudSync` centraliza el estado global de todos los módulos.
+    2. **Estrategia de Restauración:** Al restaurar datos, se realiza un *clonado por esparcimiento* (`[...data]`) para romper referencias de objetos congelados (Immer fix).
+    3. **Persistencia Híbrida:** Los datos residen en stores de Zustand y se sincronizan asíncronamente con la nube.
+
+### **3.5 Módulo: Monitor de Gmail Flotante**
+*   **Componente:** `GmailWidget.tsx` integrado globalmente en `App.tsx`.
+*   **Estados de UI:**
+    1.  **Minimizado (FAB):** Botón flotante con badge de correos no leídos.
+    2.  **Expandido:** Panel con lista de correos o configuración de credenciales.
+*   **Garantías de Privacidad:**
+    1.  El token de acceso OAuth2 se mantiene exclusivamente en memoria volátil.
+    2.  Las credenciales (Client ID / API Key) se sincronizan de forma segura mediante Cloud Sync.
+*   **Polling:** El sistema consulta la API de Gmail cada 5 minutos (configurable) para actualizar el estado de la bandeja.
 
 ## **4. Máquinas de Estado**
 
