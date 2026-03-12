@@ -1,4 +1,4 @@
-import { BrainCircuit, Database, FileText, Search } from "lucide-react";
+import { BrainCircuit, Database, FileText, Search, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useNexusDB } from "../hooks/useNexusDB";
@@ -154,7 +154,7 @@ export function CommandPalette({
 
 					{/* Section: Bases de Datos */}
 					{(query.length > 0 || allDatabases.length > 0) && (
-						<div>
+						<div className="mb-4">
 							<div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 px-3">
 								Tablas / Bases de Datos
 							</div>
@@ -172,6 +172,32 @@ export function CommandPalette({
 							))}
 						</div>
 					)}
+
+					{/* Section: Sistema */}
+					<div className="mt-2 pt-2 border-t border-navy-700/50">
+						<div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 px-3">
+							Sistema
+						</div>
+						<button
+							onClick={() => {
+								if (
+									confirm(
+										"¿Estás seguro de que deseas limpiar TODOS los datos locales? Se perderán notas, tareas y configuraciones no sincronizadas.",
+									)
+								) {
+									localStorage.clear();
+									sessionStorage.clear();
+									window.location.href = "/";
+								}
+							}}
+							className="w-full flex items-center px-3 py-2 rounded-lg hover:bg-red-500/10 text-left transition-colors group"
+						>
+							<Trash2 size={16} className="text-red-400 mr-3" />
+							<span className="text-sm text-red-400 group-hover:text-red-300">
+								Limpieza Total (Factory Reset)
+							</span>
+						</button>
+					</div>
 				</div>
 			</div>
 		</div>
