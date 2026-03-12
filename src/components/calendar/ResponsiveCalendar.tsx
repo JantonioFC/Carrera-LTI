@@ -53,11 +53,17 @@ const ResponsiveCalendar: React.FC<ResponsiveCalendarProps> = ({
 		<div className="calendar-container">
 			<header className="calendar-header">
 				<div className="year-nav">
-					<button className="nav-btn" onClick={() => setCurrentYear(currentYear - 1)}>
+					<button
+						className="nav-btn"
+						onClick={() => setCurrentYear(currentYear - 1)}
+					>
 						‹
 					</button>
 					<div className="calendar-logo">CALENDAR</div>
-					<button className="nav-btn" onClick={() => setCurrentYear(currentYear + 1)}>
+					<button
+						className="nav-btn"
+						onClick={() => setCurrentYear(currentYear + 1)}
+					>
 						›
 					</button>
 				</div>
@@ -94,7 +100,11 @@ const ResponsiveCalendar: React.FC<ResponsiveCalendarProps> = ({
 
 			<section className="calendar-content">
 				{view === "yearly" && (
-					<YearlyView year={currentYear} events={events} onDayClick={handleDayClick} />
+					<YearlyView
+						year={currentYear}
+						events={events}
+						onDayClick={handleDayClick}
+					/>
 				)}
 				{view === "monthly" && (
 					<MonthlyView

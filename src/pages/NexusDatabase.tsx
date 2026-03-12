@@ -246,10 +246,24 @@ export default function NexusDatabaseView() {
 																updateRowData(row.id, field.id, e.target.value)
 															}
 														>
-															<option value="" className="bg-navy-900">Seleccionar...</option>
-															<option value="Pendiente" className="bg-navy-900">Pendiente</option>
-															<option value="En Progreso" className="bg-navy-900">En Progreso</option>
-															<option value="Completado" className="bg-navy-900">Completado</option>
+															<option value="" className="bg-navy-900">
+																Seleccionar...
+															</option>
+															<option value="Pendiente" className="bg-navy-900">
+																Pendiente
+															</option>
+															<option
+																value="En Progreso"
+																className="bg-navy-900"
+															>
+																En Progreso
+															</option>
+															<option
+																value="Completado"
+																className="bg-navy-900"
+															>
+																Completado
+															</option>
 														</select>
 													)}
 													{field.type === "date" && (
@@ -291,7 +305,9 @@ export default function NexusDatabaseView() {
 							<div className="flex-1 overflow-x-auto p-6 flex gap-6">
 								{fields.find((f) => f.type === "select") ? (
 									["Pendiente", "En Progreso", "Completado"].map((status) => {
-										const columnField = fields.find((f) => f.type === "select")!;
+										const columnField = fields.find(
+											(f) => f.type === "select",
+										)!;
 										const columnRows = rows.filter(
 											(r) => (r.data[columnField.id] || "Pendiente") === status,
 										);
@@ -325,7 +341,11 @@ export default function NexusDatabaseView() {
 																className="w-full bg-transparent text-sm font-semibold text-white focus:outline-none mb-2"
 																value={row.data[fields[0].id] || ""}
 																onChange={(e) =>
-																	updateRowData(row.id, fields[0].id, e.target.value)
+																	updateRowData(
+																		row.id,
+																		fields[0].id,
+																		e.target.value,
+																	)
 																}
 																placeholder="Título de la fila"
 															/>

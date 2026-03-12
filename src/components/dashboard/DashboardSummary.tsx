@@ -35,7 +35,9 @@ export function DashboardSummary({
 							{average > 0 ? average.toFixed(1) : "--"}
 						</p>
 						<p className="text-lti-blue text-sm mb-1 font-medium @[200px]:block hidden">
-							{approvedCount > 0 ? `${approvedCount} UC | ${approved} Cr.` : "Sin notas"}
+							{approvedCount > 0
+								? `${approvedCount} UC | ${approved} Cr.`
+								: "Sin notas"}
 						</p>
 					</div>
 				</div>
@@ -58,7 +60,8 @@ export function DashboardSummary({
 						Período de Exámenes
 					</p>
 					<p className="text-white text-sm font-bold mt-1">
-						{formatDateShort(academicDates.examStart)} — {formatDateShort(academicDates.examEnd)}
+						{formatDateShort(academicDates.examStart)} —{" "}
+						{formatDateShort(academicDates.examEnd)}
 					</p>
 					<p className="text-lti-orange text-sm mt-1 font-medium">
 						En {getDaysUntil(academicDates.examStart)} días

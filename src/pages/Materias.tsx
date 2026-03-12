@@ -8,17 +8,27 @@ import {
 } from "../hooks/useSubjectData";
 
 export default function Materias() {
-	const { data, updateSubject, allSubjects, addCustomSubject, removeCustomSubject, customSubjects, updateCustomSubject } = useSubjectData();
+	const {
+		data,
+		updateSubject,
+		allSubjects,
+		addCustomSubject,
+		removeCustomSubject,
+		customSubjects,
+		updateCustomSubject,
+	} = useSubjectData();
 	const [editingSubject, setEditingSubject] = useState<Subject | null>(null);
 	const [isCreating, setIsCreating] = useState(false);
 
 	// Mezclar currículum estático con el estado global local y memoizar
 	const subjectsWithData = useMemo(
 		() =>
-			allSubjects.map((s) => ({
-				...s,
-				status: data[s.id]?.status || s.status,
-			})).filter(s => s.semester === 1 || !s.id.startsWith('s')), // Muestra semestre 1 y personalizadas por defecto
+			allSubjects
+				.map((s) => ({
+					...s,
+					status: data[s.id]?.status || s.status,
+				}))
+				.filter((s) => s.semester === 1 || !s.id.startsWith("s")), // Muestra semestre 1 y personalizadas por defecto
 		[data, allSubjects],
 	);
 

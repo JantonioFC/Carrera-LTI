@@ -14,9 +14,9 @@ import {
 	DEFAULT_PRESENCIALES,
 	type PresencialEvent,
 } from "./data/lti";
+import { useSubjectData } from "./hooks/useSubjectData";
 import type { ScheduleItem } from "./pages/Horarios";
 import type { Task } from "./pages/Tareas";
-import { useSubjectData } from "./hooks/useSubjectData";
 import { safeParseJSON } from "./utils/safeStorage";
 
 // ─── Lazy-loaded pages (code splitting) ───────────────────────
@@ -100,7 +100,7 @@ function App() {
 	// Sincronizar banco de materias de horarios con materias activas
 	useEffect(() => {
 		const existingIds = new Set(schedule.map((s) => s.subjectId));
-		
+
 		// 1. Agregar las "en_curso" que falten
 		const missing = allSubjects.filter((s) => {
 			const status = data[s.id]?.status || s.status;
@@ -108,16 +108,16 @@ function App() {
 		});
 
 		// 2. Opcional: Limpiar el banco de las que ya no están "en curso"
-		const invalidBankItems = schedule.filter(item => {
+		const invalidBankItems = schedule.filter((item) => {
 			if (item.day !== null) return false; // No tocar las ya agendadas
-			const subject = allSubjects.find(s => s.id === item.subjectId);
+			const subject = allSubjects.find((s) => s.id === item.subjectId);
 			const status = data[item.subjectId]?.status || subject?.status;
 			return status !== "en_curso";
 		});
 
 		if (missing.length > 0 || invalidBankItems.length > 0) {
 			let updatedSchedule = [...schedule];
-			
+
 			if (missing.length > 0) {
 				const newItems = missing.map((s) => ({
 					id: `blk-${s.id}`,
@@ -128,8 +128,8 @@ function App() {
 			}
 
 			if (invalidBankItems.length > 0) {
-				const invalidIds = new Set(invalidBankItems.map(i => i.id));
-				updatedSchedule = updatedSchedule.filter(i => !invalidIds.has(i.id));
+				const invalidIds = new Set(invalidBankItems.map((i) => i.id));
+				updatedSchedule = updatedSchedule.filter((i) => !invalidIds.has(i.id));
 			}
 
 			updateSchedule(updatedSchedule);
@@ -249,9 +249,9 @@ function App() {
 										path="/examenes"
 										element={
 											<PageTransition>
-												<Examenes 
-													calendarEvents={calendarEvents} 
-													onUpdateCalendarEvents={updateCalendarEvents} 
+												<Examenes
+													calendarEvents={calendarEvents}
+													onUpdateCalendarEvents={updateCalendarEvents}
 												/>
 											</PageTransition>
 										}

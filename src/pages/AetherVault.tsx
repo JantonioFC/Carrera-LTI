@@ -126,51 +126,57 @@ export default function AetherVault() {
 				const reader = new FileReader();
 				reader.onload = (event) => {
 					const content = event.target?.result as string;
-					
+
 					if (file.name.toLowerCase().endsWith(".json")) {
 						importNotes(content);
 					} else {
 						// Procesar Markdown
 						// 1. Intentar dividir por exportación (---)
-						const sections = content.split(/\n---\n/).filter(s => s.trim().length > 10);
+						const sections = content
+							.split(/\n---\n/)
+							.filter((s) => s.trim().length > 10);
 						const newNotes: any[] = [];
-						
+
 						if (sections.length > 1) {
 							// Es un archivo de exportación combinado
-							sections.forEach(section => {
+							sections.forEach((section) => {
 								if (section.includes("# Aether - Exportación")) return;
-								
+
 								const lines = section.trim().split("\n");
-								const titleLine = lines.find(l => l.startsWith("# "));
-								const title = titleLine ? titleLine.replace("# ", "").trim() : "Nota Importada";
+								const titleLine = lines.find((l) => l.startsWith("# "));
+								const title = titleLine
+									? titleLine.replace("# ", "").trim()
+									: "Nota Importada";
 								const noteContent = section.replace(titleLine || "", "").trim();
-								
+
 								newNotes.push({
 									id: `note_${uuidv4()}`,
 									title,
 									content: noteContent,
 									createdAt: Date.now(),
 									updatedAt: Date.now(),
-									tags: []
+									tags: [],
 								});
 							});
 						} else {
 							// Es una nota individual
 							const lines = content.trim().split("\n");
-							const titleLine = lines.find(l => l.startsWith("# "));
-							const title = titleLine ? titleLine.replace("# ", "").trim() : (file.name.replace(".md", ""));
+							const titleLine = lines.find((l) => l.startsWith("# "));
+							const title = titleLine
+								? titleLine.replace("# ", "").trim()
+								: file.name.replace(".md", "");
 							const noteContent = content.replace(titleLine || "", "").trim();
-							
+
 							newNotes.push({
 								id: `note_${uuidv4()}`,
 								title,
 								content: noteContent,
 								createdAt: Date.now(),
 								updatedAt: Date.now(),
-								tags: []
+								tags: [],
 							});
 						}
-						
+
 						if (newNotes.length > 0) {
 							importNotes(JSON.stringify({ notes: newNotes }));
 						}

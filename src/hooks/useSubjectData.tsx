@@ -84,7 +84,9 @@ export function SubjectDataProvider({
 	};
 
 	const updateCustomSubject = (id: string, updates: Partial<Subject>) => {
-		const newCustom = customSubjects.map((s) => (s.id === id ? { ...s, ...updates } : s));
+		const newCustom = customSubjects.map((s) =>
+			s.id === id ? { ...s, ...updates } : s,
+		);
 		setCustomSubjects(newCustom);
 		localStorage.setItem("lti_custom_subjects", JSON.stringify(newCustom));
 	};

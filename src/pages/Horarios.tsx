@@ -301,9 +301,7 @@ export default function Horarios({
 				</DndContext>
 			</div>
 			{isSelecting && (
-				<SelectSubjectModal
-					onClose={() => setIsSelecting(false)}
-				/>
+				<SelectSubjectModal onClose={() => setIsSelecting(false)} />
 			)}
 		</div>
 	);
@@ -397,9 +395,7 @@ function SelectSubjectModal({ onClose }: { onClose: () => void }) {
 												<p className="text-sm font-medium text-white group-hover:text-lti-blue">
 													{s.name}
 												</p>
-												<p className="text-[10px] text-slate-400">
-													{s.area}
-												</p>
+												<p className="text-[10px] text-slate-400">{s.area}</p>
 											</div>
 											<div className="flex items-center gap-2">
 												<span className="text-[10px] font-bold text-slate-500">

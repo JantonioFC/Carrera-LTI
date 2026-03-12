@@ -1,9 +1,9 @@
+import { enableMapSet } from "immer";
 import { v4 as uuidv4 } from "uuid";
 import { IndexeddbPersistence } from "y-indexeddb";
 import * as Y from "yjs";
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
-import { enableMapSet } from "immer";
 import { safeParseJSON } from "../utils/safeStorage";
 
 enableMapSet();

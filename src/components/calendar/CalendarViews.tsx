@@ -138,9 +138,16 @@ export const MonthlyView: React.FC<
 						>
 							<div className="day-number">{d}</div>
 							{events[dateKey]?.map((ev, idx) => (
-								<div key={idx} className={`event-chip ${ev.type === "examen" ? "examen" : ""}`}>
+								<div
+									key={idx}
+									className={`event-chip ${ev.type === "examen" ? "examen" : ""}`}
+								>
 									<strong>{ev.title}</strong>
-									{ev.topic && <span className="block text-[10px] opacity-80">{ev.topic}</span>}
+									{ev.topic && (
+										<span className="block text-[10px] opacity-80">
+											{ev.topic}
+										</span>
+									)}
 								</div>
 							))}
 						</div>
@@ -200,9 +207,16 @@ export const WeeklyView: React.FC<
 								{MONTH_NAMES[d.getMonth()]}
 							</div>
 							{events[dateKey]?.map((ev, idx) => (
-								<div key={idx} className={`event-chip ${ev.type === "examen" ? "examen" : ""}`}>
+								<div
+									key={idx}
+									className={`event-chip ${ev.type === "examen" ? "examen" : ""}`}
+								>
 									<strong>{ev.title}</strong>
-									{ev.topic && <div className="text-[10px] opacity-80 leading-tight">{ev.topic}</div>}
+									{ev.topic && (
+										<div className="text-[10px] opacity-80 leading-tight">
+											{ev.topic}
+										</div>
+									)}
 								</div>
 							))}
 						</div>
@@ -220,5 +234,5 @@ function getDaysInMonth(year: number, month: number) {
 
 function getMonthOffset(year: number, month: number) {
 	const firstDay = new Date(year, month, 1).getDay();
-	return firstDay === 0 ? 6 : (firstDay === 0 ? 0 : firstDay - 1);
+	return firstDay === 0 ? 6 : firstDay === 0 ? 0 : firstDay - 1;
 }

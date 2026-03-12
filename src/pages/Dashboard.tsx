@@ -32,7 +32,8 @@ export default function Dashboard({
 	const daysToStart = getDaysUntil(SEMESTER_START);
 	const sem1 = CURRICULUM[0].subjects;
 
-	const { data, getAverage, getApprovedCredits, getApprovedCount } = useSubjectData();
+	const { data, getAverage, getApprovedCredits, getApprovedCount } =
+		useSubjectData();
 	const average = getAverage();
 	const approved = getApprovedCredits();
 	const approvedCount = getApprovedCount();

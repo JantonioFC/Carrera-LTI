@@ -34,9 +34,12 @@ export default function MallaCurricular() {
 	const creditsPending = subjectsWithStatus
 		.filter((s) => s.status === "pendiente")
 		.reduce((a, s) => a + s.credits, 0);
-	
+
 	// Progressive total credits includes custom ones
-	const totalRequired = Math.max(TOTAL_CREDITS, creditsDone + creditsPending + creditsActive);
+	const totalRequired = Math.max(
+		TOTAL_CREDITS,
+		creditsDone + creditsPending + creditsActive,
+	);
 	const pct = Math.round((creditsDone / totalRequired) * 100);
 
 	// Tecnicatura = first 4 semesters (static)
@@ -147,13 +150,19 @@ export default function MallaCurricular() {
 				className="overflow-auto border border-navy-700/40 rounded-xl"
 				style={{ maxHeight: "calc(100vh - 350px)" }}
 			>
-				<div className="flex gap-4 p-4 pb-8" style={{ minWidth: "max-content" }}>
+				<div
+					className="flex gap-4 p-4 pb-8"
+					style={{ minWidth: "max-content" }}
+				>
 					{CURRICULUM.map((sem) => {
 						const semCustomSubjects = customSubjects.filter(
 							(s) => s.semester === sem.number,
 						);
 						const allSemSubjects = [...sem.subjects, ...semCustomSubjects];
-						const semCredits = allSemSubjects.reduce((a, s) => a + s.credits, 0);
+						const semCredits = allSemSubjects.reduce(
+							(a, s) => a + s.credits,
+							0,
+						);
 						const isCurrent = sem.number === 1;
 						return (
 							<div
@@ -217,7 +226,11 @@ export default function MallaCurricular() {
 																	: "bg-navy-600 text-slate-400"
 														}`}
 													>
-														{STATUS_LABELS[subject.status as keyof typeof STATUS_LABELS]}
+														{
+															STATUS_LABELS[
+																subject.status as keyof typeof STATUS_LABELS
+															]
+														}
 													</span>
 												</div>
 											</div>
@@ -227,7 +240,6 @@ export default function MallaCurricular() {
 							</div>
 						);
 					})}
-
 				</div>
 			</div>
 		</div>

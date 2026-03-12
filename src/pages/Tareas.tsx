@@ -44,7 +44,6 @@ const COLUMNS: { id: KanbanStatus; label: string; accent: string }[] = [
 	{ id: "done", label: "Hecho", accent: "border-green-500" },
 ];
 
-
 function AddTaskModal({
 	onAdd,
 	onClose,
@@ -74,7 +73,9 @@ function AddTaskModal({
 					</button>
 				</div>
 				<div className="p-5 space-y-4">
-					<p className="text-[10px] text-slate-500 mb-2 uppercase tracking-widest px-1">Detalles de la tarea</p>
+					<p className="text-[10px] text-slate-500 mb-2 uppercase tracking-widest px-1">
+						Detalles de la tarea
+					</p>
 					<div>
 						<label className="block text-xs font-medium text-slate-400 mb-1.5">
 							Título
