@@ -33,6 +33,7 @@ export default function AetherVault() {
 		findBacklinks,
 		semanticSearch,
 		importNotes,
+		ingestNote,
 	} = useAetherStore();
 	const [activeNoteId, setActiveNoteId] = useState<AetherNoteId | null>(
 		notes[0]?.id || null,

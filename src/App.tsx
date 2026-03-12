@@ -62,7 +62,7 @@ function App() {
 		const saved = safeParseJSON<ScheduleItem[]>("lti_schedule", []);
 		if (saved.length > 0) return saved;
 		return (
-			CURRICULUM.find((s) => s.id === 1)?.subjects.map((s) => ({
+			CURRICULUM.find((s) => s.number === 1)?.subjects.map((s) => ({
 				id: s.id as any,
 				subjectId: s.id,
 				name: s.name,
