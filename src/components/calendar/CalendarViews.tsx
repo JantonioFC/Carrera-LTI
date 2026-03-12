@@ -67,15 +67,19 @@ const MonthCard: React.FC<{
 				))}
 				{Array.from({ length: days }).map((_, i) => {
 					const d = i + 1;
-					const dateKey = `${year}-${String(month + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+					const monthStr = String(month + 1).padStart(2, "0");
+					const dayStr = String(d).padStart(2, "0");
+					const dk = `${year}-${monthStr}-${dayStr}`;
+					const dayEvents = events[dk] || [];
+					const hasExamen = dayEvents.some((e) => e.type === "examen");
 					const isToday =
 						new Date().toDateString() ===
 						new Date(year, month, d).toDateString();
 					return (
 						<div
 							key={d}
-							className={`day-cell ${events[dateKey] ? "has-event" : ""} ${isToday ? "today" : ""}`}
-							onClick={() => onDayClick(dateKey)}
+							className={`day-cell ${dayEvents.length > 0 ? "has-event" : ""} ${hasExamen ? "has-examen" : ""} ${isToday ? "today" : ""}`}
+							onClick={() => onDayClick(dk)}
 						>
 							{d}
 						</div>
@@ -134,8 +138,9 @@ export const MonthlyView: React.FC<
 						>
 							<div className="day-number">{d}</div>
 							{events[dateKey]?.map((ev, idx) => (
-								<div key={idx} className="event-chip">
+								<div key={idx} className={`event-chip ${ev.type === "examen" ? "examen" : ""}`}>
 									<strong>{ev.title}</strong>
+									{ev.topic && <span className="block text-[10px] opacity-80">{ev.topic}</span>}
 								</div>
 							))}
 						</div>
@@ -195,8 +200,9 @@ export const WeeklyView: React.FC<
 								{MONTH_NAMES[d.getMonth()]}
 							</div>
 							{events[dateKey]?.map((ev, idx) => (
-								<div key={idx} className="event-chip">
+								<div key={idx} className={`event-chip ${ev.type === "examen" ? "examen" : ""}`}>
 									<strong>{ev.title}</strong>
+									{ev.topic && <div className="text-[10px] opacity-80 leading-tight">{ev.topic}</div>}
 								</div>
 							))}
 						</div>
@@ -214,5 +220,5 @@ function getDaysInMonth(year: number, month: number) {
 
 function getMonthOffset(year: number, month: number) {
 	const firstDay = new Date(year, month, 1).getDay();
-	return firstDay === 0 ? 6 : firstDay - 1;
+	return firstDay === 0 ? 6 : (firstDay === 0 ? 0 : firstDay - 1);
 }

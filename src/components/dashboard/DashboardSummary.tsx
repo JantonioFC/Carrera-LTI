@@ -1,26 +1,27 @@
 import { AlertCircle } from "lucide-react";
 import {
-	EXAM_END,
-	EXAM_START,
 	formatDate,
 	formatDateShort,
 	getDaysUntil,
 	type PresencialEvent,
-	SEMESTER_START,
 } from "../../data/lti";
+import { useAcademicCalendar } from "../../hooks/useAcademicCalendar";
 
 interface DashboardSummaryProps {
 	average: number;
 	approved: number;
+	approvedCount: number;
 	upcomingPresenciales: PresencialEvent[];
 }
 
 export function DashboardSummary({
 	average,
 	approved,
+	approvedCount,
 	upcomingPresenciales,
 }: DashboardSummaryProps) {
-	const daysToStart = getDaysUntil(SEMESTER_START);
+	const { academicDates } = useAcademicCalendar();
+	const daysToStart = getDaysUntil(academicDates.semesterStart);
 
 	return (
 		<div className="@container">
@@ -34,7 +35,7 @@ export function DashboardSummary({
 							{average > 0 ? average.toFixed(1) : "--"}
 						</p>
 						<p className="text-lti-blue text-sm mb-1 font-medium @[200px]:block hidden">
-							{approved > 0 ? `${approved} UC aprobadas` : "Sin notas"}
+							{approvedCount > 0 ? `${approvedCount} UC | ${approved} Cr.` : "Sin notas"}
 						</p>
 					</div>
 				</div>
@@ -43,7 +44,7 @@ export function DashboardSummary({
 						Inicio del Semestre
 					</p>
 					<p className="text-white text-xl font-bold mt-1">
-						{formatDate(SEMESTER_START)}
+						{formatDate(academicDates.semesterStart)}
 					</p>
 					<p
 						className={`text-sm mt-1 font-medium flex items-center gap-1 ${daysToStart > 0 ? "text-lti-blue" : "text-green-400"}`}
@@ -57,10 +58,10 @@ export function DashboardSummary({
 						Período de Exámenes
 					</p>
 					<p className="text-white text-sm font-bold mt-1">
-						{formatDateShort(EXAM_START)} — {formatDateShort(EXAM_END)}
+						{formatDateShort(academicDates.examStart)} — {formatDateShort(academicDates.examEnd)}
 					</p>
 					<p className="text-lti-orange text-sm mt-1 font-medium">
-						En {getDaysUntil(EXAM_START)} días
+						En {getDaysUntil(academicDates.examStart)} días
 					</p>
 				</div>
 				<div className="card @container p-5 border-l-4 border-purple-500 flex flex-col justify-between">

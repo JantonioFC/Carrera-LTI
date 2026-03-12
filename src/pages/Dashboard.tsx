@@ -28,12 +28,14 @@ export default function Dashboard({
 	const [editingEvent, setEditingEvent] = useState<PresencialEvent | null>(
 		null,
 	);
+	const [isCreating, setIsCreating] = useState(false);
 	const daysToStart = getDaysUntil(SEMESTER_START);
 	const sem1 = CURRICULUM[0].subjects;
 
-	const { data, getAverage, getApprovedCredits } = useSubjectData();
+	const { data, getAverage, getApprovedCredits, getApprovedCount } = useSubjectData();
 	const average = getAverage();
 	const approved = getApprovedCredits();
+	const approvedCount = getApprovedCount();
 
 	const upcomingPresenciales = useMemo(() => {
 		return presenciales
@@ -86,16 +88,24 @@ export default function Dashboard({
 						})}
 					</p>
 				</div>
-				<div
-					className={`px-4 py-2 rounded-xl text-sm font-semibold ${
-						daysToStart > 0
-							? "bg-lti-blue/10 text-lti-blue border border-lti-blue/20"
-							: "bg-green-500/10 text-green-400 border border-green-500/20"
-					}`}
-				>
-					{daysToStart > 0
-						? `🎓 El semestre comienza en ${daysToStart} día${daysToStart !== 1 ? "s" : ""}`
-						: "🎓 Semestre en curso"}
+				<div className="flex items-center gap-4">
+					<button
+						onClick={() => setIsCreating(true)}
+						className="px-4 py-2 rounded-xl text-sm font-semibold bg-lti-blue/10 text-lti-blue border border-lti-blue/20 hover:bg-lti-blue/20 transition-colors"
+					>
+						Añadir Instancia
+					</button>
+					<div
+						className={`px-4 py-2 rounded-xl text-sm font-semibold ${
+							daysToStart > 0
+								? "bg-lti-blue/10 text-lti-blue border border-lti-blue/20"
+								: "bg-green-500/10 text-green-400 border border-green-500/20"
+						}`}
+					>
+						{daysToStart > 0
+							? `🎓 El semestre comienza en ${daysToStart} día${daysToStart !== 1 ? "s" : ""}`
+							: "🎓 Semestre en curso"}
+					</div>
 				</div>
 			</header>
 
@@ -103,6 +113,7 @@ export default function Dashboard({
 			<DashboardSummary
 				average={average}
 				approved={approved}
+				approvedCount={approvedCount}
 				upcomingPresenciales={upcomingPresenciales}
 			/>
 
@@ -129,6 +140,16 @@ export default function Dashboard({
 					onSave={handleSaveEvent}
 					onDelete={handleDeleteEvent}
 					onClose={() => setEditingEvent(null)}
+				/>
+			)}
+
+			{isCreating && (
+				<EditPresencialModal
+					onSave={(newEvent) => {
+						onUpdatePresenciales([...presenciales, newEvent]);
+						setIsCreating(false);
+					}}
+					onClose={() => setIsCreating(false)}
 				/>
 			)}
 		</div>

@@ -37,6 +37,12 @@
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
 }
 
+.year-nav {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
 .calendar-logo {
   font-size: 1.5rem;
   font-weight: 700;
@@ -45,6 +51,8 @@
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  min-width: 160px;
+  text-align: center;
 }
 
 .view-controls {
@@ -215,6 +223,18 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.event-chip.examen {
+  background: #f59e0b;
+  color: #ffffff;
+  border-left: 3px solid #b45309;
+}
+
+.day-cell.has-examen {
+  background: #f59e0b !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
 }
 
 .nav-btn {

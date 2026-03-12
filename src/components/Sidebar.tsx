@@ -3,6 +3,7 @@ import {
 	BotMessageSquare,
 	BrainCircuit,
 	Calendar,
+	CalendarDays,
 	CheckSquare,
 	Cloud,
 	CloudOff,
@@ -39,6 +40,7 @@ const navItems: { path: string; label: string; icon: React.ReactNode }[] = [
 	{ path: "/calendario", label: "Calendario", icon: <Calendar size={20} /> },
 	{ path: "/malla", label: "Malla Curricular", icon: <Map size={20} /> },
 	{ path: "/tareas", label: "Tareas", icon: <CheckSquare size={20} /> },
+	{ path: "/examenes", label: "Exámenes", icon: <CalendarDays size={20} className="text-lti-orange" /> },
 	{ path: "/horarios", label: "Horarios", icon: <LayoutTemplate size={20} /> },
 	{
 		path: "/aether",

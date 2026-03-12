@@ -1,5 +1,5 @@
 import type React from "react";
-import Calendar2026 from "../components/calendar/Calendar2026";
+import ResponsiveCalendar from "../components/calendar/ResponsiveCalendar";
 import type { PresencialEvent } from "../data/lti";
 
 interface CalendarioProps {
@@ -15,7 +15,7 @@ const Calendario: React.FC<CalendarioProps> = ({
 }) => {
 	return (
 		<div className="h-full p-4 md:p-6 overflow-hidden">
-			<Calendar2026
+			<ResponsiveCalendar
 				events={calendarEvents}
 				onUpdateEvents={onUpdateCalendarEvents}
 			/>

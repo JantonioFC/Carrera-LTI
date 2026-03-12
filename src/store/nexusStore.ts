@@ -3,7 +3,10 @@ import { IndexeddbPersistence } from "y-indexeddb";
 import * as Y from "yjs";
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
+import { enableMapSet } from "immer";
 import { safeParseJSON } from "../utils/safeStorage";
+
+enableMapSet();
 
 export type NexusDocumentId = `doc_${string}`;
 
@@ -104,13 +107,19 @@ export const useNexusStore = create<NexusState & NexusActions>()(
 					return new Y.Doc(); // Temporary doc return while initializing
 				}
 
-				yDocsCreating.add(idStr);
-
 				const ydoc = new Y.Doc();
 				void new IndexeddbPersistence(`nexus-doc-${idStr}`, ydoc);
 
 				set((state) => {
-					state.yDocs[idStr] = ydoc as any; // Ignore immer draft type checking for Y.Doc
+					state.yDocs[idStr] = ydoc as any;
+					state.yDocsCreating.add(idStr); // Now done inside set
+					// Note: we don't delete it immediately because we want to track it
+					// but actually getYDoc is synchronous here.
+					// Let's optimize the flow.
+				});
+
+				// We need to remove it from creating set after it's in yDocs
+				set((state) => {
 					state.yDocsCreating.delete(idStr);
 				});
 

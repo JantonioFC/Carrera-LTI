@@ -31,8 +31,16 @@ export function SemesterSubjects({ subjects }: SemesterSubjectsProps) {
 						<span className="text-xs text-slate-400 font-medium shrink-0">
 							{subject.credits} cr
 						</span>
-						<span className="px-2 py-0.5 bg-lti-blue/10 text-lti-blue text-xs rounded-full font-medium shrink-0">
-							En curso
+						<span
+							className={`px-2 py-0.5 text-xs rounded-full font-medium shrink-0 ${
+								subject.status === "aprobada"
+									? "bg-green-500/10 text-green-400"
+									: subject.status === "en_curso"
+										? "bg-lti-blue/10 text-lti-blue"
+										: "bg-slate-500/10 text-slate-400"
+							}`}
+						>
+							{subject.status.charAt(0).toUpperCase() + subject.status.slice(1)}
 						</span>
 					</div>
 				))}

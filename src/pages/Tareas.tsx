@@ -8,7 +8,7 @@ import {
 	X,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { CURRICULUM } from "../data/lti";
+import { useSubjectData } from "../hooks/useSubjectData";
 
 export type KanbanStatus = "todo" | "inProgress" | "done";
 export type Priority = "alta" | "media" | "baja";
@@ -44,7 +44,6 @@ const COLUMNS: { id: KanbanStatus; label: string; accent: string }[] = [
 	{ id: "done", label: "Hecho", accent: "border-green-500" },
 ];
 
-const sem1Subjects = CURRICULUM[0].subjects;
 
 function AddTaskModal({
 	onAdd,
@@ -55,7 +54,7 @@ function AddTaskModal({
 }) {
 	const [form, setForm] = useState<Omit<Task, "id">>({
 		title: "",
-		subjectId: sem1Subjects[0].id,
+		subjectId: "",
 		dueDate: "",
 		priority: "media",
 		status: "todo",
@@ -75,6 +74,7 @@ function AddTaskModal({
 					</button>
 				</div>
 				<div className="p-5 space-y-4">
+					<p className="text-[10px] text-slate-500 mb-2 uppercase tracking-widest px-1">Detalles de la tarea</p>
 					<div>
 						<label className="block text-xs font-medium text-slate-400 mb-1.5">
 							Título
@@ -96,7 +96,8 @@ function AddTaskModal({
 							onChange={(e) => setForm({ ...form, subjectId: e.target.value })}
 							className="w-full bg-navy-900 border border-navy-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-lti-blue"
 						>
-							{sem1Subjects.map((s) => (
+							<option value="">Seleccionar U.C.</option>
+							{useSubjectData().allSubjects.map((s) => (
 								<option key={s.id} value={s.id}>
 									{s.name}
 								</option>
@@ -175,6 +176,7 @@ interface TareasProps {
 }
 
 export default function Tareas({ tasks, onUpdateTasks }: TareasProps) {
+	const { allSubjects } = useSubjectData();
 	const [showAdd, setShowAdd] = useState(false);
 
 	useEffect(() => {
@@ -295,7 +297,7 @@ export default function Tareas({ tasks, onUpdateTasks }: TareasProps) {
 							</div>
 							<div className="space-y-2">
 								{colTasks.map((task) => {
-									const subject = sem1Subjects.find(
+									const subject = allSubjects.find(
 										(s) => s.id === task.subjectId,
 									);
 									return (

@@ -1,6 +1,6 @@
 import { AnimatePresence } from "framer-motion";
 import { Menu } from "lucide-react";
-import { lazy, Suspense, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { CommandPalette } from "./components/CommandPalette";
 import { GmailWidget } from "./components/dashboard/GmailWidget";
@@ -16,6 +16,7 @@ import {
 } from "./data/lti";
 import type { ScheduleItem } from "./pages/Horarios";
 import type { Task } from "./pages/Tareas";
+import { useSubjectData } from "./hooks/useSubjectData";
 import { safeParseJSON } from "./utils/safeStorage";
 
 // ─── Lazy-loaded pages (code splitting) ───────────────────────
@@ -24,6 +25,7 @@ const Materias = lazy(() => import("./pages/Materias"));
 const Calendario = lazy(() => import("./pages/Calendario"));
 const MallaCurricular = lazy(() => import("./pages/MallaCurricular"));
 const Tareas = lazy(() => import("./pages/Tareas"));
+const Examenes = lazy(() => import("./pages/Examenes"));
 const Horarios = lazy(() => import("./pages/Horarios"));
 const AetherVault = lazy(() => import("./pages/AetherVault"));
 const AetherCanvas = lazy(() => import("./pages/AetherCanvas"));
@@ -34,6 +36,7 @@ const NexusAI = lazy(() => import("./pages/NexusAI"));
 
 function App() {
 	const location = useLocation();
+	const { allSubjects, data } = useSubjectData();
 
 	// Presenciales editables — guardadas en localStorage
 	const [presenciales, setPresenciales] = useState<PresencialEvent[]>(() => {
@@ -54,12 +57,20 @@ function App() {
 		safeParseJSON<Task[]>("lti_tasks", []),
 	);
 
-	// Horarios
+	// Horarios (Precarga dinámica si está vacío)
 	const [schedule, setSchedule] = useState<ScheduleItem[]>(() => {
-		const sem1 = CURRICULUM[0].subjects;
-		return safeParseJSON<ScheduleItem[]>(
-			"lti_schedule",
-			sem1.map((s) => ({ id: `blk-${s.id}`, subjectId: s.id, day: null })),
+		const saved = safeParseJSON<ScheduleItem[]>("lti_schedule", []);
+		if (saved.length > 0) return saved;
+		return (
+			CURRICULUM.find((s) => s.id === 1)?.subjects.map((s) => ({
+				id: s.id as any,
+				subjectId: s.id,
+				name: s.name,
+				day: 1,
+				startTime: "18:00",
+				endTime: "22:00",
+				type: "Teórico",
+			})) || []
 		);
 	});
 
@@ -85,6 +96,45 @@ function App() {
 		setSchedule(updated);
 		localStorage.setItem("lti_schedule", JSON.stringify(updated));
 	};
+
+	// Sincronizar banco de materias de horarios con materias activas
+	useEffect(() => {
+		const existingIds = new Set(schedule.map((s) => s.subjectId));
+		
+		// 1. Agregar las "en_curso" que falten
+		const missing = allSubjects.filter((s) => {
+			const status = data[s.id]?.status || s.status;
+			return status === "en_curso" && !existingIds.has(s.id);
+		});
+
+		// 2. Opcional: Limpiar el banco de las que ya no están "en curso"
+		const invalidBankItems = schedule.filter(item => {
+			if (item.day !== null) return false; // No tocar las ya agendadas
+			const subject = allSubjects.find(s => s.id === item.subjectId);
+			const status = data[item.subjectId]?.status || subject?.status;
+			return status !== "en_curso";
+		});
+
+		if (missing.length > 0 || invalidBankItems.length > 0) {
+			let updatedSchedule = [...schedule];
+			
+			if (missing.length > 0) {
+				const newItems = missing.map((s) => ({
+					id: `blk-${s.id}`,
+					subjectId: s.id,
+					day: null,
+				}));
+				updatedSchedule = [...updatedSchedule, ...newItems];
+			}
+
+			if (invalidBankItems.length > 0) {
+				const invalidIds = new Set(invalidBankItems.map(i => i.id));
+				updatedSchedule = updatedSchedule.filter(i => !invalidIds.has(i.id));
+			}
+
+			updateSchedule(updatedSchedule);
+		}
+	}, [allSubjects, schedule, data]);
 
 	return (
 		<>
@@ -192,6 +242,17 @@ function App() {
 										element={
 											<PageTransition>
 												<Tareas tasks={tasks} onUpdateTasks={updateTasks} />
+											</PageTransition>
+										}
+									/>
+									<Route
+										path="/examenes"
+										element={
+											<PageTransition>
+												<Examenes 
+													calendarEvents={calendarEvents} 
+													onUpdateCalendarEvents={updateCalendarEvents} 
+												/>
 											</PageTransition>
 										}
 									/>

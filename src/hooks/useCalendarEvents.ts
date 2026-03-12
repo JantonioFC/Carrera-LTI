@@ -3,6 +3,8 @@ import { useState } from "react";
 export interface CalendarEvent {
 	title: string;
 	time: string;
+	type?: string;
+	topic?: string;
 }
 
 export interface EventsState {

@@ -7,16 +7,17 @@ import { MonthlyView, WeeklyView, YearlyView } from "./CalendarViews.tsx";
 
 type ViewType = "yearly" | "monthly" | "weekly";
 
-interface Calendar2026Props {
+interface ResponsiveCalendarProps {
 	events: EventsState;
 	onUpdateEvents: (events: EventsState) => void;
 }
 
-const Calendar2026: React.FC<Calendar2026Props> = ({
+const ResponsiveCalendar: React.FC<ResponsiveCalendarProps> = ({
 	events,
 	onUpdateEvents,
 }) => {
 	const [view, setView] = useState<ViewType>("yearly");
+	const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
 	const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
 	const [weekOffset, setWeekOffset] = useState(0);
 
@@ -51,7 +52,15 @@ const Calendar2026: React.FC<Calendar2026Props> = ({
 	return (
 		<div className="calendar-container">
 			<header className="calendar-header">
-				<div className="calendar-logo">2026 CALENDAR</div>
+				<div className="year-nav">
+					<button className="nav-btn" onClick={() => setCurrentYear(currentYear - 1)}>
+						‹
+					</button>
+					<div className="calendar-logo">CALENDAR</div>
+					<button className="nav-btn" onClick={() => setCurrentYear(currentYear + 1)}>
+						›
+					</button>
+				</div>
 				<div className="view-controls">
 					<button
 						className={`view-btn ${view === "yearly" ? "active" : ""}`}
@@ -75,7 +84,7 @@ const Calendar2026: React.FC<Calendar2026Props> = ({
 				<div className="current-year-info">
 					<span>
 						{view === "yearly"
-							? "Calendario 2026"
+							? `Calendario ${currentYear}`
 							: view === "monthly"
 								? "Vista Mensual"
 								: "Vista Semanal"}
@@ -85,11 +94,11 @@ const Calendar2026: React.FC<Calendar2026Props> = ({
 
 			<section className="calendar-content">
 				{view === "yearly" && (
-					<YearlyView year={2026} events={events} onDayClick={handleDayClick} />
+					<YearlyView year={currentYear} events={events} onDayClick={handleDayClick} />
 				)}
 				{view === "monthly" && (
 					<MonthlyView
-						year={2026}
+						year={currentYear}
 						month={currentMonth}
 						events={events}
 						onMonthChange={setCurrentMonth}
@@ -98,7 +107,7 @@ const Calendar2026: React.FC<Calendar2026Props> = ({
 				)}
 				{view === "weekly" && (
 					<WeeklyView
-						year={2026}
+						year={currentYear}
 						offset={weekOffset}
 						events={events}
 						onOffsetChange={setWeekOffset}
@@ -117,4 +126,4 @@ const Calendar2026: React.FC<Calendar2026Props> = ({
 	);
 };
 
-export default Calendar2026;
+export default ResponsiveCalendar;

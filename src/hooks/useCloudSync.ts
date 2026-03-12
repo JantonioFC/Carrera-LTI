@@ -37,9 +37,15 @@ export function useCloudSync(
 
 	// Inicializar auth usando el servicio desacoplado
 	useEffect(() => {
-		authService.init((uid: string | null) => {
+		authService.init(async (uid: string | null) => {
 			if (uid) {
 				setUserId(uid);
+			} else {
+				// Intentar login anónimo automático para habilitar la nube
+				const newUid = await authService.signInAnonymously();
+				if (newUid) {
+					setUserId(newUid);
+				}
 			}
 		});
 	}, []);

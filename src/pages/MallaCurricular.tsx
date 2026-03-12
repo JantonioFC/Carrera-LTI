@@ -1,5 +1,5 @@
 import { Award, BookOpen, Clock } from "lucide-react";
-import { CURRICULUM, formatDateShort, TOTAL_CREDITS } from "../data/lti";
+import { CURRICULUM, TOTAL_CREDITS } from "../data/lti";
 import { useSubjectData } from "../hooks/useSubjectData";
 
 const STATUS_STYLES = {
@@ -17,30 +17,33 @@ const STATUS_LABELS = {
 };
 
 export default function MallaCurricular() {
-	const { data } = useSubjectData();
+	const { data, allSubjects, customSubjects } = useSubjectData();
 
-	const allSubjects = CURRICULUM.flatMap((s) => s.subjects).map((s) => ({
+	const subjectsWithStatus = allSubjects.map((s) => ({
 		...s,
 		status: data[s.id]?.status || s.status,
 		grade: data[s.id]?.grade,
 	}));
 
-	const creditsDone = allSubjects
+	const creditsDone = subjectsWithStatus
 		.filter((s) => s.status === "aprobada")
 		.reduce((a, s) => a + s.credits, 0);
-	const creditsActive = allSubjects
+	const creditsActive = subjectsWithStatus
 		.filter((s) => s.status === "en_curso")
 		.reduce((a, s) => a + s.credits, 0);
-	const creditsPending = allSubjects
+	const creditsPending = subjectsWithStatus
 		.filter((s) => s.status === "pendiente")
 		.reduce((a, s) => a + s.credits, 0);
-	const pct = Math.round((creditsDone / TOTAL_CREDITS) * 100);
+	
+	// Progressive total credits includes custom ones
+	const totalRequired = Math.max(TOTAL_CREDITS, creditsDone + creditsPending + creditsActive);
+	const pct = Math.round((creditsDone / totalRequired) * 100);
 
-	// Tecnicatura = first 4 semesters
+	// Tecnicatura = first 4 semesters (static)
 	const tcTotal = CURRICULUM.slice(0, 4)
 		.flatMap((s) => s.subjects)
 		.reduce((a, s) => a + s.credits, 0);
-	const tcDone = allSubjects
+	const tcDone = subjectsWithStatus
 		.filter((s) => s.semester <= 4 && s.status === "aprobada")
 		.reduce((a, s) => a + s.credits, 0);
 
@@ -54,7 +57,7 @@ export default function MallaCurricular() {
 				</p>
 			</div>
 
-			{/* Credit counter cards */}
+			{/* Credit counter cards sliced for brevity (keeping logic same) */}
 			<div className="grid grid-cols-4 gap-4">
 				{/* Total progress */}
 				<div className="col-span-1 card p-4 space-y-3">
@@ -67,7 +70,7 @@ export default function MallaCurricular() {
 					<div className="space-y-1">
 						<div className="flex justify-between text-xs text-slate-400">
 							<span>
-								{creditsDone} / {TOTAL_CREDITS} cr
+								{creditsDone} / {totalRequired} cr
 							</span>
 						</div>
 						<div className="h-2 bg-navy-900 rounded-full overflow-hidden">
@@ -139,14 +142,18 @@ export default function MallaCurricular() {
 				</div>
 			</div>
 
-			{/* Curriculum Grid — scroll bidireccional */}
+			{/* Curriculum Grid */}
 			<div
 				className="overflow-auto border border-navy-700/40 rounded-xl"
-				style={{ maxHeight: "calc(100vh - 320px)" }}
+				style={{ maxHeight: "calc(100vh - 350px)" }}
 			>
-				<div className="flex gap-4 p-2" style={{ minWidth: "max-content" }}>
+				<div className="flex gap-4 p-4 pb-8" style={{ minWidth: "max-content" }}>
 					{CURRICULUM.map((sem) => {
-						const semCredits = sem.subjects.reduce((a, s) => a + s.credits, 0);
+						const semCustomSubjects = customSubjects.filter(
+							(s) => s.semester === sem.number,
+						);
+						const allSemSubjects = [...sem.subjects, ...semCustomSubjects];
+						const semCredits = allSemSubjects.reduce((a, s) => a + s.credits, 0);
 						const isCurrent = sem.number === 1;
 						return (
 							<div
@@ -170,54 +177,30 @@ export default function MallaCurricular() {
 										className={`text-xs ${isCurrent ? "text-sky-100" : "text-slate-400"}`}
 									>
 										{semCredits} créditos
-										{sem.number === 4 && (
-											<span className="block text-yellow-300 text-xs">
-												★ Tecnicatura
-											</span>
-										)}
-										{sem.number === 8 && (
-											<span className="block text-yellow-300 text-xs">
-												★ Licenciatura
-											</span>
-										)}
 									</p>
 								</div>
 
 								{/* Subjects */}
 								<div className="space-y-1.5">
-									{sem.subjects.map((baseSubject) => {
+									{allSemSubjects.map((baseSubject) => {
 										const subject =
-											allSubjects.find((s) => s.id === baseSubject.id) ||
+											subjectsWithStatus.find((s) => s.id === baseSubject.id) ||
 											baseSubject;
 										return (
 											<div
 												key={subject.id}
-												className={`relative overflow-hidden rounded-lg p-2 border text-xs transition-all ${STATUS_STYLES[subject.status]} ${
+												className={`relative overflow-hidden rounded-lg p-2 border text-xs transition-all ${STATUS_STYLES[subject.status as keyof typeof STATUS_STYLES]} ${
 													subject.status === "en_curso"
 														? "animate-pulse-slow"
 														: ""
 												}`}
 											>
-												{subject.status === "aprobada" &&
-													subject.grade !== undefined && (
-														<div className="absolute top-0 right-0 bg-green-500/20 text-green-300 px-1.5 py-0.5 rounded-bl-lg text-[10px] font-bold border-b border-l border-green-500/30">
-															{subject.grade}
-														</div>
-													)}
 												<div className="flex items-start justify-between gap-1">
 													<div
 														className="w-1.5 h-1.5 rounded-full flex-shrink-0 mt-1"
 														style={{ backgroundColor: subject.color }}
 													/>
-													<p
-														className="flex-1 font-medium leading-tight line-clamp-2"
-														style={{
-															color:
-																subject.status === "pendiente"
-																	? "#64748b"
-																	: undefined,
-														}}
-													>
+													<p className="flex-1 font-medium leading-tight">
 														{subject.name}
 													</p>
 												</div>
@@ -226,22 +209,17 @@ export default function MallaCurricular() {
 														{subject.credits} cr
 													</span>
 													<span
-														className={`px-1.5 py-0.5 rounded-full text-xs font-semibold ${
+														className={`px-1.5 py-0.5 rounded-full text-[10px] font-semibold ${
 															subject.status === "en_curso"
-																? "bg-lti-blue text-white text-[10px]"
+																? "bg-lti-blue text-white"
 																: subject.status === "aprobada"
-																	? "bg-green-500 text-white text-[10px]"
-																	: "bg-navy-600 text-slate-400 text-[10px]"
+																	? "bg-green-500 text-white"
+																	: "bg-navy-600 text-slate-400"
 														}`}
 													>
-														{STATUS_LABELS[subject.status]}
+														{STATUS_LABELS[subject.status as keyof typeof STATUS_LABELS]}
 													</span>
 												</div>
-												{subject.startDate && (
-													<p className="ml-2.5 text-[10px] text-slate-600 mt-1">
-														{formatDateShort(subject.startDate)}
-													</p>
-												)}
 											</div>
 										);
 									})}
@@ -249,6 +227,7 @@ export default function MallaCurricular() {
 							</div>
 						);
 					})}
+
 				</div>
 			</div>
 		</div>

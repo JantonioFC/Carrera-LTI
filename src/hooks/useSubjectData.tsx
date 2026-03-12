@@ -1,6 +1,5 @@
-import type React from "react";
-import { createContext, useContext, useEffect, useState } from "react";
-import type { SubjectStatus } from "../data/lti";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { CURRICULUM, type Subject, type SubjectStatus } from "../data/lti";
 import { safeParseJSON } from "../utils/safeStorage";
 
 export interface SubjectResource {
@@ -20,9 +19,15 @@ export type SubjectDataMap = Record<string, SubjectData>;
 
 interface SubjectDataContextType {
 	data: SubjectDataMap;
+	customSubjects: Subject[];
+	allSubjects: Subject[];
 	updateSubject: (id: string, partialData: Partial<SubjectData>) => void;
-	getAverage: () => number;
+	addCustomSubject: (s: Subject) => void;
+	removeCustomSubject: (id: string) => void;
+	updateCustomSubject: (id: string, updates: Partial<Subject>) => void;
+	getApprovedCount: () => number;
 	getApprovedCredits: () => number;
+	getAverage: () => number;
 }
 
 const SubjectDataContext = createContext<SubjectDataContextType | undefined>(
@@ -38,9 +43,22 @@ export function SubjectDataProvider({
 		return safeParseJSON<SubjectDataMap>("lti_subject_data", {});
 	});
 
+	const [customSubjects, setCustomSubjects] = useState<Subject[]>(() => {
+		return safeParseJSON<Subject[]>("lti_custom_subjects", []);
+	});
+
+	const allSubjects = useMemo(() => {
+		const staticSubjects = CURRICULUM.flatMap((s) => s.subjects);
+		return [...staticSubjects, ...customSubjects];
+	}, [customSubjects]);
+
 	useEffect(() => {
 		localStorage.setItem("lti_subject_data", JSON.stringify(data));
 	}, [data]);
+
+	useEffect(() => {
+		localStorage.setItem("lti_custom_subjects", JSON.stringify(customSubjects));
+	}, [customSubjects]);
 
 	const updateSubject = (id: string, partialData: Partial<SubjectData>) => {
 		setData((prev) => {
@@ -52,25 +70,60 @@ export function SubjectDataProvider({
 		});
 	};
 
+	const addCustomSubject = (s: Subject) => {
+		setCustomSubjects((prev) => [...prev, s]);
+	};
+
+	const removeCustomSubject = (id: string) => {
+		setCustomSubjects((prev) => prev.filter((s) => s.id !== id));
+		// Clean up data for this subject if any
+		setData((prev) => {
+			const { [id]: _, ...rest } = prev;
+			return rest;
+		});
+	};
+
+	const updateCustomSubject = (id: string, updates: Partial<Subject>) => {
+		const newCustom = customSubjects.map((s) => (s.id === id ? { ...s, ...updates } : s));
+		setCustomSubjects(newCustom);
+		localStorage.setItem("lti_custom_subjects", JSON.stringify(newCustom));
+	};
+
 	const getAverage = () => {
-		const approved = Object.values(data).filter(
-			(d) => d.status === "aprobada" && d.grade !== undefined,
+		const approved = Object.entries(data).filter(
+			([_, d]) => d.status === "aprobada" && d.grade !== undefined,
 		);
 		if (approved.length === 0) return 0;
-		const sum = approved.reduce((acc, curr) => acc + (curr.grade || 0), 0);
+		const sum = approved.reduce((acc, [_, curr]) => acc + (curr.grade || 0), 0);
 		return Math.round((sum / approved.length) * 10) / 10;
 	};
 
 	const getApprovedCredits = () => {
-		// Necesitamos los créditos, esto es un cálculo que debe hacerse cruzando con CURRICULUM,
-		// pero lo exportaremos como un helper en otro lado si hace falta,
-		// por ahora devolvemos la cantidad de materias aprobadas o lo calculamos en la UI.
+		return Object.entries(data).reduce((acc, [id, d]) => {
+			if (d.status !== "aprobada") return acc;
+			const subject = allSubjects.find((s) => s.id === id);
+			return acc + (subject?.credits || 0);
+		}, 0);
+	};
+
+	const getApprovedCount = () => {
 		return Object.values(data).filter((d) => d.status === "aprobada").length;
 	};
 
 	return (
 		<SubjectDataContext.Provider
-			value={{ data, updateSubject, getAverage, getApprovedCredits }}
+			value={{
+				data,
+				customSubjects,
+				allSubjects,
+				updateSubject,
+				addCustomSubject,
+				removeCustomSubject,
+				updateCustomSubject,
+				getApprovedCount,
+				getApprovedCredits,
+				getAverage,
+			}}
 		>
 			{children}
 		</SubjectDataContext.Provider>

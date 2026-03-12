@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 
 const MDEditor = lazy(() => import("@uiw/react-md-editor"));
 const ForceGraph2D = lazy(() => import("react-force-graph-2d"));
@@ -7,12 +8,14 @@ import {
 	Brain,
 	ChevronLeft,
 	ChevronRight,
+	Download,
 	FileText,
 	Loader2,
 	Network,
 	Plus,
 	Search,
 	Sparkles,
+	Upload,
 } from "lucide-react";
 import {
 	type AetherNote,
@@ -28,8 +31,8 @@ export default function AetherVault() {
 		deleteNote,
 		getGraphData,
 		findBacklinks,
-		ingestNote,
 		semanticSearch,
+		importNotes,
 	} = useAetherStore();
 	const [activeNoteId, setActiveNoteId] = useState<AetherNoteId | null>(
 		notes[0]?.id || null,
@@ -82,6 +85,101 @@ export default function AetherVault() {
 		const newNote = addNote("Sin Título");
 		setActiveNoteId(newNote.id);
 		setViewMode("editor");
+	};
+
+	const handleExportJSON = () => {
+		const data = { notes };
+		const blob = new Blob([JSON.stringify(data, null, 2)], {
+			type: "application/json",
+		});
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement("a");
+		a.href = url;
+		a.download = `aether_backup_${new Date().toISOString().slice(0, 10)}.json`;
+		a.click();
+		URL.revokeObjectURL(url);
+	};
+
+	const handleExportMarkdown = () => {
+		let content = "# Aether - Exportación de Notas\n\n";
+		notes.forEach((note) => {
+			content += `---\n\n# ${note.title}\n\n${note.content}\n\n`;
+			content += `*Metadatos: Creado el ${new Date(note.createdAt).toLocaleDateString()}, Modificado el ${new Date(note.updatedAt).toLocaleDateString()}*\n\n`;
+		});
+
+		const blob = new Blob([content], { type: "text/markdown" });
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement("a");
+		a.href = url;
+		a.download = `aether_notes_${new Date().toISOString().slice(0, 10)}.md`;
+		a.click();
+		URL.revokeObjectURL(url);
+	};
+
+	const handleImport = () => {
+		const input = document.createElement("input");
+		input.type = "file";
+		input.accept = ".json,.md";
+		input.onchange = (e: any) => {
+			const file = e.target.files[0];
+			if (file) {
+				const reader = new FileReader();
+				reader.onload = (event) => {
+					const content = event.target?.result as string;
+					
+					if (file.name.toLowerCase().endsWith(".json")) {
+						importNotes(content);
+					} else {
+						// Procesar Markdown
+						// 1. Intentar dividir por exportación (---)
+						const sections = content.split(/\n---\n/).filter(s => s.trim().length > 10);
+						const newNotes: any[] = [];
+						
+						if (sections.length > 1) {
+							// Es un archivo de exportación combinado
+							sections.forEach(section => {
+								if (section.includes("# Aether - Exportación")) return;
+								
+								const lines = section.trim().split("\n");
+								const titleLine = lines.find(l => l.startsWith("# "));
+								const title = titleLine ? titleLine.replace("# ", "").trim() : "Nota Importada";
+								const noteContent = section.replace(titleLine || "", "").trim();
+								
+								newNotes.push({
+									id: `note_${uuidv4()}`,
+									title,
+									content: noteContent,
+									createdAt: Date.now(),
+									updatedAt: Date.now(),
+									tags: []
+								});
+							});
+						} else {
+							// Es una nota individual
+							const lines = content.trim().split("\n");
+							const titleLine = lines.find(l => l.startsWith("# "));
+							const title = titleLine ? titleLine.replace("# ", "").trim() : (file.name.replace(".md", ""));
+							const noteContent = content.replace(titleLine || "", "").trim();
+							
+							newNotes.push({
+								id: `note_${uuidv4()}`,
+								title,
+								content: noteContent,
+								createdAt: Date.now(),
+								updatedAt: Date.now(),
+								tags: []
+							});
+						}
+						
+						if (newNotes.length > 0) {
+							importNotes(JSON.stringify({ notes: newNotes }));
+						}
+					}
+				};
+				reader.readAsText(file);
+			}
+		};
+		input.click();
 	};
 
 	// Prevent hydration mismatch or layout thrashing for the force graph width
@@ -139,13 +237,37 @@ export default function AetherVault() {
 						</button>
 					</div>
 				</div>
-				<div className="flex items-center gap-3">
+				<div className="flex items-center gap-2">
+					<button
+						onClick={handleImport}
+						className="flex items-center gap-1.5 px-3 py-1.5 text-slate-400 hover:text-white hover:bg-navy-800 rounded-md text-sm font-medium transition-colors"
+						title="Importar notas JSON"
+					>
+						<Upload size={16} />
+						<span className="hidden sm:inline">Importar</span>
+					</button>
+					<button
+						onClick={handleExportMarkdown}
+						className="flex items-center gap-1.5 px-3 py-1.5 text-slate-400 hover:text-white hover:bg-navy-800 rounded-md text-sm font-medium transition-colors border border-transparent hover:border-navy-700"
+						title="Descargar notas como Markdown"
+					>
+						<FileText size={16} />
+						<span className="hidden xl:inline">Exportar MD</span>
+					</button>
+					<button
+						onClick={handleExportJSON}
+						className="flex items-center gap-1.5 px-3 py-1.5 text-slate-400 hover:text-white hover:bg-navy-800 rounded-md text-sm font-medium transition-colors border border-transparent hover:border-navy-700"
+						title="Exportar respaldo técnico (JSON)"
+					>
+						<Download size={16} />
+						<span className="hidden xl:inline">Backup JSON</span>
+					</button>
 					<button
 						onClick={handleCreateNote}
-						className="flex items-center gap-1.5 px-3 py-1.5 bg-lti-blue hover:bg-lti-blue-dark text-white rounded-md text-sm font-medium transition-colors"
+						className="flex items-center gap-1.5 px-3 py-1.5 bg-lti-blue hover:bg-lti-blue-dark text-white rounded-md text-sm font-medium transition-colors shadow-lg shadow-lti-blue/20"
 					>
 						<Plus size={16} />
-						Nueva Nota
+						<span>Nueva Nota</span>
 					</button>
 				</div>
 			</div>

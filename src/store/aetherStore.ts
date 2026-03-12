@@ -60,6 +60,7 @@ interface AetherActions {
 	) => ChatMessageId;
 	appendChatMessage: (id: ChatMessageId, textChunk: string) => void;
 	clearChatHistory: () => void;
+	importNotes: (json: string) => void;
 }
 
 const extractLinks = (text: string): string[] => {
@@ -224,6 +225,29 @@ export const useAetherStore = create<AetherState & AetherActions>()(
 					set((state) => {
 						state.chatHistory = [];
 					});
+				},
+
+				importNotes: (json: string) => {
+					try {
+						const data = JSON.parse(json);
+						const importedNotes = Array.isArray(data) ? data : data.notes;
+
+						if (!Array.isArray(importedNotes)) return;
+
+						set((state) => {
+							importedNotes.forEach((newNote: any) => {
+								if (!newNote.id || !newNote.title) return;
+								const exists = state.notes.find((n) => n.id === newNote.id);
+								if (!exists) {
+									state.notes.push(newNote);
+								} else {
+									Object.assign(exists, newNote);
+								}
+							});
+						});
+					} catch (e) {
+						console.error("Failed to import notes", e);
+					}
 				},
 			};
 		}),

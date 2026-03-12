@@ -1,6 +1,6 @@
 import { Link as LinkIcon, Pencil, Plus, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
-import { CURRICULUM, formatDateShort, type Subject } from "../data/lti";
+import { AREA_COLORS, formatDateShort, type Subject } from "../data/lti";
 import {
 	type SubjectData,
 	type SubjectResource,
@@ -8,18 +8,18 @@ import {
 } from "../hooks/useSubjectData";
 
 export default function Materias() {
-	const sem1 = CURRICULUM[0];
-	const { data, updateSubject } = useSubjectData();
+	const { data, updateSubject, allSubjects, addCustomSubject, removeCustomSubject, customSubjects, updateCustomSubject } = useSubjectData();
 	const [editingSubject, setEditingSubject] = useState<Subject | null>(null);
+	const [isCreating, setIsCreating] = useState(false);
 
 	// Mezclar currículum estático con el estado global local y memoizar
 	const subjectsWithData = useMemo(
 		() =>
-			sem1.subjects.map((s) => ({
+			allSubjects.map((s) => ({
 				...s,
 				status: data[s.id]?.status || s.status,
-			})),
-		[data],
+			})).filter(s => s.semester === 1 || !s.id.startsWith('s')), // Muestra semestre 1 y personalizadas por defecto
+		[data, allSubjects],
 	);
 
 	const totalCredits = useMemo(
@@ -30,13 +30,22 @@ export default function Materias() {
 	return (
 		<>
 			<div className="p-6 space-y-5 animate-fade-in">
-				<div>
-					<h1 className="text-2xl font-bold text-white">
-						Unidades Curriculares
-					</h1>
-					<p className="text-slate-400 text-sm mt-0.5">
-						Semestre 1 — {totalCredits} créditos totales
-					</p>
+				<div className="flex items-start justify-between">
+					<div>
+						<h1 className="text-2xl font-bold text-white">
+							Unidades Curriculares
+						</h1>
+						<p className="text-slate-400 text-sm mt-0.5">
+							Mis materias — {totalCredits} créditos totales
+						</p>
+					</div>
+					<button
+						onClick={() => setIsCreating(true)}
+						className="flex items-center gap-2 px-4 py-2 bg-lti-blue hover:bg-lti-blue-dark text-white rounded-lg text-sm font-medium transition-colors shadow-lg shadow-blue-500/20"
+					>
+						<Plus size={18} />
+						Nueva U.C.
+					</button>
 				</div>
 
 				<div className="@container">
@@ -160,11 +169,33 @@ export default function Materias() {
 							resources: [],
 						}
 					}
-					onSave={(partial) => {
-						updateSubject(editingSubject.id, partial);
-						setEditingSubject(null);
-					}}
+					onSave={(updated) => updateSubject(editingSubject.id, updated)}
+					onUpdateBase={
+						customSubjects.some((s) => s.id === editingSubject.id)
+							? (updates) => updateCustomSubject(editingSubject.id, updates)
+							: undefined
+					}
+					onDelete={
+						customSubjects.some((s) => s.id === editingSubject.id)
+							? () => {
+									if (confirm("¿Eliminar esta materia personalizada?")) {
+										removeCustomSubject(editingSubject.id);
+										setEditingSubject(null);
+									}
+								}
+							: undefined
+					}
 					onClose={() => setEditingSubject(null)}
+				/>
+			)}
+
+			{isCreating && (
+				<CreateSubjectModal
+					onSave={(newSubject) => {
+						addCustomSubject(newSubject);
+						setIsCreating(false);
+					}}
+					onClose={() => setIsCreating(false)}
 				/>
 			)}
 		</>
@@ -175,14 +206,21 @@ function EditSubjectModal({
 	subject,
 	currentData,
 	onSave,
+	onUpdateBase,
+	onDelete,
 	onClose,
 }: {
 	subject: Subject;
 	currentData: SubjectData;
 	onSave: (p: Partial<SubjectData>) => void;
+	onUpdateBase?: (p: Partial<Subject>) => void;
+	onDelete?: () => void;
 	onClose: () => void;
 }) {
 	const [status, setStatus] = useState(currentData.status);
+	const [name, setName] = useState(subject.name);
+	const [credits, setCredits] = useState(subject.credits);
+	const [area, setArea] = useState(subject.area);
 	const [grade, setGrade] = useState(currentData.grade?.toString() || "");
 	const [resources, setResources] = useState<SubjectResource[]>(
 		currentData.resources || [],
@@ -225,6 +263,53 @@ function EditSubjectModal({
 				</div>
 
 				<div className="p-5 overflow-y-auto space-y-6 form-scrollbar">
+					{onUpdateBase && (
+						<div className="space-y-4 p-4 bg-navy-900/50 rounded-xl border border-navy-700/30">
+							<p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+								Propiedades de la U.C.
+							</p>
+							<div>
+								<label className="block text-xs font-medium text-slate-400 mb-1.5">
+									Nombre de la Materia
+								</label>
+								<input
+									type="text"
+									value={name}
+									onChange={(e) => setName(e.target.value)}
+									className="w-full bg-navy-900 border border-navy-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-lti-blue transition-colors"
+								/>
+							</div>
+							<div className="grid grid-cols-2 gap-4">
+								<div>
+									<label className="block text-xs font-medium text-slate-400 mb-1.5">
+										Créditos
+									</label>
+									<input
+										type="number"
+										value={credits}
+										onChange={(e) => setCredits(Number(e.target.value))}
+										className="w-full bg-navy-900 border border-navy-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-lti-blue transition-colors"
+									/>
+								</div>
+								<div>
+									<label className="block text-xs font-medium text-slate-400 mb-1.5">
+										Área
+									</label>
+									<select
+										value={area}
+										onChange={(e) => setArea(e.target.value)}
+										className="w-full bg-navy-900 border border-navy-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-lti-blue transition-colors"
+									>
+										{Object.keys(AREA_COLORS).map((a) => (
+											<option key={a} value={a}>
+												{a}
+											</option>
+										))}
+									</select>
+								</div>
+							</div>
+						</div>
+					)}
 					{/* Status & Grade */}
 					<div className="space-y-4">
 						<div>
@@ -342,7 +427,132 @@ function EditSubjectModal({
 					</div>
 				</div>
 
-				<div className="p-5 border-t border-navy-700/50 flex justify-end gap-3 flex-shrink-0">
+				<div className="p-5 border-t border-navy-700/50 flex justify-between items-center flex-shrink-0">
+					{onDelete ? (
+						<button
+							onClick={onDelete}
+							className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-colors"
+						>
+							<Trash2 size={14} />
+							Eliminar Materia
+						</button>
+					) : (
+						<div />
+					)}
+					<div className="flex gap-3">
+						<button
+							onClick={onClose}
+							className="px-4 py-2 text-sm text-slate-400 hover:text-white"
+						>
+							Cancelar
+						</button>
+						<button
+							onClick={() => {
+								onSave({
+									status,
+									grade: grade ? Number(grade) : undefined,
+									resources,
+								});
+								if (onUpdateBase) {
+									onUpdateBase({ name, credits, area });
+								}
+								onClose();
+							}}
+							className="px-4 py-2 text-sm gradient-blue text-white rounded-lg font-medium shadow-lg shadow-blue-500/20"
+						>
+							Guardar Cambios
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	);
+}
+function CreateSubjectModal({
+	onSave,
+	onClose,
+}: {
+	onSave: (s: Subject) => void;
+	onClose: () => void;
+}) {
+	const [name, setName] = useState("");
+	const [credits, setCredits] = useState("4");
+	const [area, setArea] = useState("Gestión");
+
+	const handleSave = () => {
+		if (!name.trim()) return;
+		const newSubject: Subject = {
+			id: `custom-${Date.now()}`,
+			name: name.trim(),
+			credits: Number(credits),
+			semester: 1, // Por ahora las ponemos en semestre 1 o "libres"
+			color: AREA_COLORS[area] || "#64748b",
+			area,
+			status: "en_curso",
+		};
+		onSave(newSubject);
+	};
+
+	return (
+		<div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
+			<div className="bg-navy-800 rounded-2xl border border-navy-600/50 shadow-2xl w-full max-w-sm">
+				<div className="p-5 border-b border-navy-700/50 flex justify-between items-center">
+					<h3 className="text-white font-semibold flex items-center gap-2">
+						<Plus size={18} className="text-lti-blue" />
+						Nueva Unidad Curricular
+					</h3>
+					<button
+						onClick={onClose}
+						className="text-slate-400 hover:text-white transition-colors text-xl leading-none"
+					>
+						×
+					</button>
+				</div>
+				<div className="p-5 space-y-4">
+					<div>
+						<label className="block text-xs font-medium text-slate-400 mb-1.5">
+							Nombre de la Materia
+						</label>
+						<input
+							type="text"
+							value={name}
+							onChange={(e) => setName(e.target.value)}
+							placeholder="Ej: Taller de Robótica"
+							className="w-full bg-navy-900 border border-navy-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-lti-blue"
+						/>
+					</div>
+					<div className="grid grid-cols-2 gap-4">
+						<div>
+							<label className="block text-xs font-medium text-slate-400 mb-1.5">
+								Créditos
+							</label>
+							<input
+								type="number"
+								min="1"
+								value={credits}
+								onChange={(e) => setCredits(e.target.value)}
+								className="w-full bg-navy-900 border border-navy-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-lti-blue"
+							/>
+						</div>
+						<div>
+							<label className="block text-xs font-medium text-slate-400 mb-1.5">
+								Área
+							</label>
+							<select
+								value={area}
+								onChange={(e) => setArea(e.target.value)}
+								className="w-full bg-navy-900 border border-navy-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-lti-blue"
+							>
+								{Object.keys(AREA_COLORS).map((a) => (
+									<option key={a} value={a}>
+										{a}
+									</option>
+								))}
+							</select>
+						</div>
+					</div>
+				</div>
+				<div className="p-5 border-t border-navy-700/50 flex justify-end gap-3">
 					<button
 						onClick={onClose}
 						className="px-4 py-2 text-sm text-slate-400 hover:text-white"
@@ -350,16 +560,11 @@ function EditSubjectModal({
 						Cancelar
 					</button>
 					<button
-						onClick={() =>
-							onSave({
-								status,
-								grade: grade ? Number(grade) : undefined,
-								resources,
-							})
-						}
-						className="px-4 py-2 text-sm gradient-blue text-white rounded-lg font-medium shadow-lg shadow-blue-500/20"
+						onClick={handleSave}
+						disabled={!name.trim()}
+						className="px-4 py-2 text-sm gradient-blue text-white rounded-lg font-medium shadow-lg shadow-blue-500/20 disabled:opacity-50"
 					>
-						Guardar Cambios
+						Crear Materia
 					</button>
 				</div>
 			</div>
