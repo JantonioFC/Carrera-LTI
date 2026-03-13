@@ -1,5 +1,5 @@
 import {
-	closestCorners,
+	rectIntersection,
 	DndContext,
 	type DragEndEvent,
 	type DragOverEvent,
@@ -8,6 +8,7 @@ import {
 	defaultDropAnimationSideEffects,
 	KeyboardSensor,
 	PointerSensor,
+	useDroppable,
 	useSensor,
 	useSensors,
 } from "@dnd-kit/core";
@@ -166,8 +167,8 @@ function DroppableColumn({
 	onUpdateTime: (id: string, start: string, end: string) => void;
 	onRemove: (id: string) => void;
 }) {
-	const { setNodeRef } = useSortable({
-		id: `col-${day}`,
+	const { setNodeRef, isOver } = useDroppable({
+		id: day === null ? "bank" : `day-${day}`,
 		data: {
 			type: "Column",
 			day,
@@ -176,7 +177,14 @@ function DroppableColumn({
 
 	return (
 		<div
-			className={`flex flex-col flex-1 min-w-[180px] bg-navy-800/50 rounded-xl p-3 border ${day === null ? "border-lti-coral/30" : "border-navy-700/50 shadow-sm"}`}
+			ref={setNodeRef}
+			className={`flex flex-col flex-1 min-w-[200px] bg-navy-800/50 rounded-xl p-3 border h-full transition-all duration-200 z-10 ${
+				isOver
+					? "border-lti-coral bg-navy-800 shadow-lg shadow-lti-coral/10"
+					: day === null
+						? "border-lti-coral/30"
+						: "border-navy-700/50 shadow-sm"
+			}`}
 		>
 			<div className="flex items-center justify-between mb-3 px-1">
 				<h3
@@ -194,7 +202,7 @@ function DroppableColumn({
 					</button>
 				)}
 			</div>
-			<div ref={setNodeRef} className="flex-1 min-h-[150px]">
+			<div className="flex-1 min-h-[500px]">
 				<SortableContext
 					items={items.map((i) => i.id)}
 					strategy={verticalListSortingStrategy}
@@ -289,26 +297,45 @@ export default function Horarios({
 
 		if (activeData?.type !== "Task") return;
 
-		const activeItem = activeData.item as ScheduleItem;
-		let overDay: number | null = activeItem.day;
+		let overDay: number | null = null;
 
 		if (overData?.type === "Column") {
 			overDay = overData.day;
 		} else if (overData?.type === "Task") {
 			overDay = overData.item.day;
+		} else if (overId.startsWith("day-")) {
+			const dayStr = overId.replace("day-", "");
+			overDay = dayStr === "null" ? null : Number.parseInt(dayStr, 10);
+		} else if (overId === "bank") {
+			overDay = null;
 		}
 
-		if (activeItem.day !== overDay) {
+		if (overDay !== undefined) {
 			setItems((prev) => {
 				const activeIndex = prev.findIndex((i) => i.id === activeId);
-				const overIndex = prev.findIndex((i) => i.id === overId);
+				if (activeIndex === -1) return prev;
 
+				const item = { ...prev[activeIndex] };
+				if (item.day === overDay) {
+					// Reorder within same day if over another task
+					if (overData?.type === "Task") {
+						const overIndex = prev.findIndex((i) => i.id === overId);
+						return arrayMove(prev, activeIndex, overIndex);
+					}
+					return prev;
+				}
+
+				// Preview moving item to new day
+				item.day = overDay;
 				const newItems = [...prev];
-				newItems[activeIndex] = { ...activeItem, day: overDay };
+				newItems[activeIndex] = item;
 
-				if (overIndex !== -1) {
+				// If over a task in another day, move to that position
+				if (overData?.type === "Task") {
+					const overIndex = prev.findIndex((i) => i.id === overId);
 					return arrayMove(newItems, activeIndex, overIndex);
 				}
+
 				return newItems;
 			});
 		}
@@ -316,14 +343,102 @@ export default function Horarios({
 
 	const handleDragEnd = (event: DragEndEvent) => {
 		const { active, over } = event;
-		if (over && active.id !== over.id) {
-			setItems((prev) => {
-				const oldIndex = prev.findIndex((i) => i.id === active.id);
-				const newIndex = prev.findIndex((i) => i.id === over.id);
-				return arrayMove(prev, oldIndex, newIndex);
-			});
-		}
 		setActiveId(null);
+
+		const activeId = active.id.toString();
+
+		if (!over) {
+			console.log("[DND] DragEnd: No drop target found");
+			// If it's a bank item, move it back to the bank if it was left in a day during DragOver
+			if (activeId.startsWith("bank-")) {
+				setItems((prev) =>
+					prev.map((i) => (i.id === activeId ? { ...i, day: null } : i)),
+				);
+			}
+			return;
+		}
+
+		const overId = over.id.toString();
+		console.log(`[DND] DragEnd: active=${activeId} over=${overId}`);
+
+		setItems((prev) => {
+			const activeIndex = prev.findIndex((i) => i.id === activeId);
+			if (activeIndex === -1) return prev;
+
+			const overData = over.data.current;
+			let overDay: number | null = undefined;
+
+			if (overData?.type === "Column") {
+				overDay = overData.day;
+			} else if (overData?.type === "Task") {
+				overDay = overData.item.day;
+			} else if (overId.startsWith("day-")) {
+				const dayStr = overId.replace("day-", "");
+				overDay = dayStr === "null" ? null : Number.parseInt(dayStr, 10);
+			} else if (overId === "bank") {
+				overDay = null;
+			}
+
+			// Case 1: Dropped on bank -> Delete if it's an instance
+			if (overDay === null) {
+				if (!activeId.startsWith("bank-")) {
+					console.log(`[DND] Removing instance ${activeId}`);
+					return prev.filter((i) => i.id !== activeId);
+				}
+				// If it's the master bank item, just ensure it stays in bank
+				const newItems = [...prev];
+				newItems[activeIndex] = { ...prev[activeIndex], day: null };
+				return newItems;
+			}
+
+			// Case 2: Dropped on a day
+			if (overDay !== undefined && overDay !== null) {
+				const originalItem = prev[activeIndex];
+				const newItem = { ...originalItem, day: overDay };
+
+				// If it's a bank master, clone it by giving it a new instance ID
+				if (activeId.startsWith("bank-")) {
+					console.log(`[DND] Cloning master ${activeId} to day ${overDay}`);
+					const instanceId = `inst-${newItem.subjectId}-${Math.random().toString(36).substring(2, 9)}`;
+					
+					// IMPORTANT: The master stays in the bank (day null)
+					// We insert the new instance at the same position or reordered
+					const newItems = [...prev];
+					const instanceItem = { ...newItem, id: instanceId };
+					
+					if (overData?.type === "Task") {
+						const overIndex = newItems.findIndex((i) => i.id === overId);
+						// Remove nothing, add instance at overIndex
+						newItems.splice(overIndex, 0, instanceItem);
+					} else {
+						newItems.push(instanceItem);
+					}
+					
+					// The master block remains at its index but definitely as day: null
+					newItems[activeIndex] = { ...originalItem, day: null };
+					return newItems;
+				}
+
+				const newItems = [...prev];
+				newItems[activeIndex] = newItem;
+
+				// Handle reordering if dropped over another task
+				if (overData?.type === "Task") {
+					const overIndex = newItems.findIndex((i) => i.id === overId);
+					return arrayMove(newItems, activeIndex, overIndex);
+				}
+
+				return newItems;
+			}
+
+			// Case 3: Reordering within same list (handled by overDay logic above or fallback)
+			const overIndex = prev.findIndex((i) => i.id === overId);
+			if (overIndex !== -1 && activeIndex !== overIndex) {
+				return arrayMove(prev, activeIndex, overIndex);
+			}
+
+			return prev;
+		});
 	};
 
 	const activeItem = activeId ? items.find((i) => i.id === activeId) : null;
@@ -346,7 +461,7 @@ export default function Horarios({
 			<div className="flex-1 flex gap-4 overflow-x-auto pb-4">
 				<DndContext
 					sensors={sensors}
-					collisionDetection={closestCorners}
+					collisionDetection={rectIntersection}
 					onDragStart={handleDragStart}
 					onDragOver={handleDragOver}
 					onDragEnd={handleDragEnd}

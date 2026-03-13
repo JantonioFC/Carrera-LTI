@@ -1,0 +1,17 @@
+{
+  "status": "commited",
+  "type": "frontend",
+  "scope": "codebase",
+  "localEndpoint": "http://localhost:5174",
+  "executionArgs": {
+    "projectName": "Carrera LTI",
+    "projectPath": "/home/juan/Escritorio/Carrera LTI",
+    "testIds": [],
+    "additionalInstruction": "Focus on the Horarios page drag and drop functionality. Ensure that items can be dropped on Tuesday and that bank items are not duplicated incorrectly.",
+    "envs": {
+      "API_KEY": "sk-user-VwBO6y1dcF5D9K7454ETfvDh0p_DKuCdU9kGEfs3Pi-ETJkXq2DUoSP2uxsjeuXFxxwT9HIzyPAZVt2T0Le2QZ9GCTPHjTk_fJ9KxBYJJhXZnEpoYDUL4mfpMx5FXjadSCU"
+    }
+  },
+  "serverPort": 39791,
+  "proxy": "http://9cd8ee92-86e9-4f5b-a5e3-f65f8cce3ec4:YNJKeHPx3ryaN72P5pafY2LFxoDpIu1H@tun.testsprite.com:8080"
+}

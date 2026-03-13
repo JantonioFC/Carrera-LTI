@@ -95,32 +95,35 @@ function App() {
 
 	// Sincronizar banco de materias de horarios con materias activas
 	useEffect(() => {
-		const existingIds = new Set(schedule.map((s) => s.subjectId));
+		// 1. Identificar qué materias deberían estar en el banco (día === null)
+		const bankSubjectIds = new Set(
+			schedule.filter((item) => item.id.startsWith("bank-")).map((i) => i.subjectId),
+		);
 
-		// 1. Agregar las "en_curso" que falten
-		const missing = allSubjects.filter((s) => {
+		// 2. Agregar al banco las "en_curso" que falten
+		const missingInBank = allSubjects.filter((s) => {
 			const status = data[s.id]?.status || s.status;
-			return status === "en_curso" && !existingIds.has(s.id);
+			return status === "en_curso" && !bankSubjectIds.has(s.id);
 		});
 
-		// 2. Opcional: Limpiar el banco de las que ya no están "en curso"
+		// 3. Limpiar el banco de las que ya no están "en curso"
 		const invalidBankItems = schedule.filter((item) => {
-			if (item.day !== null) return false; // No tocar las ya agendadas
+			if (!item.id.startsWith("bank-")) return false;
 			const subject = allSubjects.find((s) => s.id === item.subjectId);
 			const status = data[item.subjectId]?.status || subject?.status;
 			return status !== "en_curso";
 		});
 
-		if (missing.length > 0 || invalidBankItems.length > 0) {
+		if (missingInBank.length > 0 || invalidBankItems.length > 0) {
 			let updatedSchedule = [...schedule];
 
-			if (missing.length > 0) {
-				const newItems = missing.map((s) => ({
-					id: `blk-${s.id}`,
+			if (missingInBank.length > 0) {
+				const newBankItems = missingInBank.map((s) => ({
+					id: `bank-${s.id}`, // Original master block for the bank
 					subjectId: s.id,
 					day: null,
 				}));
-				updatedSchedule = [...updatedSchedule, ...newItems];
+				updatedSchedule = [...updatedSchedule, ...newBankItems];
 			}
 
 			if (invalidBankItems.length > 0) {
