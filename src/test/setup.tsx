@@ -1,7 +1,7 @@
 import "@testing-library/jest-dom";
 import { cleanup } from "@testing-library/react";
+import type React from "react";
 import { afterEach, vi } from "vitest";
-import React from "react";
 
 afterEach(() => {
 	cleanup();
@@ -12,7 +12,7 @@ vi.mock("lucide-react", () => {
 	return new Proxy(
 		{},
 		{
-			get: (target, prop) => {
+			get: (_target, prop) => {
 				return ({ className }: { className?: string }) => (
 					<span data-testid={`icon-${String(prop)}`} className={className} />
 				);
@@ -23,9 +23,8 @@ vi.mock("lucide-react", () => {
 
 // Mock Recharts globally
 vi.mock("recharts", () => {
-	const mockComponent = ({ children }: { children: React.ReactNode }) => (
-		<>{children}</>
-	);
+	const mockComponent = ({ children }: { children: React.ReactNode }) =>
+		children;
 	return {
 		ResponsiveContainer: mockComponent,
 		AreaChart: mockComponent,

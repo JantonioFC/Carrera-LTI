@@ -1,1624 +1,1624 @@
 [
-  {
-    "id": "TC001",
-    "title": "Dashboard loads and displays core KPI widgets",
-    "description": "Verifies the main dashboard renders and shows key semester KPI information to the user.",
-    "category": "Dashboard",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify page title contains \"Dashboard\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"promedio\" is visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"créditos\" is visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"cuenta regresiva\" is visible"
-      }
-    ]
-  },
-  {
-    "id": "TC002",
-    "title": "Open a subject card and view subject details modal",
-    "description": "Verifies a subject card on the dashboard can be opened to reveal a subject details modal with quick actions.",
-    "category": "Dashboard",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"Subject card\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Click on \"Subject card\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"Subject details modal\" is visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Acciones\" is visible"
-      }
-    ]
-  },
-  {
-    "id": "TC003",
-    "title": "Close subject details modal from dashboard",
-    "description": "Verifies the subject details modal can be dismissed and the user returns to the dashboard view.",
-    "category": "Dashboard",
-    "priority": "Medium",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /"
-      },
-      {
-        "type": "action",
-        "description": "Click on \"Subject card\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"Subject details modal\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Click on \"Close\" in the subject details modal"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"Subject details modal\" is not visible"
-      }
-    ]
-  },
-  {
-    "id": "TC004",
-    "title": "Gmail widget absent and 'Connect Gmail' CTA is offered",
-    "description": "Verifies that when Gmail is not connected, the dashboard shows a 'Connect Gmail' call-to-action instead of the Gmail widget.",
-    "category": "Dashboard",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"Gmail widget\" is not visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Connect Gmail\" is visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"Notifications\" is visible"
-      }
-    ]
-  },
-  {
-    "id": "TC005",
-    "title": "Open 'Connect Gmail' contextual API key modal (progressive disclosure)",
-    "description": "Verifies clicking the 'Connect Gmail' CTA opens a contextual modal requesting an API Key.",
-    "category": "Dashboard",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Connect Gmail\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Click on \"Connect Gmail\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"Connect Gmail modal\" is visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"API Key\" is visible"
-      }
-    ]
-  },
-  {
-    "id": "TC006",
-    "title": "Dismiss the 'Connect Gmail' modal and remain on dashboard",
-    "description": "Verifies the Gmail connection modal can be closed without navigating away from the dashboard.",
-    "category": "Dashboard",
-    "priority": "Medium",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /"
-      },
-      {
-        "type": "action",
-        "description": "Click on \"Connect Gmail\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"Connect Gmail modal\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Click on \"Close\" in the Connect Gmail modal"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"Connect Gmail modal\" is not visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify URL contains \"/\""
-      }
-    ]
-  },
-  {
-    "id": "TC007",
-    "title": "Dashboard quick links navigate to core modules",
-    "description": "Verifies the dashboard provides working quick links to major modules and navigation lands on the correct pages.",
-    "category": "Dashboard",
-    "priority": "Medium",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"Quick links\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Click on \"Tareas\" quick link"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify URL contains \"/tareas\""
-      },
-      {
-        "type": "action",
-        "description": "Click on \"Dashboard\" in the main navigation"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify URL contains \"/\""
-      }
-    ]
-  },
-  {
-    "id": "TC008",
-    "title": "Dashboard countdown widget is present and labeled",
-    "description": "Verifies the dashboard includes a clearly labeled countdown section for upcoming academic milestones.",
-    "category": "Dashboard",
-    "priority": "Low",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"cuenta regresiva\" is visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"Countdown widget\" is visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"Countdown value\" is visible"
-      }
-    ]
-  },
-  {
-    "id": "TC009",
-    "title": "View curriculum map grid and progress indicators",
-    "description": "Verifies the Malla page renders an 8-semester grid with visible credit/progress indicators.",
-    "category": "Malla Curricular (Curriculum Map)",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /malla"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Malla\" is visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Semestre 1\" is visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Semestre 8\" is visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"credit progress\" is visible"
-      }
-    ]
-  },
-  {
-    "id": "TC010",
-    "title": "Open a subject detail from the grid",
-    "description": "Verifies a subject in the curriculum grid can be opened to view available actions including state changes.",
-    "category": "Malla Curricular (Curriculum Map)",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /malla"
-      },
-      {
-        "type": "action",
-        "description": "Click on a subject card in \"Semestre 1\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"Subject details\" is visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"Mark as En Curso\" is visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"Prerequisites\" is visible"
-      }
-    ]
-  },
-  {
-    "id": "TC011",
-    "title": "Mark a subject as En Curso and see state reflected in the grid",
-    "description": "Verifies marking a subject as En Curso updates the visible state on the curriculum grid.",
-    "category": "Malla Curricular (Curriculum Map)",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /malla"
-      },
-      {
-        "type": "action",
-        "description": "Click on a subject card in \"Semestre 1\""
-      },
-      {
-        "type": "action",
-        "description": "Click \"Mark as En Curso\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"En curso\" is visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify the selected subject shows state \"En curso\" in the grid"
-      }
-    ]
-  },
-  {
-    "id": "TC012",
-    "title": "Create Aether folder after marking subject En Curso (happy path)",
-    "description": "Verifies that marking a subject En Curso results in a corresponding folder being visible in Aether.",
-    "category": "Malla Curricular (Curriculum Map)",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /malla"
-      },
-      {
-        "type": "action",
-        "description": "Click on a subject card in \"Semestre 1\""
-      },
-      {
-        "type": "action",
-        "description": "Click \"Mark as En Curso\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify the selected subject shows state \"En curso\" in the grid"
-      },
-      {
-        "type": "action",
-        "description": "Click on the navigation item \"Aether\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify URL contains \"/aether\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"Folder\" with the same subject name is visible"
-      }
-    ]
-  },
-  {
-    "id": "TC013",
-    "title": "Cancel/close subject details without changing state",
-    "description": "Verifies a user can dismiss the subject details view and the grid remains unchanged.",
-    "category": "Malla Curricular (Curriculum Map)",
-    "priority": "Low",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /malla"
-      },
-      {
-        "type": "action",
-        "description": "Click on a subject card in \"Semestre 1\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"Subject details\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Press \"Escape\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"Subject details\" is not visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"En curso\" is not visible"
-      }
-    ]
-  },
-  {
-    "id": "TC014",
-    "title": "Credit/progress indicators update after marking a subject En Curso",
-    "description": "Verifies credit/progress indicators visibly change after a subject state change that affects progress.",
-    "category": "Malla Curricular (Curriculum Map)",
-    "priority": "Medium",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /malla"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"credit progress\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Click on a subject card in \"Semestre 1\""
-      },
-      {
-        "type": "action",
-        "description": "Click \"Mark as En Curso\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify the selected subject shows state \"En curso\" in the grid"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"credit progress\" shows an updated value"
-      }
-    ]
-  },
-  {
-    "id": "TC015",
-    "title": "Filter by semester, change status to 'en curso', and save a grade successfully",
-    "description": "Verifies a user can filter subjects by semester, set a subject to 'en curso', edit its grade, and see the updated values reflected in the list.",
-    "category": "Subject Management (Materias)",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /materias"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify page title contains \"Materias\""
-      },
-      {
-        "type": "action",
-        "description": "Select option \"1\" from the semester filter dropdown"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Semestre 1\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Click on the subject status control for the first visible subject"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"en curso\" is visible on the first visible subject row"
-      },
-      {
-        "type": "action",
-        "description": "Click on \"Edit grades\" for the first visible subject"
-      },
-      {
-        "type": "action",
-        "description": "Type \"15\" into the grade field"
-      },
-      {
-        "type": "action",
-        "description": "Click on \"Save\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"15\" is visible on the first visible subject row"
-      }
-    ]
-  },
-  {
-    "id": "TC016",
-    "title": "Filter semester '1' shows a subject list state and is persistent on the page",
-    "description": "Verifies filtering by semester updates the visible list and the filter selection remains applied while staying on the Materias page.",
-    "category": "Subject Management (Materias)",
-    "priority": "Medium",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /materias"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify page title contains \"Materias\""
-      },
-      {
-        "type": "action",
-        "description": "Select option \"1\" from the semester filter dropdown"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Semestre 1\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Scroll to the bottom of the subjects list"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Semestre 1\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Scroll to the top of the subjects list"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Semestre 1\" is visible"
-      }
-    ]
-  },
-  {
-    "id": "TC017",
-    "title": "Edit grade input validation blocks saving when the grade is empty",
-    "description": "Verifies the grade editor does not allow saving an empty grade and keeps the user in an editable state or shows a visible validation message.",
-    "category": "Subject Management (Materias)",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /materias"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify page title contains \"Materias\""
-      },
-      {
-        "type": "action",
-        "description": "Click on \"Edit grades\" for the first visible subject"
-      },
-      {
-        "type": "action",
-        "description": "Type \"\" into the grade field"
-      },
-      {
-        "type": "action",
-        "description": "Click on \"Save\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Save\" is visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"grade\" is visible"
-      }
-    ]
-  },
-  {
-    "id": "TC018",
-    "title": "Cancel grade editing does not change the displayed grade",
-    "description": "Verifies that exiting the grade editor without saving leaves the previously displayed grade unchanged.",
-    "category": "Subject Management (Materias)",
-    "priority": "Medium",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /materias"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify page title contains \"Materias\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"Grade\" is visible for the first visible subject"
-      },
-      {
-        "type": "action",
-        "description": "Click on \"Edit grades\" for the first visible subject"
-      },
-      {
-        "type": "action",
-        "description": "Type \"12\" into the grade field"
-      },
-      {
-        "type": "action",
-        "description": "Click on \"Cancel\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"Grade\" is visible for the first visible subject"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"12\" is not visible"
-      }
-    ]
-  },
-  {
-    "id": "TC019",
-    "title": "Switch status between 'en curso' and 'aprobada' updates the displayed label",
-    "description": "Verifies status toggling between states updates the visible status label on the subject row.",
-    "category": "Subject Management (Materias)",
-    "priority": "Medium",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /materias"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify page title contains \"Materias\""
-      },
-      {
-        "type": "action",
-        "description": "Click on the subject status control for the first visible subject"
-      },
-      {
-        "type": "action",
-        "description": "Select option \"en curso\" from the status dropdown"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"en curso\" is visible on the first visible subject row"
-      },
-      {
-        "type": "action",
-        "description": "Click on the subject status control for the first visible subject"
-      },
-      {
-        "type": "action",
-        "description": "Select option \"aprobada\" from the status dropdown"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"aprobada\" is visible on the first visible subject row"
-      }
-    ]
-  },
-  {
-    "id": "TC020",
-    "title": "Create a new task with title and due date and see it on the Kanban board",
-    "description": "Verifies a user can create a task and it becomes visible in a Kanban column.",
-    "category": "Task Management (Tareas) — Kanban",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to \"/tareas\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify URL contains \"/tareas\""
-      },
-      {
-        "type": "action",
-        "description": "Click on \"Create Task\""
-      },
-      {
-        "type": "action",
-        "description": "Type \"Read chapter 3\" into the title field"
-      },
-      {
-        "type": "action",
-        "description": "Type \"2026-03-20\" into the due date field"
-      },
-      {
-        "type": "action",
-        "description": "Click on \"Save\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Read chapter 3\" is visible"
-      }
-    ]
-  },
-  {
-    "id": "TC021",
-    "title": "Fail to create a task when title is empty (validation error)",
-    "description": "Verifies the task form enforces required title validation and prevents creation.",
-    "category": "Task Management (Tareas) — Kanban",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to \"/tareas\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify URL contains \"/tareas\""
-      },
-      {
-        "type": "action",
-        "description": "Click on \"Create Task\""
-      },
-      {
-        "type": "action",
-        "description": "Type \"2026-03-20\" into the due date field"
-      },
-      {
-        "type": "action",
-        "description": "Click on \"Save\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Title required\" is visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"2026-03-20\" is not visible"
-      }
-    ]
-  },
-  {
-    "id": "TC022",
-    "title": "Calendario: Weekly view can be selected and calendar content remains visible",
-    "description": "Verifies that switching to weekly view works and the calendar still renders visible content.",
-    "category": "Calendario",
-    "priority": "Medium",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /calendario"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Calendario\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Click on \"Week\" view"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Week\" is visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"Calendar\" is visible"
-      }
-    ]
-  },
-  {
-    "id": "TC023",
-    "title": "Create a new note with a wiki-style link and verify it appears in the vault list",
-    "description": "Verifies that a user can create a new note containing a [[Wiki]] link and that the note becomes visible in the Aether Vault list after saving/auto-save.",
-    "category": "Aether Vault (Second Brain)",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /aether"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify page title contains \"Aether\""
-      },
-      {
-        "type": "action",
-        "description": "Click on \"New Note\""
-      },
-      {
-        "type": "action",
-        "description": "Type \"E2E Note - Wiki Link\" into the note title field"
-      },
-      {
-        "type": "action",
-        "description": "Type \"This is a test note linking to [[Linked Note]].\" into the note content editor"
-      },
-      {
-        "type": "action",
-        "description": "Click on \"Save\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"E2E Note - Wiki Link\" is visible"
-      }
-    ]
-  },
-  {
-    "id": "TC024",
-    "title": "Create a new note and verify the linked note appears as a visible graph connection",
-    "description": "Verifies that after creating a note with a [[Wiki]] link, the graph view shows a visible relationship between notes.",
-    "category": "Aether Vault (Second Brain)",
-    "priority": "Medium",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /aether"
-      },
-      {
-        "type": "action",
-        "description": "Click on \"New Note\""
-      },
-      {
-        "type": "action",
-        "description": "Type \"Graph Source Note\" into the note title field"
-      },
-      {
-        "type": "action",
-        "description": "Type \"Connecting to [[Graph Target Note]] for graph test.\" into the note content editor"
-      },
-      {
-        "type": "action",
-        "description": "Click on \"Save\""
-      },
-      {
-        "type": "action",
-        "description": "Click on \"Graph\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Graph Source Note\" is visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Graph Target Note\" is visible"
-      }
-    ]
-  },
-  {
-    "id": "TC025",
-    "title": "Attempt to save a note and handle 'Encryption key required' by opening Security Settings",
-    "description": "Verifies the encryption gating flow: saving triggers an 'Encryption key required' modal and the user can proceed to Security Settings to set a passphrase prompt.",
-    "category": "Aether Vault (Second Brain)",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /aether"
-      },
-      {
-        "type": "action",
-        "description": "Click on \"New Note\""
-      },
-      {
-        "type": "action",
-        "description": "Type \"Encrypted Note Attempt\" into the note title field"
-      },
-      {
-        "type": "action",
-        "description": "Type \"This note should require encryption key before saving.\" into the note content editor"
-      },
-      {
-        "type": "action",
-        "description": "Click on \"Save\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Encryption key required\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Click on \"Open Security Settings\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Passphrase\" is visible"
-      }
-    ]
-  },
-  {
-    "id": "TC026",
-    "title": "Cancel out of the encryption requirement modal and remain on the note editor",
-    "description": "Verifies that dismissing the encryption requirement modal does not navigate away and the editor remains visible for the current note.",
-    "category": "Aether Vault (Second Brain)",
-    "priority": "Medium",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /aether"
-      },
-      {
-        "type": "action",
-        "description": "Click on \"New Note\""
-      },
-      {
-        "type": "action",
-        "description": "Type \"Encryption Modal Cancel\" into the note title field"
-      },
-      {
-        "type": "action",
-        "description": "Type \"Trigger encryption modal and then cancel.\" into the note content editor"
-      },
-      {
-        "type": "action",
-        "description": "Click on \"Save\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Encryption key required\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Click on \"Cancel\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"note content editor\" is visible"
-      }
-    ]
-  },
-  {
-    "id": "TC027",
-    "title": "Create a note with an empty title and verify a visible validation message (if enforced)",
-    "description": "Verifies that the UI prevents saving a note without a title (or shows a clear validation message).",
-    "category": "Aether Vault (Second Brain)",
-    "priority": "Medium",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /aether"
-      },
-      {
-        "type": "action",
-        "description": "Click on \"New Note\""
-      },
-      {
-        "type": "action",
-        "description": "Type \"Body without a title\" into the note content editor"
-      },
-      {
-        "type": "action",
-        "description": "Click on \"Save\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Title\" is visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"required\" is visible"
-      }
-    ]
-  },
-  {
-    "id": "TC028",
-    "title": "Create a note with an empty body and verify it can be saved and listed (or shows validation)",
-    "description": "Verifies behavior when saving a note that has a title but no content: it should either save successfully and appear in the list or show a visible validation message.",
-    "category": "Aether Vault (Second Brain)",
-    "priority": "Low",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /aether"
-      },
-      {
-        "type": "action",
-        "description": "Click on \"New Note\""
-      },
-      {
-        "type": "action",
-        "description": "Type \"Title Only Note\" into the note title field"
-      },
-      {
-        "type": "action",
-        "description": "Click on \"Save\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Title Only Note\" is visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"notes list\" is visible"
-      }
-    ]
-  },
-  {
-    "id": "TC029",
-    "title": "Create a new canvas node and add text content",
-    "description": "Verifies a user can add a node on Aether Canvas and save text content to it.",
-    "category": "Aether Canvas (Spatial Canvas)",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /aether/canvas"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify page title contains \"Aether\""
-      },
-      {
-        "type": "action",
-        "description": "Click \"Add Node\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Node\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Click on the newly created node"
-      },
-      {
-        "type": "action",
-        "description": "Type \"Study: Diagram for system architecture\" into the node text field"
-      },
-      {
-        "type": "action",
-        "description": "Press Enter"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Study: Diagram for system architecture\" is visible"
-      }
-    ]
-  },
-  {
-    "id": "TC030",
-    "title": "Canvas persistence: node remains after reload",
-    "description": "Verifies a node created on the canvas is still available after reloading the page.",
-    "category": "Aether Canvas (Spatial Canvas)",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /aether/canvas"
-      },
-      {
-        "type": "action",
-        "description": "Click \"Add Node\""
-      },
-      {
-        "type": "action",
-        "description": "Click on the newly created node"
-      },
-      {
-        "type": "action",
-        "description": "Type \"Persistent node\" into the node text field"
-      },
-      {
-        "type": "action",
-        "description": "Press Enter"
-      },
-      {
-        "type": "action",
-        "description": "Navigate to /aether/canvas"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Persistent node\" is visible"
-      }
-    ]
-  },
-  {
-    "id": "TC031",
-    "title": "Add multiple nodes and confirm both are visible",
-    "description": "Verifies the canvas can contain multiple nodes and each one is visible after creation.",
-    "category": "Aether Canvas (Spatial Canvas)",
-    "priority": "Medium",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /aether/canvas"
-      },
-      {
-        "type": "action",
-        "description": "Click \"Add Node\""
-      },
-      {
-        "type": "action",
-        "description": "Click \"Add Node\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Node\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Click on one node"
-      },
-      {
-        "type": "action",
-        "description": "Type \"Node A\" into the node text field"
-      },
-      {
-        "type": "action",
-        "description": "Press Enter"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Node A\" is visible"
-      }
-    ]
-  },
-  {
-    "id": "TC032",
-    "title": "Cancel node creation (if supported) does not add a node",
-    "description": "Verifies canceling out of node creation leaves the canvas unchanged (no new node visible).",
-    "category": "Aether Canvas (Spatial Canvas)",
-    "priority": "Low",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /aether/canvas"
-      },
-      {
-        "type": "action",
-        "description": "Click \"Add Node\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"Node details\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Click \"Cancel\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Node details\" is not visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Untitled\" is not visible"
-      }
-    ]
-  },
-  {
-    "id": "TC033",
-    "title": "Start chat and receive an assistant response based on private notes",
-    "description": "Verifies a user can start a new Aether Chat session and receive a visible assistant response after sending a question about their notes.",
-    "category": "Aether Chat (Assistant)",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /aether/chat"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify page title contains \"Aether\""
-      },
-      {
-        "type": "action",
-        "description": "Click \"Start Chat\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Start Chat\" is not visible"
-      },
-      {
-        "type": "action",
-        "description": "Type \"Using my notes, summarize the key points about my current subjects and tasks.\" into the message input field"
-      },
-      {
-        "type": "action",
-        "description": "Press Enter"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify an assistant response element is visible"
-      }
-    ]
-  },
-  {
-    "id": "TC034",
-    "title": "API key progressive disclosure: prompt appears when sending without key",
-    "description": "Verifies that sending a message without an API key triggers a visible 'API Key required' modal prompt.",
-    "category": "Aether Chat (Assistant)",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /aether/chat"
-      },
-      {
-        "type": "action",
-        "description": "Type \"What do my notes say about my next deadlines?\" into the message input field"
-      },
-      {
-        "type": "action",
-        "description": "Press Enter"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"API Key required\" is visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Add API Key\" is visible"
-      }
-    ]
-  },
-  {
-    "id": "TC035",
-    "title": "Add API key and resume chat to get a response",
-    "description": "Verifies the user can add an API key from the required modal and then receive a chat response after saving.",
-    "category": "Aether Chat (Assistant)",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /aether/chat"
-      },
-      {
-        "type": "action",
-        "description": "Type \"Answer using only my notes: what should I study first this week?\" into the message input field"
-      },
-      {
-        "type": "action",
-        "description": "Press Enter"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"API Key required\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Click \"Add API Key\""
-      },
-      {
-        "type": "action",
-        "description": "Type \"sk-test-1234567890\" into the API key input field"
-      },
-      {
-        "type": "action",
-        "description": "Click \"Save\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify an assistant response element is visible"
-      }
-    ]
-  },
-  {
-    "id": "TC036",
-    "title": "Cancel/close API key modal does not send message",
-    "description": "Verifies that dismissing the API key required modal does not produce an assistant response for the attempted message.",
-    "category": "Aether Chat (Assistant)",
-    "priority": "Medium",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /aether/chat"
-      },
-      {
-        "type": "action",
-        "description": "Type \"From my notes, list my upcoming exams.\" into the message input field"
-      },
-      {
-        "type": "action",
-        "description": "Press Enter"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"API Key required\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Press Escape"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"API Key required\" is not visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify an assistant response element is not visible"
-      }
-    ]
-  },
-  {
-    "id": "TC037",
-    "title": "Empty message is not sent",
-    "description": "Verifies the chat input prevents sending an empty message and no assistant response appears.",
-    "category": "Aether Chat (Assistant)",
-    "priority": "Medium",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /aether/chat"
-      },
-      {
-        "type": "action",
-        "description": "Click the message input field"
-      },
-      {
-        "type": "action",
-        "description": "Press Enter"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"API Key required\" is not visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify an assistant response element is not visible"
-      }
-    ]
-  },
-  {
-    "id": "TC038",
-    "title": "Long question can be entered and submitted",
-    "description": "Verifies the chat supports a longer prompt and shows an assistant response after submission.",
-    "category": "Aether Chat (Assistant)",
-    "priority": "Medium",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /aether/chat"
-      },
-      {
-        "type": "action",
-        "description": "Click \"Start Chat\""
-      },
-      {
-        "type": "action",
-        "description": "Type \"Using only my private notes, create a detailed study plan for the next 7 days. Include what to review each day, how to split time across subjects, and a short checklist.\" into the message input field"
-      },
-      {
-        "type": "action",
-        "description": "Press Enter"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify an assistant response element is visible"
-      }
-    ]
-  },
-  {
-    "id": "TC039",
-    "title": "Chat remains usable after adding API key (send a second message)",
-    "description": "Verifies that after saving an API key and receiving one response, the user can send another question and get another response.",
-    "category": "Aether Chat (Assistant)",
-    "priority": "Medium",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /aether/chat"
-      },
-      {
-        "type": "action",
-        "description": "Type \"Use my notes: what are the main concepts I struggled with last week?\" into the message input field"
-      },
-      {
-        "type": "action",
-        "description": "Press Enter"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"API Key required\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Click \"Add API Key\""
-      },
-      {
-        "type": "action",
-        "description": "Type \"sk-test-abcdefg\" into the API key input field"
-      },
-      {
-        "type": "action",
-        "description": "Click \"Save\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify an assistant response element is visible"
-      }
-    ]
-  },
-  {
-    "id": "TC040",
-    "title": "Nexus Workspace: Create a new block document and verify it persists locally",
-    "description": "Verifies a user can create a new block-based document in Nexus Workspace and the content remains visible after a refresh (local persistence/CRDT save).",
-    "category": "Nexus Workspace — Editor & Database",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /nexus"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify URL contains \"/nexus\""
-      },
-      {
-        "type": "action",
-        "description": "Click on \"New\" or \"Create document\" in the workspace"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"Document title\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Click into the main editor area"
-      },
-      {
-        "type": "action",
-        "description": "Type \"CRDT test note: Persistence check\" into the editor"
-      },
-      {
-        "type": "action",
-        "description": "Press \"Enter\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"CRDT test note: Persistence check\" is visible"
-      }
-    ]
-  },
-  {
-    "id": "TC041",
-    "title": "Nexus Workspace: Verify content remains after page reload",
-    "description": "Verifies that a previously typed block remains visible after reloading the Nexus Workspace page.",
-    "category": "Nexus Workspace — Editor & Database",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /nexus"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify URL contains \"/nexus\""
-      },
-      {
-        "type": "action",
-        "description": "Click into the main editor area"
-      },
-      {
-        "type": "action",
-        "description": "Type \"Local persistence smoke test line\" into the editor"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Local persistence smoke test line\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Navigate to /nexus"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Local persistence smoke test line\" is visible"
-      }
-    ]
-  },
-  {
-    "id": "TC042",
-    "title": "Nexus Workspace: Create multiple blocks and verify ordering is preserved",
-    "description": "Verifies that creating multiple blocks results in distinct visible lines in the editor in the expected order.",
-    "category": "Nexus Workspace — Editor & Database",
-    "priority": "Medium",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /nexus"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify URL contains \"/nexus\""
-      },
-      {
-        "type": "action",
-        "description": "Click into the main editor area"
-      },
-      {
-        "type": "action",
-        "description": "Type \"Block A\" into the editor"
-      },
-      {
-        "type": "action",
-        "description": "Press \"Enter\""
-      },
-      {
-        "type": "action",
-        "description": "Type \"Block B\" into the editor"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Block A\" is visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Block B\" is visible"
-      }
-    ]
-  },
-  {
-    "id": "TC043",
-    "title": "Nexus Workspace: Verify workspace loads without blocking errors",
-    "description": "Verifies Nexus Workspace renders its main editor UI and is usable on initial load.",
-    "category": "Nexus Workspace — Editor & Database",
-    "priority": "Medium",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /nexus"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify URL contains \"/nexus\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"Main editor\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Click into the main editor area"
-      },
-      {
-        "type": "action",
-        "description": "Type \"Workspace load check\" into the editor"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Workspace load check\" is visible"
-      }
-    ]
-  },
-  {
-    "id": "TC044",
-    "title": "Nexus Database: Create a new record and verify it appears in the table",
-    "description": "Verifies a user can create a database record, save it, and see it listed in the table view.",
-    "category": "Nexus Workspace — Editor & Database",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /nexus/db"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify URL contains \"/nexus/db\""
-      },
-      {
-        "type": "action",
-        "description": "Click on \"New record\" or \"Add\" in the database view"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"Save\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Fill \"Test Record 001\" into the \"Name\" field"
-      },
-      {
-        "type": "action",
-        "description": "Click on \"Save\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Test Record 001\" is visible"
-      }
-    ]
-  },
-  {
-    "id": "TC045",
-    "title": "Nexus Database: Required field validation prevents saving empty record",
-    "description": "Verifies the database record form shows visible validation feedback when trying to save with missing required fields.",
-    "category": "Nexus Workspace — Editor & Database",
-    "priority": "Medium",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /nexus/db"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify URL contains \"/nexus/db\""
-      },
-      {
-        "type": "action",
-        "description": "Click on \"New record\" or \"Add\" in the database view"
-      },
-      {
-        "type": "action",
-        "description": "Click on \"Save\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify text \"Required\" is visible"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"Save\" is visible"
-      }
-    ]
-  },
-  {
-    "id": "TC046",
-    "title": "RAG response using selected sources (Notes + Database)",
-    "description": "Verifies the AI response is generated and visibly references content from the user-selected sources (Notes and Database).",
-    "category": "Nexus AI (Multi-source RAG)",
-    "priority": "High",
-    "steps": [
-      {
-        "type": "action",
-        "description": "Navigate to /nexus/ai"
-      },
-      {
-        "type": "assertion",
-        "description": "Verify page title contains \"Nexus\""
-      },
-      {
-        "type": "action",
-        "description": "Click on \"Open Nexus AI\" or \"Open AI panel\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"AI chat panel\" is visible"
-      },
-      {
-        "type": "action",
-        "description": "Click on source \"Notes\" to enable it"
-      },
-      {
-        "type": "action",
-        "description": "Click on source \"Database\" to enable it"
-      },
-      {
-        "type": "action",
-        "description": "Type \"Summarize the key concepts from my notes related to this week and cross-check them with any matching entries in my database.\" into the prompt input"
-      },
-      {
-        "type": "action",
-        "description": "Click on \"Send\""
-      },
-      {
-        "type": "assertion",
-        "description": "Verify element \"AI response message\" is visible"
-      }
-    ]
-  }
+	{
+		"id": "TC001",
+		"title": "Dashboard loads and displays core KPI widgets",
+		"description": "Verifies the main dashboard renders and shows key semester KPI information to the user.",
+		"category": "Dashboard",
+		"priority": "High",
+		"steps": [
+			{
+				"type": "action",
+				"description": "Navigate to /"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify page title contains \"Dashboard\""
+			},
+			{
+				"type": "assertion",
+				"description": "Verify text \"promedio\" is visible"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify text \"créditos\" is visible"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify text \"cuenta regresiva\" is visible"
+			}
+		]
+	},
+	{
+		"id": "TC002",
+		"title": "Open a subject card and view subject details modal",
+		"description": "Verifies a subject card on the dashboard can be opened to reveal a subject details modal with quick actions.",
+		"category": "Dashboard",
+		"priority": "High",
+		"steps": [
+			{
+				"type": "action",
+				"description": "Navigate to /"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify element \"Subject card\" is visible"
+			},
+			{
+				"type": "action",
+				"description": "Click on \"Subject card\""
+			},
+			{
+				"type": "assertion",
+				"description": "Verify element \"Subject details modal\" is visible"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify text \"Acciones\" is visible"
+			}
+		]
+	},
+	{
+		"id": "TC003",
+		"title": "Close subject details modal from dashboard",
+		"description": "Verifies the subject details modal can be dismissed and the user returns to the dashboard view.",
+		"category": "Dashboard",
+		"priority": "Medium",
+		"steps": [
+			{
+				"type": "action",
+				"description": "Navigate to /"
+			},
+			{
+				"type": "action",
+				"description": "Click on \"Subject card\""
+			},
+			{
+				"type": "assertion",
+				"description": "Verify element \"Subject details modal\" is visible"
+			},
+			{
+				"type": "action",
+				"description": "Click on \"Close\" in the subject details modal"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify element \"Subject details modal\" is not visible"
+			}
+		]
+	},
+	{
+		"id": "TC004",
+		"title": "Gmail widget absent and 'Connect Gmail' CTA is offered",
+		"description": "Verifies that when Gmail is not connected, the dashboard shows a 'Connect Gmail' call-to-action instead of the Gmail widget.",
+		"category": "Dashboard",
+		"priority": "High",
+		"steps": [
+			{
+				"type": "action",
+				"description": "Navigate to /"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify element \"Gmail widget\" is not visible"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify text \"Connect Gmail\" is visible"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify element \"Notifications\" is visible"
+			}
+		]
+	},
+	{
+		"id": "TC005",
+		"title": "Open 'Connect Gmail' contextual API key modal (progressive disclosure)",
+		"description": "Verifies clicking the 'Connect Gmail' CTA opens a contextual modal requesting an API Key.",
+		"category": "Dashboard",
+		"priority": "High",
+		"steps": [
+			{
+				"type": "action",
+				"description": "Navigate to /"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify text \"Connect Gmail\" is visible"
+			},
+			{
+				"type": "action",
+				"description": "Click on \"Connect Gmail\""
+			},
+			{
+				"type": "assertion",
+				"description": "Verify element \"Connect Gmail modal\" is visible"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify text \"API Key\" is visible"
+			}
+		]
+	},
+	{
+		"id": "TC006",
+		"title": "Dismiss the 'Connect Gmail' modal and remain on dashboard",
+		"description": "Verifies the Gmail connection modal can be closed without navigating away from the dashboard.",
+		"category": "Dashboard",
+		"priority": "Medium",
+		"steps": [
+			{
+				"type": "action",
+				"description": "Navigate to /"
+			},
+			{
+				"type": "action",
+				"description": "Click on \"Connect Gmail\""
+			},
+			{
+				"type": "assertion",
+				"description": "Verify element \"Connect Gmail modal\" is visible"
+			},
+			{
+				"type": "action",
+				"description": "Click on \"Close\" in the Connect Gmail modal"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify element \"Connect Gmail modal\" is not visible"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify URL contains \"/\""
+			}
+		]
+	},
+	{
+		"id": "TC007",
+		"title": "Dashboard quick links navigate to core modules",
+		"description": "Verifies the dashboard provides working quick links to major modules and navigation lands on the correct pages.",
+		"category": "Dashboard",
+		"priority": "Medium",
+		"steps": [
+			{
+				"type": "action",
+				"description": "Navigate to /"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify element \"Quick links\" is visible"
+			},
+			{
+				"type": "action",
+				"description": "Click on \"Tareas\" quick link"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify URL contains \"/tareas\""
+			},
+			{
+				"type": "action",
+				"description": "Click on \"Dashboard\" in the main navigation"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify URL contains \"/\""
+			}
+		]
+	},
+	{
+		"id": "TC008",
+		"title": "Dashboard countdown widget is present and labeled",
+		"description": "Verifies the dashboard includes a clearly labeled countdown section for upcoming academic milestones.",
+		"category": "Dashboard",
+		"priority": "Low",
+		"steps": [
+			{
+				"type": "action",
+				"description": "Navigate to /"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify text \"cuenta regresiva\" is visible"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify element \"Countdown widget\" is visible"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify element \"Countdown value\" is visible"
+			}
+		]
+	},
+	{
+		"id": "TC009",
+		"title": "View curriculum map grid and progress indicators",
+		"description": "Verifies the Malla page renders an 8-semester grid with visible credit/progress indicators.",
+		"category": "Malla Curricular (Curriculum Map)",
+		"priority": "High",
+		"steps": [
+			{
+				"type": "action",
+				"description": "Navigate to /malla"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify text \"Malla\" is visible"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify text \"Semestre 1\" is visible"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify text \"Semestre 8\" is visible"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify element \"credit progress\" is visible"
+			}
+		]
+	},
+	{
+		"id": "TC010",
+		"title": "Open a subject detail from the grid",
+		"description": "Verifies a subject in the curriculum grid can be opened to view available actions including state changes.",
+		"category": "Malla Curricular (Curriculum Map)",
+		"priority": "High",
+		"steps": [
+			{
+				"type": "action",
+				"description": "Navigate to /malla"
+			},
+			{
+				"type": "action",
+				"description": "Click on a subject card in \"Semestre 1\""
+			},
+			{
+				"type": "assertion",
+				"description": "Verify element \"Subject details\" is visible"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify element \"Mark as En Curso\" is visible"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify element \"Prerequisites\" is visible"
+			}
+		]
+	},
+	{
+		"id": "TC011",
+		"title": "Mark a subject as En Curso and see state reflected in the grid",
+		"description": "Verifies marking a subject as En Curso updates the visible state on the curriculum grid.",
+		"category": "Malla Curricular (Curriculum Map)",
+		"priority": "High",
+		"steps": [
+			{
+				"type": "action",
+				"description": "Navigate to /malla"
+			},
+			{
+				"type": "action",
+				"description": "Click on a subject card in \"Semestre 1\""
+			},
+			{
+				"type": "action",
+				"description": "Click \"Mark as En Curso\""
+			},
+			{
+				"type": "assertion",
+				"description": "Verify text \"En curso\" is visible"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify the selected subject shows state \"En curso\" in the grid"
+			}
+		]
+	},
+	{
+		"id": "TC012",
+		"title": "Create Aether folder after marking subject En Curso (happy path)",
+		"description": "Verifies that marking a subject En Curso results in a corresponding folder being visible in Aether.",
+		"category": "Malla Curricular (Curriculum Map)",
+		"priority": "High",
+		"steps": [
+			{
+				"type": "action",
+				"description": "Navigate to /malla"
+			},
+			{
+				"type": "action",
+				"description": "Click on a subject card in \"Semestre 1\""
+			},
+			{
+				"type": "action",
+				"description": "Click \"Mark as En Curso\""
+			},
+			{
+				"type": "assertion",
+				"description": "Verify the selected subject shows state \"En curso\" in the grid"
+			},
+			{
+				"type": "action",
+				"description": "Click on the navigation item \"Aether\""
+			},
+			{
+				"type": "assertion",
+				"description": "Verify URL contains \"/aether\""
+			},
+			{
+				"type": "assertion",
+				"description": "Verify element \"Folder\" with the same subject name is visible"
+			}
+		]
+	},
+	{
+		"id": "TC013",
+		"title": "Cancel/close subject details without changing state",
+		"description": "Verifies a user can dismiss the subject details view and the grid remains unchanged.",
+		"category": "Malla Curricular (Curriculum Map)",
+		"priority": "Low",
+		"steps": [
+			{
+				"type": "action",
+				"description": "Navigate to /malla"
+			},
+			{
+				"type": "action",
+				"description": "Click on a subject card in \"Semestre 1\""
+			},
+			{
+				"type": "assertion",
+				"description": "Verify element \"Subject details\" is visible"
+			},
+			{
+				"type": "action",
+				"description": "Press \"Escape\""
+			},
+			{
+				"type": "assertion",
+				"description": "Verify element \"Subject details\" is not visible"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify text \"En curso\" is not visible"
+			}
+		]
+	},
+	{
+		"id": "TC014",
+		"title": "Credit/progress indicators update after marking a subject En Curso",
+		"description": "Verifies credit/progress indicators visibly change after a subject state change that affects progress.",
+		"category": "Malla Curricular (Curriculum Map)",
+		"priority": "Medium",
+		"steps": [
+			{
+				"type": "action",
+				"description": "Navigate to /malla"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify element \"credit progress\" is visible"
+			},
+			{
+				"type": "action",
+				"description": "Click on a subject card in \"Semestre 1\""
+			},
+			{
+				"type": "action",
+				"description": "Click \"Mark as En Curso\""
+			},
+			{
+				"type": "assertion",
+				"description": "Verify the selected subject shows state \"En curso\" in the grid"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify element \"credit progress\" shows an updated value"
+			}
+		]
+	},
+	{
+		"id": "TC015",
+		"title": "Filter by semester, change status to 'en curso', and save a grade successfully",
+		"description": "Verifies a user can filter subjects by semester, set a subject to 'en curso', edit its grade, and see the updated values reflected in the list.",
+		"category": "Subject Management (Materias)",
+		"priority": "High",
+		"steps": [
+			{
+				"type": "action",
+				"description": "Navigate to /materias"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify page title contains \"Materias\""
+			},
+			{
+				"type": "action",
+				"description": "Select option \"1\" from the semester filter dropdown"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify text \"Semestre 1\" is visible"
+			},
+			{
+				"type": "action",
+				"description": "Click on the subject status control for the first visible subject"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify text \"en curso\" is visible on the first visible subject row"
+			},
+			{
+				"type": "action",
+				"description": "Click on \"Edit grades\" for the first visible subject"
+			},
+			{
+				"type": "action",
+				"description": "Type \"15\" into the grade field"
+			},
+			{
+				"type": "action",
+				"description": "Click on \"Save\""
+			},
+			{
+				"type": "assertion",
+				"description": "Verify text \"15\" is visible on the first visible subject row"
+			}
+		]
+	},
+	{
+		"id": "TC016",
+		"title": "Filter semester '1' shows a subject list state and is persistent on the page",
+		"description": "Verifies filtering by semester updates the visible list and the filter selection remains applied while staying on the Materias page.",
+		"category": "Subject Management (Materias)",
+		"priority": "Medium",
+		"steps": [
+			{
+				"type": "action",
+				"description": "Navigate to /materias"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify page title contains \"Materias\""
+			},
+			{
+				"type": "action",
+				"description": "Select option \"1\" from the semester filter dropdown"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify text \"Semestre 1\" is visible"
+			},
+			{
+				"type": "action",
+				"description": "Scroll to the bottom of the subjects list"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify text \"Semestre 1\" is visible"
+			},
+			{
+				"type": "action",
+				"description": "Scroll to the top of the subjects list"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify text \"Semestre 1\" is visible"
+			}
+		]
+	},
+	{
+		"id": "TC017",
+		"title": "Edit grade input validation blocks saving when the grade is empty",
+		"description": "Verifies the grade editor does not allow saving an empty grade and keeps the user in an editable state or shows a visible validation message.",
+		"category": "Subject Management (Materias)",
+		"priority": "High",
+		"steps": [
+			{
+				"type": "action",
+				"description": "Navigate to /materias"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify page title contains \"Materias\""
+			},
+			{
+				"type": "action",
+				"description": "Click on \"Edit grades\" for the first visible subject"
+			},
+			{
+				"type": "action",
+				"description": "Type \"\" into the grade field"
+			},
+			{
+				"type": "action",
+				"description": "Click on \"Save\""
+			},
+			{
+				"type": "assertion",
+				"description": "Verify text \"Save\" is visible"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify text \"grade\" is visible"
+			}
+		]
+	},
+	{
+		"id": "TC018",
+		"title": "Cancel grade editing does not change the displayed grade",
+		"description": "Verifies that exiting the grade editor without saving leaves the previously displayed grade unchanged.",
+		"category": "Subject Management (Materias)",
+		"priority": "Medium",
+		"steps": [
+			{
+				"type": "action",
+				"description": "Navigate to /materias"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify page title contains \"Materias\""
+			},
+			{
+				"type": "assertion",
+				"description": "Verify element \"Grade\" is visible for the first visible subject"
+			},
+			{
+				"type": "action",
+				"description": "Click on \"Edit grades\" for the first visible subject"
+			},
+			{
+				"type": "action",
+				"description": "Type \"12\" into the grade field"
+			},
+			{
+				"type": "action",
+				"description": "Click on \"Cancel\""
+			},
+			{
+				"type": "assertion",
+				"description": "Verify element \"Grade\" is visible for the first visible subject"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify text \"12\" is not visible"
+			}
+		]
+	},
+	{
+		"id": "TC019",
+		"title": "Switch status between 'en curso' and 'aprobada' updates the displayed label",
+		"description": "Verifies status toggling between states updates the visible status label on the subject row.",
+		"category": "Subject Management (Materias)",
+		"priority": "Medium",
+		"steps": [
+			{
+				"type": "action",
+				"description": "Navigate to /materias"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify page title contains \"Materias\""
+			},
+			{
+				"type": "action",
+				"description": "Click on the subject status control for the first visible subject"
+			},
+			{
+				"type": "action",
+				"description": "Select option \"en curso\" from the status dropdown"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify text \"en curso\" is visible on the first visible subject row"
+			},
+			{
+				"type": "action",
+				"description": "Click on the subject status control for the first visible subject"
+			},
+			{
+				"type": "action",
+				"description": "Select option \"aprobada\" from the status dropdown"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify text \"aprobada\" is visible on the first visible subject row"
+			}
+		]
+	},
+	{
+		"id": "TC020",
+		"title": "Create a new task with title and due date and see it on the Kanban board",
+		"description": "Verifies a user can create a task and it becomes visible in a Kanban column.",
+		"category": "Task Management (Tareas) — Kanban",
+		"priority": "High",
+		"steps": [
+			{
+				"type": "action",
+				"description": "Navigate to \"/tareas\""
+			},
+			{
+				"type": "assertion",
+				"description": "Verify URL contains \"/tareas\""
+			},
+			{
+				"type": "action",
+				"description": "Click on \"Create Task\""
+			},
+			{
+				"type": "action",
+				"description": "Type \"Read chapter 3\" into the title field"
+			},
+			{
+				"type": "action",
+				"description": "Type \"2026-03-20\" into the due date field"
+			},
+			{
+				"type": "action",
+				"description": "Click on \"Save\""
+			},
+			{
+				"type": "assertion",
+				"description": "Verify text \"Read chapter 3\" is visible"
+			}
+		]
+	},
+	{
+		"id": "TC021",
+		"title": "Fail to create a task when title is empty (validation error)",
+		"description": "Verifies the task form enforces required title validation and prevents creation.",
+		"category": "Task Management (Tareas) — Kanban",
+		"priority": "High",
+		"steps": [
+			{
+				"type": "action",
+				"description": "Navigate to \"/tareas\""
+			},
+			{
+				"type": "assertion",
+				"description": "Verify URL contains \"/tareas\""
+			},
+			{
+				"type": "action",
+				"description": "Click on \"Create Task\""
+			},
+			{
+				"type": "action",
+				"description": "Type \"2026-03-20\" into the due date field"
+			},
+			{
+				"type": "action",
+				"description": "Click on \"Save\""
+			},
+			{
+				"type": "assertion",
+				"description": "Verify text \"Title required\" is visible"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify text \"2026-03-20\" is not visible"
+			}
+		]
+	},
+	{
+		"id": "TC022",
+		"title": "Calendario: Weekly view can be selected and calendar content remains visible",
+		"description": "Verifies that switching to weekly view works and the calendar still renders visible content.",
+		"category": "Calendario",
+		"priority": "Medium",
+		"steps": [
+			{
+				"type": "action",
+				"description": "Navigate to /calendario"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify text \"Calendario\" is visible"
+			},
+			{
+				"type": "action",
+				"description": "Click on \"Week\" view"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify text \"Week\" is visible"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify element \"Calendar\" is visible"
+			}
+		]
+	},
+	{
+		"id": "TC023",
+		"title": "Create a new note with a wiki-style link and verify it appears in the vault list",
+		"description": "Verifies that a user can create a new note containing a [[Wiki]] link and that the note becomes visible in the Aether Vault list after saving/auto-save.",
+		"category": "Aether Vault (Second Brain)",
+		"priority": "High",
+		"steps": [
+			{
+				"type": "action",
+				"description": "Navigate to /aether"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify page title contains \"Aether\""
+			},
+			{
+				"type": "action",
+				"description": "Click on \"New Note\""
+			},
+			{
+				"type": "action",
+				"description": "Type \"E2E Note - Wiki Link\" into the note title field"
+			},
+			{
+				"type": "action",
+				"description": "Type \"This is a test note linking to [[Linked Note]].\" into the note content editor"
+			},
+			{
+				"type": "action",
+				"description": "Click on \"Save\""
+			},
+			{
+				"type": "assertion",
+				"description": "Verify text \"E2E Note - Wiki Link\" is visible"
+			}
+		]
+	},
+	{
+		"id": "TC024",
+		"title": "Create a new note and verify the linked note appears as a visible graph connection",
+		"description": "Verifies that after creating a note with a [[Wiki]] link, the graph view shows a visible relationship between notes.",
+		"category": "Aether Vault (Second Brain)",
+		"priority": "Medium",
+		"steps": [
+			{
+				"type": "action",
+				"description": "Navigate to /aether"
+			},
+			{
+				"type": "action",
+				"description": "Click on \"New Note\""
+			},
+			{
+				"type": "action",
+				"description": "Type \"Graph Source Note\" into the note title field"
+			},
+			{
+				"type": "action",
+				"description": "Type \"Connecting to [[Graph Target Note]] for graph test.\" into the note content editor"
+			},
+			{
+				"type": "action",
+				"description": "Click on \"Save\""
+			},
+			{
+				"type": "action",
+				"description": "Click on \"Graph\""
+			},
+			{
+				"type": "assertion",
+				"description": "Verify text \"Graph Source Note\" is visible"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify text \"Graph Target Note\" is visible"
+			}
+		]
+	},
+	{
+		"id": "TC025",
+		"title": "Attempt to save a note and handle 'Encryption key required' by opening Security Settings",
+		"description": "Verifies the encryption gating flow: saving triggers an 'Encryption key required' modal and the user can proceed to Security Settings to set a passphrase prompt.",
+		"category": "Aether Vault (Second Brain)",
+		"priority": "High",
+		"steps": [
+			{
+				"type": "action",
+				"description": "Navigate to /aether"
+			},
+			{
+				"type": "action",
+				"description": "Click on \"New Note\""
+			},
+			{
+				"type": "action",
+				"description": "Type \"Encrypted Note Attempt\" into the note title field"
+			},
+			{
+				"type": "action",
+				"description": "Type \"This note should require encryption key before saving.\" into the note content editor"
+			},
+			{
+				"type": "action",
+				"description": "Click on \"Save\""
+			},
+			{
+				"type": "assertion",
+				"description": "Verify text \"Encryption key required\" is visible"
+			},
+			{
+				"type": "action",
+				"description": "Click on \"Open Security Settings\""
+			},
+			{
+				"type": "assertion",
+				"description": "Verify text \"Passphrase\" is visible"
+			}
+		]
+	},
+	{
+		"id": "TC026",
+		"title": "Cancel out of the encryption requirement modal and remain on the note editor",
+		"description": "Verifies that dismissing the encryption requirement modal does not navigate away and the editor remains visible for the current note.",
+		"category": "Aether Vault (Second Brain)",
+		"priority": "Medium",
+		"steps": [
+			{
+				"type": "action",
+				"description": "Navigate to /aether"
+			},
+			{
+				"type": "action",
+				"description": "Click on \"New Note\""
+			},
+			{
+				"type": "action",
+				"description": "Type \"Encryption Modal Cancel\" into the note title field"
+			},
+			{
+				"type": "action",
+				"description": "Type \"Trigger encryption modal and then cancel.\" into the note content editor"
+			},
+			{
+				"type": "action",
+				"description": "Click on \"Save\""
+			},
+			{
+				"type": "assertion",
+				"description": "Verify text \"Encryption key required\" is visible"
+			},
+			{
+				"type": "action",
+				"description": "Click on \"Cancel\""
+			},
+			{
+				"type": "assertion",
+				"description": "Verify element \"note content editor\" is visible"
+			}
+		]
+	},
+	{
+		"id": "TC027",
+		"title": "Create a note with an empty title and verify a visible validation message (if enforced)",
+		"description": "Verifies that the UI prevents saving a note without a title (or shows a clear validation message).",
+		"category": "Aether Vault (Second Brain)",
+		"priority": "Medium",
+		"steps": [
+			{
+				"type": "action",
+				"description": "Navigate to /aether"
+			},
+			{
+				"type": "action",
+				"description": "Click on \"New Note\""
+			},
+			{
+				"type": "action",
+				"description": "Type \"Body without a title\" into the note content editor"
+			},
+			{
+				"type": "action",
+				"description": "Click on \"Save\""
+			},
+			{
+				"type": "assertion",
+				"description": "Verify text \"Title\" is visible"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify text \"required\" is visible"
+			}
+		]
+	},
+	{
+		"id": "TC028",
+		"title": "Create a note with an empty body and verify it can be saved and listed (or shows validation)",
+		"description": "Verifies behavior when saving a note that has a title but no content: it should either save successfully and appear in the list or show a visible validation message.",
+		"category": "Aether Vault (Second Brain)",
+		"priority": "Low",
+		"steps": [
+			{
+				"type": "action",
+				"description": "Navigate to /aether"
+			},
+			{
+				"type": "action",
+				"description": "Click on \"New Note\""
+			},
+			{
+				"type": "action",
+				"description": "Type \"Title Only Note\" into the note title field"
+			},
+			{
+				"type": "action",
+				"description": "Click on \"Save\""
+			},
+			{
+				"type": "assertion",
+				"description": "Verify text \"Title Only Note\" is visible"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify element \"notes list\" is visible"
+			}
+		]
+	},
+	{
+		"id": "TC029",
+		"title": "Create a new canvas node and add text content",
+		"description": "Verifies a user can add a node on Aether Canvas and save text content to it.",
+		"category": "Aether Canvas (Spatial Canvas)",
+		"priority": "High",
+		"steps": [
+			{
+				"type": "action",
+				"description": "Navigate to /aether/canvas"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify page title contains \"Aether\""
+			},
+			{
+				"type": "action",
+				"description": "Click \"Add Node\""
+			},
+			{
+				"type": "assertion",
+				"description": "Verify text \"Node\" is visible"
+			},
+			{
+				"type": "action",
+				"description": "Click on the newly created node"
+			},
+			{
+				"type": "action",
+				"description": "Type \"Study: Diagram for system architecture\" into the node text field"
+			},
+			{
+				"type": "action",
+				"description": "Press Enter"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify text \"Study: Diagram for system architecture\" is visible"
+			}
+		]
+	},
+	{
+		"id": "TC030",
+		"title": "Canvas persistence: node remains after reload",
+		"description": "Verifies a node created on the canvas is still available after reloading the page.",
+		"category": "Aether Canvas (Spatial Canvas)",
+		"priority": "High",
+		"steps": [
+			{
+				"type": "action",
+				"description": "Navigate to /aether/canvas"
+			},
+			{
+				"type": "action",
+				"description": "Click \"Add Node\""
+			},
+			{
+				"type": "action",
+				"description": "Click on the newly created node"
+			},
+			{
+				"type": "action",
+				"description": "Type \"Persistent node\" into the node text field"
+			},
+			{
+				"type": "action",
+				"description": "Press Enter"
+			},
+			{
+				"type": "action",
+				"description": "Navigate to /aether/canvas"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify text \"Persistent node\" is visible"
+			}
+		]
+	},
+	{
+		"id": "TC031",
+		"title": "Add multiple nodes and confirm both are visible",
+		"description": "Verifies the canvas can contain multiple nodes and each one is visible after creation.",
+		"category": "Aether Canvas (Spatial Canvas)",
+		"priority": "Medium",
+		"steps": [
+			{
+				"type": "action",
+				"description": "Navigate to /aether/canvas"
+			},
+			{
+				"type": "action",
+				"description": "Click \"Add Node\""
+			},
+			{
+				"type": "action",
+				"description": "Click \"Add Node\""
+			},
+			{
+				"type": "assertion",
+				"description": "Verify text \"Node\" is visible"
+			},
+			{
+				"type": "action",
+				"description": "Click on one node"
+			},
+			{
+				"type": "action",
+				"description": "Type \"Node A\" into the node text field"
+			},
+			{
+				"type": "action",
+				"description": "Press Enter"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify text \"Node A\" is visible"
+			}
+		]
+	},
+	{
+		"id": "TC032",
+		"title": "Cancel node creation (if supported) does not add a node",
+		"description": "Verifies canceling out of node creation leaves the canvas unchanged (no new node visible).",
+		"category": "Aether Canvas (Spatial Canvas)",
+		"priority": "Low",
+		"steps": [
+			{
+				"type": "action",
+				"description": "Navigate to /aether/canvas"
+			},
+			{
+				"type": "action",
+				"description": "Click \"Add Node\""
+			},
+			{
+				"type": "assertion",
+				"description": "Verify element \"Node details\" is visible"
+			},
+			{
+				"type": "action",
+				"description": "Click \"Cancel\""
+			},
+			{
+				"type": "assertion",
+				"description": "Verify text \"Node details\" is not visible"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify text \"Untitled\" is not visible"
+			}
+		]
+	},
+	{
+		"id": "TC033",
+		"title": "Start chat and receive an assistant response based on private notes",
+		"description": "Verifies a user can start a new Aether Chat session and receive a visible assistant response after sending a question about their notes.",
+		"category": "Aether Chat (Assistant)",
+		"priority": "High",
+		"steps": [
+			{
+				"type": "action",
+				"description": "Navigate to /aether/chat"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify page title contains \"Aether\""
+			},
+			{
+				"type": "action",
+				"description": "Click \"Start Chat\""
+			},
+			{
+				"type": "assertion",
+				"description": "Verify text \"Start Chat\" is not visible"
+			},
+			{
+				"type": "action",
+				"description": "Type \"Using my notes, summarize the key points about my current subjects and tasks.\" into the message input field"
+			},
+			{
+				"type": "action",
+				"description": "Press Enter"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify an assistant response element is visible"
+			}
+		]
+	},
+	{
+		"id": "TC034",
+		"title": "API key progressive disclosure: prompt appears when sending without key",
+		"description": "Verifies that sending a message without an API key triggers a visible 'API Key required' modal prompt.",
+		"category": "Aether Chat (Assistant)",
+		"priority": "High",
+		"steps": [
+			{
+				"type": "action",
+				"description": "Navigate to /aether/chat"
+			},
+			{
+				"type": "action",
+				"description": "Type \"What do my notes say about my next deadlines?\" into the message input field"
+			},
+			{
+				"type": "action",
+				"description": "Press Enter"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify text \"API Key required\" is visible"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify text \"Add API Key\" is visible"
+			}
+		]
+	},
+	{
+		"id": "TC035",
+		"title": "Add API key and resume chat to get a response",
+		"description": "Verifies the user can add an API key from the required modal and then receive a chat response after saving.",
+		"category": "Aether Chat (Assistant)",
+		"priority": "High",
+		"steps": [
+			{
+				"type": "action",
+				"description": "Navigate to /aether/chat"
+			},
+			{
+				"type": "action",
+				"description": "Type \"Answer using only my notes: what should I study first this week?\" into the message input field"
+			},
+			{
+				"type": "action",
+				"description": "Press Enter"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify text \"API Key required\" is visible"
+			},
+			{
+				"type": "action",
+				"description": "Click \"Add API Key\""
+			},
+			{
+				"type": "action",
+				"description": "Type \"sk-test-1234567890\" into the API key input field"
+			},
+			{
+				"type": "action",
+				"description": "Click \"Save\""
+			},
+			{
+				"type": "assertion",
+				"description": "Verify an assistant response element is visible"
+			}
+		]
+	},
+	{
+		"id": "TC036",
+		"title": "Cancel/close API key modal does not send message",
+		"description": "Verifies that dismissing the API key required modal does not produce an assistant response for the attempted message.",
+		"category": "Aether Chat (Assistant)",
+		"priority": "Medium",
+		"steps": [
+			{
+				"type": "action",
+				"description": "Navigate to /aether/chat"
+			},
+			{
+				"type": "action",
+				"description": "Type \"From my notes, list my upcoming exams.\" into the message input field"
+			},
+			{
+				"type": "action",
+				"description": "Press Enter"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify text \"API Key required\" is visible"
+			},
+			{
+				"type": "action",
+				"description": "Press Escape"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify text \"API Key required\" is not visible"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify an assistant response element is not visible"
+			}
+		]
+	},
+	{
+		"id": "TC037",
+		"title": "Empty message is not sent",
+		"description": "Verifies the chat input prevents sending an empty message and no assistant response appears.",
+		"category": "Aether Chat (Assistant)",
+		"priority": "Medium",
+		"steps": [
+			{
+				"type": "action",
+				"description": "Navigate to /aether/chat"
+			},
+			{
+				"type": "action",
+				"description": "Click the message input field"
+			},
+			{
+				"type": "action",
+				"description": "Press Enter"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify text \"API Key required\" is not visible"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify an assistant response element is not visible"
+			}
+		]
+	},
+	{
+		"id": "TC038",
+		"title": "Long question can be entered and submitted",
+		"description": "Verifies the chat supports a longer prompt and shows an assistant response after submission.",
+		"category": "Aether Chat (Assistant)",
+		"priority": "Medium",
+		"steps": [
+			{
+				"type": "action",
+				"description": "Navigate to /aether/chat"
+			},
+			{
+				"type": "action",
+				"description": "Click \"Start Chat\""
+			},
+			{
+				"type": "action",
+				"description": "Type \"Using only my private notes, create a detailed study plan for the next 7 days. Include what to review each day, how to split time across subjects, and a short checklist.\" into the message input field"
+			},
+			{
+				"type": "action",
+				"description": "Press Enter"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify an assistant response element is visible"
+			}
+		]
+	},
+	{
+		"id": "TC039",
+		"title": "Chat remains usable after adding API key (send a second message)",
+		"description": "Verifies that after saving an API key and receiving one response, the user can send another question and get another response.",
+		"category": "Aether Chat (Assistant)",
+		"priority": "Medium",
+		"steps": [
+			{
+				"type": "action",
+				"description": "Navigate to /aether/chat"
+			},
+			{
+				"type": "action",
+				"description": "Type \"Use my notes: what are the main concepts I struggled with last week?\" into the message input field"
+			},
+			{
+				"type": "action",
+				"description": "Press Enter"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify text \"API Key required\" is visible"
+			},
+			{
+				"type": "action",
+				"description": "Click \"Add API Key\""
+			},
+			{
+				"type": "action",
+				"description": "Type \"sk-test-abcdefg\" into the API key input field"
+			},
+			{
+				"type": "action",
+				"description": "Click \"Save\""
+			},
+			{
+				"type": "assertion",
+				"description": "Verify an assistant response element is visible"
+			}
+		]
+	},
+	{
+		"id": "TC040",
+		"title": "Nexus Workspace: Create a new block document and verify it persists locally",
+		"description": "Verifies a user can create a new block-based document in Nexus Workspace and the content remains visible after a refresh (local persistence/CRDT save).",
+		"category": "Nexus Workspace — Editor & Database",
+		"priority": "High",
+		"steps": [
+			{
+				"type": "action",
+				"description": "Navigate to /nexus"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify URL contains \"/nexus\""
+			},
+			{
+				"type": "action",
+				"description": "Click on \"New\" or \"Create document\" in the workspace"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify element \"Document title\" is visible"
+			},
+			{
+				"type": "action",
+				"description": "Click into the main editor area"
+			},
+			{
+				"type": "action",
+				"description": "Type \"CRDT test note: Persistence check\" into the editor"
+			},
+			{
+				"type": "action",
+				"description": "Press \"Enter\""
+			},
+			{
+				"type": "assertion",
+				"description": "Verify text \"CRDT test note: Persistence check\" is visible"
+			}
+		]
+	},
+	{
+		"id": "TC041",
+		"title": "Nexus Workspace: Verify content remains after page reload",
+		"description": "Verifies that a previously typed block remains visible after reloading the Nexus Workspace page.",
+		"category": "Nexus Workspace — Editor & Database",
+		"priority": "High",
+		"steps": [
+			{
+				"type": "action",
+				"description": "Navigate to /nexus"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify URL contains \"/nexus\""
+			},
+			{
+				"type": "action",
+				"description": "Click into the main editor area"
+			},
+			{
+				"type": "action",
+				"description": "Type \"Local persistence smoke test line\" into the editor"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify text \"Local persistence smoke test line\" is visible"
+			},
+			{
+				"type": "action",
+				"description": "Navigate to /nexus"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify text \"Local persistence smoke test line\" is visible"
+			}
+		]
+	},
+	{
+		"id": "TC042",
+		"title": "Nexus Workspace: Create multiple blocks and verify ordering is preserved",
+		"description": "Verifies that creating multiple blocks results in distinct visible lines in the editor in the expected order.",
+		"category": "Nexus Workspace — Editor & Database",
+		"priority": "Medium",
+		"steps": [
+			{
+				"type": "action",
+				"description": "Navigate to /nexus"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify URL contains \"/nexus\""
+			},
+			{
+				"type": "action",
+				"description": "Click into the main editor area"
+			},
+			{
+				"type": "action",
+				"description": "Type \"Block A\" into the editor"
+			},
+			{
+				"type": "action",
+				"description": "Press \"Enter\""
+			},
+			{
+				"type": "action",
+				"description": "Type \"Block B\" into the editor"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify text \"Block A\" is visible"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify text \"Block B\" is visible"
+			}
+		]
+	},
+	{
+		"id": "TC043",
+		"title": "Nexus Workspace: Verify workspace loads without blocking errors",
+		"description": "Verifies Nexus Workspace renders its main editor UI and is usable on initial load.",
+		"category": "Nexus Workspace — Editor & Database",
+		"priority": "Medium",
+		"steps": [
+			{
+				"type": "action",
+				"description": "Navigate to /nexus"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify URL contains \"/nexus\""
+			},
+			{
+				"type": "assertion",
+				"description": "Verify element \"Main editor\" is visible"
+			},
+			{
+				"type": "action",
+				"description": "Click into the main editor area"
+			},
+			{
+				"type": "action",
+				"description": "Type \"Workspace load check\" into the editor"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify text \"Workspace load check\" is visible"
+			}
+		]
+	},
+	{
+		"id": "TC044",
+		"title": "Nexus Database: Create a new record and verify it appears in the table",
+		"description": "Verifies a user can create a database record, save it, and see it listed in the table view.",
+		"category": "Nexus Workspace — Editor & Database",
+		"priority": "High",
+		"steps": [
+			{
+				"type": "action",
+				"description": "Navigate to /nexus/db"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify URL contains \"/nexus/db\""
+			},
+			{
+				"type": "action",
+				"description": "Click on \"New record\" or \"Add\" in the database view"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify element \"Save\" is visible"
+			},
+			{
+				"type": "action",
+				"description": "Fill \"Test Record 001\" into the \"Name\" field"
+			},
+			{
+				"type": "action",
+				"description": "Click on \"Save\""
+			},
+			{
+				"type": "assertion",
+				"description": "Verify text \"Test Record 001\" is visible"
+			}
+		]
+	},
+	{
+		"id": "TC045",
+		"title": "Nexus Database: Required field validation prevents saving empty record",
+		"description": "Verifies the database record form shows visible validation feedback when trying to save with missing required fields.",
+		"category": "Nexus Workspace — Editor & Database",
+		"priority": "Medium",
+		"steps": [
+			{
+				"type": "action",
+				"description": "Navigate to /nexus/db"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify URL contains \"/nexus/db\""
+			},
+			{
+				"type": "action",
+				"description": "Click on \"New record\" or \"Add\" in the database view"
+			},
+			{
+				"type": "action",
+				"description": "Click on \"Save\""
+			},
+			{
+				"type": "assertion",
+				"description": "Verify text \"Required\" is visible"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify element \"Save\" is visible"
+			}
+		]
+	},
+	{
+		"id": "TC046",
+		"title": "RAG response using selected sources (Notes + Database)",
+		"description": "Verifies the AI response is generated and visibly references content from the user-selected sources (Notes and Database).",
+		"category": "Nexus AI (Multi-source RAG)",
+		"priority": "High",
+		"steps": [
+			{
+				"type": "action",
+				"description": "Navigate to /nexus/ai"
+			},
+			{
+				"type": "assertion",
+				"description": "Verify page title contains \"Nexus\""
+			},
+			{
+				"type": "action",
+				"description": "Click on \"Open Nexus AI\" or \"Open AI panel\""
+			},
+			{
+				"type": "assertion",
+				"description": "Verify element \"AI chat panel\" is visible"
+			},
+			{
+				"type": "action",
+				"description": "Click on source \"Notes\" to enable it"
+			},
+			{
+				"type": "action",
+				"description": "Click on source \"Database\" to enable it"
+			},
+			{
+				"type": "action",
+				"description": "Type \"Summarize the key concepts from my notes related to this week and cross-check them with any matching entries in my database.\" into the prompt input"
+			},
+			{
+				"type": "action",
+				"description": "Click on \"Send\""
+			},
+			{
+				"type": "assertion",
+				"description": "Verify element \"AI response message\" is visible"
+			}
+		]
+	}
 ]

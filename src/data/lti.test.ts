@@ -26,7 +26,7 @@ describe("LTI Utils", () => {
 		it("returns 0 for empty input", () => {
 			expect(getDaysUntil("")).toBe(0);
 		});
-		
+
 		// Note: testing actual days until is tricky due to dependence on "now".
 		// But we can check it returns a number.
 		it("returns a number for a valid date", () => {

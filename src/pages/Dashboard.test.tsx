@@ -1,7 +1,6 @@
-import { render, screen } from "../test/test-utils";
 import { describe, expect, it, vi } from "vitest";
+import { render, screen } from "../test/test-utils";
 import Dashboard from "./Dashboard";
-import React from "react";
 
 // Mock sub-components for isolation
 vi.mock("../components/DashboardSummary", () => ({
@@ -26,34 +25,36 @@ describe("Dashboard Page", () => {
 
 	it("renders main dashboard header", () => {
 		render(
-			<Dashboard 
-				presenciales={mockPresenciales} 
-				onUpdatePresenciales={mockOnUpdate} 
-			/>
+			<Dashboard
+				presenciales={mockPresenciales}
+				onUpdatePresenciales={mockOnUpdate}
+			/>,
 		);
-		
+
 		expect(screen.getByText("Dashboard")).toBeInTheDocument();
 	});
 
 	it("shows the 'Añadir Instancia' button", () => {
 		render(
-			<Dashboard 
-				presenciales={mockPresenciales} 
-				onUpdatePresenciales={mockOnUpdate} 
-			/>
+			<Dashboard
+				presenciales={mockPresenciales}
+				onUpdatePresenciales={mockOnUpdate}
+			/>,
 		);
-		
+
 		expect(screen.getByText("Añadir Instancia")).toBeInTheDocument();
 	});
 
 	it("renders Semester 1 subjects", () => {
 		render(
-			<Dashboard 
-				presenciales={mockPresenciales} 
-				onUpdatePresenciales={mockOnUpdate} 
-			/>
+			<Dashboard
+				presenciales={mockPresenciales}
+				onUpdatePresenciales={mockOnUpdate}
+			/>,
 		);
-		
-		expect(screen.getByText(/Introducción y Perspectivas/i)).toBeInTheDocument();
+
+		expect(
+			screen.getByText(/Introducción y Perspectivas/i),
+		).toBeInTheDocument();
 	});
 });

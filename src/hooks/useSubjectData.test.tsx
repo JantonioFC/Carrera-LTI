@@ -1,7 +1,7 @@
-import { renderHook, act } from "@testing-library/react";
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { act, renderHook } from "@testing-library/react";
+import type React from "react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { SubjectDataProvider, useSubjectData } from "./useSubjectData";
-import React from "react";
 
 // Mock localStorage
 const localStorageMock = (() => {
@@ -42,7 +42,10 @@ describe("useSubjectData", () => {
 		const subjectId = "s1-1";
 
 		act(() => {
-			result.current.updateSubject(subjectId, { status: "aprobada", grade: 10 });
+			result.current.updateSubject(subjectId, {
+				status: "aprobada",
+				grade: 10,
+			});
 		});
 
 		expect(result.current.data[subjectId].status).toBe("aprobada");

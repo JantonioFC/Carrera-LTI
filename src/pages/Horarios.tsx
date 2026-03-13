@@ -1,5 +1,4 @@
 import {
-	rectIntersection,
 	DndContext,
 	type DragEndEvent,
 	type DragOverEvent,
@@ -8,6 +7,7 @@ import {
 	defaultDropAnimationSideEffects,
 	KeyboardSensor,
 	PointerSensor,
+	rectIntersection,
 	useDroppable,
 	useSensor,
 	useSensors,
@@ -366,7 +366,7 @@ export default function Horarios({
 			if (activeIndex === -1) return prev;
 
 			const overData = over.data.current;
-			let overDay: number | null = undefined;
+			let overDay: number | null;
 
 			if (overData?.type === "Column") {
 				overDay = overData.day;
@@ -400,12 +400,12 @@ export default function Horarios({
 				if (activeId.startsWith("bank-")) {
 					console.log(`[DND] Cloning master ${activeId} to day ${overDay}`);
 					const instanceId = `inst-${newItem.subjectId}-${Math.random().toString(36).substring(2, 9)}`;
-					
+
 					// IMPORTANT: The master stays in the bank (day null)
 					// We insert the new instance at the same position or reordered
 					const newItems = [...prev];
 					const instanceItem = { ...newItem, id: instanceId };
-					
+
 					if (overData?.type === "Task") {
 						const overIndex = newItems.findIndex((i) => i.id === overId);
 						// Remove nothing, add instance at overIndex
@@ -413,7 +413,7 @@ export default function Horarios({
 					} else {
 						newItems.push(instanceItem);
 					}
-					
+
 					// The master block remains at its index but definitely as day: null
 					newItems[activeIndex] = { ...originalItem, day: null };
 					return newItems;

@@ -97,7 +97,9 @@ function App() {
 	useEffect(() => {
 		// 1. Identificar qué materias deberían estar en el banco (día === null)
 		const bankSubjectIds = new Set(
-			schedule.filter((item) => item.id.startsWith("bank-")).map((i) => i.subjectId),
+			schedule
+				.filter((item) => item.id.startsWith("bank-"))
+				.map((i) => i.subjectId),
 		);
 
 		// 2. Agregar al banco las "en_curso" que falten
