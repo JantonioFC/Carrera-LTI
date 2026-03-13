@@ -54,7 +54,7 @@ export default function Pomodoro() {
 		return (
 			<button
 				onClick={() => setIsOpen(true)}
-				className="fixed bottom-6 right-6 p-4 rounded-full gradient-blue text-white shadow-xl shadow-lti-blue/20 hover:scale-110 transition-transform animate-fade-in z-50 flex items-center justify-center group"
+				className="fixed bottom-6 right-20 w-12 h-12 rounded-full gradient-blue text-white shadow-xl shadow-lti-blue/20 hover:scale-110 transition-transform animate-fade-in z-[150] flex items-center justify-center group"
 			>
 				<BrainCircuit size={24} />
 				{isActive && (
@@ -68,7 +68,7 @@ export default function Pomodoro() {
 	}
 
 	return (
-		<div className="fixed bottom-6 right-6 w-80 bg-navy-800 rounded-2xl border border-navy-600 shadow-2xl z-50 overflow-hidden animate-fade-in">
+		<div className="fixed bottom-6 right-[380px] w-80 bg-navy-800 rounded-2xl border border-navy-600 shadow-2xl z-[150] overflow-hidden animate-fade-in">
 			<div className="p-4 border-b border-navy-700/50 flex justify-between items-center bg-navy-900/50">
 				<div className="flex items-center gap-2">
 					{mode === "focus" ? (

@@ -63,13 +63,9 @@ function App() {
 		if (saved.length > 0) return saved;
 		return (
 			CURRICULUM.find((s) => s.number === 1)?.subjects.map((s) => ({
-				id: s.id as any,
+				id: `blk-${s.id}`,
 				subjectId: s.id,
-				name: s.name,
-				day: 1,
-				startTime: "18:00",
-				endTime: "22:00",
-				type: "Teórico",
+				day: null,
 			})) || []
 		);
 	});

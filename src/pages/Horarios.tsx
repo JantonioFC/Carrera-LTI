@@ -1,10 +1,11 @@
 import {
 	closestCorners,
+	defaultDropAnimationSideEffects,
 	DndContext,
+	type DragEndEvent,
 	type DragOverEvent,
 	DragOverlay,
 	type DragStartEvent,
-	defaultDropAnimationSideEffects,
 	KeyboardSensor,
 	PointerSensor,
 	useSensor,
@@ -18,7 +19,15 @@ import {
 	verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { GripVertical, Plus, Search, X } from "lucide-react";
+import {
+	Calendar as CalendarIcon,
+	Clock,
+	GripVertical,
+	Plus,
+	Search,
+	Trash2,
+	X,
+} from "lucide-react";
 import { useMemo, useState } from "react";
 import { type Subject, WEEKDAY_SHORT } from "../data/lti";
 import { useSubjectData } from "../hooks/useSubjectData";
@@ -29,15 +38,27 @@ export interface ScheduleItem {
 	id: string; // The specific scheduled block id
 	subjectId: string;
 	day: number | null; // null means in the "bank"
+	startTime?: string;
+	endTime?: string;
 }
 
 function SortableItem({
 	id,
+	item,
 	subject,
+	onUpdateTime,
+	onRemove,
 }: {
 	id: string;
+	item: ScheduleItem;
 	subject: Subject | undefined;
+	onUpdateTime: (id: string, start: string, end: string) => void;
+	onRemove: (id: string) => void;
 }) {
+	const [isEditing, setIsEditing] = useState(false);
+	const [tempStart, setTempStart] = useState(item.startTime || "18:00");
+	const [tempEnd, setTempEnd] = useState(item.endTime || "22:00");
+
 	const {
 		attributes,
 		listeners,
@@ -45,41 +66,91 @@ function SortableItem({
 		transform,
 		transition,
 		isDragging,
-	} = useSortable({ id });
+	} = useSortable({ 
+		id,
+		data: {
+			type: "Task",
+			item,
+		}
+	});
 
 	const style = {
-		transform: CSS.Transform.toString(transform),
+		transform: CSS.Translate.toString(transform),
 		transition,
-		opacity: isDragging ? 0.4 : 1,
+		opacity: isDragging ? 0.3 : 1,
 	};
 
 	return (
 		<div
 			ref={setNodeRef}
 			style={style}
-			className="bg-navy-900/60 border border-navy-700/50 rounded-lg p-2 flex items-center gap-2 mb-2 group touch-none"
+			className="bg-navy-900/80 border border-navy-700/50 rounded-lg p-2.5 mb-2 group touch-none hover:border-lti-blue/30 transition-all shadow-lg"
 		>
-			<div
-				{...attributes}
-				{...listeners}
-				className="cursor-grab p-1 text-slate-400 hover:text-white transition-colors"
-			>
-				<GripVertical size={14} />
-			</div>
-			<div className="flex-1 min-w-0">
-				<p className="text-xs text-white font-medium truncate">
-					{subject?.name}
-				</p>
-				<div className="flex items-center gap-2 mt-0.5">
-					<span
-						className="text-[10px] px-1.5 py-0.5 rounded-full"
-						style={{
-							backgroundColor: `${subject?.color}20`,
-							color: subject?.color,
-						}}
-					>
-						{subject?.area}
-					</span>
+			<div className="flex items-start gap-2">
+				<div
+					{...attributes}
+					{...listeners}
+					className="cursor-grab p-1 mt-0.5 text-slate-500 hover:text-white transition-colors"
+				>
+					<GripVertical size={14} />
+				</div>
+				<div className="flex-1 min-w-0">
+					<p className="text-xs text-white font-bold truncate mb-1">
+						{subject?.name}
+					</p>
+					
+					{isEditing ? (
+						<div className="space-y-2 mt-2">
+							<div className="flex items-center gap-1">
+								<input 
+									type="time" 
+									value={tempStart}
+									onChange={(e) => setTempStart(e.target.value)}
+									className="bg-navy-950 border border-navy-700 rounded px-1.5 py-0.5 text-[10px] text-white w-full outline-none focus:border-lti-blue"
+								/>
+								<span className="text-slate-600">-</span>
+								<input 
+									type="time" 
+									value={tempEnd}
+									onChange={(e) => setTempEnd(e.target.value)}
+									className="bg-navy-950 border border-navy-700 rounded px-1.5 py-0.5 text-[10px] text-white w-full outline-none focus:border-lti-blue"
+								/>
+							</div>
+							<div className="flex gap-1">
+								<button 
+									onClick={() => {
+										onUpdateTime(id, tempStart, tempEnd);
+										setIsEditing(false);
+									}}
+									className="flex-1 bg-lti-blue text-white text-[10px] py-1 rounded font-bold hover:bg-lti-blue/80"
+								>
+									OK
+								</button>
+								<button 
+									onClick={() => setIsEditing(false)}
+									className="bg-navy-700 text-slate-400 text-[10px] px-2 py-1 rounded hover:text-white"
+								>
+									X
+								</button>
+							</div>
+						</div>
+					) : (
+						<div className="flex items-center justify-between">
+							<div 
+								onClick={() => setIsEditing(true)}
+								className="flex items-center gap-1 text-[10px] text-slate-400 font-medium hover:text-lti-blue transition-colors cursor-pointer"
+							>
+								<Clock size={10} />
+								<span>{item.startTime || "00:00"} - {item.endTime || "00:00"}</span>
+							</div>
+							<button 
+								onClick={() => onRemove(id)}
+								className="opacity-0 group-hover:opacity-100 text-slate-600 hover:text-lti-coral p-1 transition-all"
+							>
+								<Trash2 size={12} />
+							</button>
+						</div>
+					)}
 				</div>
 			</div>
 		</div>
@@ -91,11 +162,15 @@ function DroppableColumn({
 	items,
 	allSubjects,
 	onAdd,
+	onUpdateTime,
+	onRemove,
 }: {
 	day: number | null;
 	items: ScheduleItem[];
 	allSubjects: Subject[];
 	onAdd?: () => void;
+	onUpdateTime: (id: string, start: string, end: string) => void;
+	onRemove: (id: string) => void;
 }) {
 	const { setNodeRef } = useSortable({
 		id: `col-${day}`,
@@ -107,10 +182,10 @@ function DroppableColumn({
 
 	return (
 		<div
-			className={`flex flex-col flex-1 min-w-[150px] bg-navy-800/50 rounded-xl p-3 border ${day === null ? "border-lti-coral/30" : "border-navy-700/50"}`}
+			className={`flex flex-col flex-1 min-w-[180px] bg-navy-800/50 rounded-xl p-3 border ${day === null ? "border-lti-coral/30" : "border-navy-700/50 shadow-sm"}`}
 		>
 			<div className="flex items-center justify-between mb-3 px-1">
-				<h3 className="text-sm font-semibold text-white">
+				<h3 className={`text-xs font-bold uppercase tracking-wider ${day === null ? "text-lti-coral" : "text-slate-400"}`}>
 					{day === null ? "Banco de U.C." : WEEKDAY_SHORT[day]}
 				</h3>
 				{day === null && onAdd && (
@@ -123,7 +198,7 @@ function DroppableColumn({
 					</button>
 				)}
 			</div>
-			<div ref={setNodeRef} className="flex-1 min-h-[100px]">
+			<div ref={setNodeRef} className="flex-1 min-h-[150px]">
 				<SortableContext
 					items={items.map((i) => i.id)}
 					strategy={verticalListSortingStrategy}
@@ -131,7 +206,14 @@ function DroppableColumn({
 					{items.map((item) => {
 						const subject = allSubjects.find((s) => s.id === item.subjectId);
 						return (
-							<SortableItem key={item.id} id={item.id} subject={subject} />
+							<SortableItem 
+								key={item.id} 
+								id={item.id} 
+								item={item} 
+								subject={subject} 
+								onUpdateTime={onUpdateTime}
+								onRemove={onRemove}
+							/>
 						);
 					})}
 				</SortableContext>
@@ -170,6 +252,16 @@ export default function Horarios({
 
 	const [activeId, setActiveId] = useState<string | null>(null);
 
+	const handleUpdateTime = (id: string, start: string, end: string) => {
+		setItems((prev) => 
+			prev.map((i) => (i.id === id ? { ...i, startTime: start, endTime: end } : i))
+		);
+	};
+
+	const handleRemove = (id: string) => {
+		setItems((prev) => prev.filter((i) => i.id !== id));
+	};
+
 	const sensors = useSensors(
 		useSensor(PointerSensor, {
 			activationConstraint: {
@@ -189,47 +281,50 @@ export default function Horarios({
 		const { active, over } = event;
 		if (!over) return;
 
-		const activeId = active.id;
-		const overId = over.id;
+		const activeId = active.id.toString();
+		const overId = over.id.toString();
 
 		if (activeId === overId) return;
 
-		const isActiveTask = active.data.current?.sortable;
-		const isOverTask = over.data.current?.sortable;
-		const isOverColumn = over.data.current?.type === "Column";
+		const activeData = active.data.current;
+		const overData = over.data.current;
 
-		if (!isActiveTask) return;
+		if (activeData?.type !== "Task") return;
 
-		setItems((prevItems) => {
-			const activeIndex = prevItems.findIndex((t) => t.id === activeId);
-			const activeItem = { ...prevItems[activeIndex] };
+		const activeItem = activeData.item as ScheduleItem;
+		let overDay: number | null = activeItem.day;
 
-			if (isOverTask) {
-				const overIndex = prevItems.findIndex((t) => t.id === overId);
-				const overItem = prevItems[overIndex];
+		if (overData?.type === "Column") {
+			overDay = overData.day;
+		} else if (overData?.type === "Task") {
+			overDay = overData.item.day;
+		}
 
-				if (activeItem.day !== overItem.day) {
-					activeItem.day = overItem.day;
-					const newItems = [...prevItems];
-					newItems[activeIndex] = activeItem;
+		if (activeItem.day !== overDay) {
+			setItems((prev) => {
+				const activeIndex = prev.findIndex((i) => i.id === activeId);
+				const overIndex = prev.findIndex((i) => i.id === overId);
+				
+				const newItems = [...prev];
+				newItems[activeIndex] = { ...activeItem, day: overDay };
+				
+				if (overIndex !== -1) {
 					return arrayMove(newItems, activeIndex, overIndex);
 				}
-				return arrayMove(prevItems, activeIndex, overIndex);
-			}
-
-			if (isOverColumn) {
-				if (activeItem.day !== over.data.current?.day) {
-					activeItem.day = over.data.current?.day;
-					const newItems = [...prevItems];
-					newItems[activeIndex] = activeItem;
-					return arrayMove(newItems, activeIndex, prevItems.length - 1);
-				}
-			}
-			return prevItems;
-		});
+				return newItems;
+			});
+		}
 	};
 
-	const handleDragEnd = () => {
+	const handleDragEnd = (event: DragEndEvent) => {
+		const { active, over } = event;
+		if (over && active.id !== over.id) {
+			setItems((prev) => {
+				const oldIndex = prev.findIndex((i) => i.id === active.id);
+				const newIndex = prev.findIndex((i) => i.id === over.id);
+				return arrayMove(prev, oldIndex, newIndex);
+			});
+		}
 		setActiveId(null);
 	};
 
@@ -265,17 +360,21 @@ export default function Horarios({
 							items={items.filter((i) => i.day === null)}
 							allSubjects={allSubjects}
 							onAdd={() => setIsSelecting(true)}
+							onUpdateTime={handleUpdateTime}
+							onRemove={handleRemove}
 						/>
 					</div>
 
 					{/* Days Grid */}
-					<div className="flex-1 flex gap-3 min-w-[800px] overflow-x-auto">
+					<div className="flex-1 flex gap-3 min-w-[1000px] overflow-x-auto">
 						{DAYS.map((day) => (
 							<DroppableColumn
 								key={day}
 								day={day}
 								items={items.filter((i) => i.day === day)}
 								allSubjects={allSubjects}
+								onUpdateTime={handleUpdateTime}
+								onRemove={handleRemove}
 							/>
 						))}
 					</div>

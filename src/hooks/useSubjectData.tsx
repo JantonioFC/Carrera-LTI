@@ -61,11 +61,30 @@ export function SubjectDataProvider({
 	}, [customSubjects]);
 
 	const updateSubject = (id: string, partialData: Partial<SubjectData>) => {
+		const subject = allSubjects.find((s) => s.id === id);
+		if (!subject) return;
+
 		setData((prev) => {
 			const existing = prev[id] || { status: "pendiente", resources: [] };
+			const newData = { ...existing, ...partialData };
+
+			// --- Event-Driven Trigger (Eje 2.2) ---
+			if (partialData.status === "en_curso" && existing.status !== "en_curso") {
+				console.log(`[ORCHESTRATOR] Activating subject: ${subject.name}`);
+				// Side-effect: Ensure resources directory exists (simulated)
+				if (newData.resources.length === 0) {
+					newData.resources = [
+						{ id: `res-${id}-intro`, name: "Guía de Inicio", url: "#", type: "pdf" },
+						{ id: `res-${id}-drive`, name: "Carpeta Drive", url: "#", type: "drive" }
+					];
+				}
+				// Emit a custom event for other modules
+				window.dispatchEvent(new CustomEvent('lti-subject-activated', { detail: { id, name: subject.name } }));
+			}
+
 			return {
 				...prev,
-				[id]: { ...existing, ...partialData },
+				[id]: newData,
 			};
 		});
 	};
@@ -76,10 +95,13 @@ export function SubjectDataProvider({
 
 	const removeCustomSubject = (id: string) => {
 		setCustomSubjects((prev) => prev.filter((s) => s.id !== id));
-		// Clean up data for this subject if any
+		// --- Soft Delete Protocol (Eje 2.2) ---
+		// Instead of deleting data, we move it to an 'archived' state if it has content
 		setData((prev) => {
-			const { [id]: _, ...rest } = prev;
-			return rest;
+			if (!prev[id]) return prev;
+			console.log(`[ORCHESTRATOR] Soft Delete: Archiving data for subject ${id}`);
+			const archivedData = { ...prev[id], archived: true, archivedAt: new Date().toISOString() };
+			return { ...prev, [id]: archivedData };
 		});
 	};
 

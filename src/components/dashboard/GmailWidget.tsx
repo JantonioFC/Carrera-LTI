@@ -11,6 +11,8 @@ import {
 import { useCallback, useEffect, useState } from "react";
 import { type GmailMessage, gmailService } from "../../services/gmail";
 import { useAetherStore } from "../../store/aetherStore";
+import { AssistantGuide } from "../AssistantGuide";
+import { AnimatePresence } from "framer-motion";
 
 export function GmailWidget() {
 	const { gmailClientId, gmailApiKey, setGmailClientId, setGmailApiKey } =
@@ -21,6 +23,7 @@ export function GmailWidget() {
 	const [isAuthenticated, setIsAuthenticated] = useState(false);
 	const [showSettings, setShowSettings] = useState(false);
 	const [isMinimized, setIsMinimized] = useState(true);
+	const [showGuide, setShowGuide] = useState(false);
 
 	const fetchEmails = useCallback(async () => {
 		if (!gmailService.isAuthenticated()) {
@@ -79,83 +82,102 @@ export function GmailWidget() {
 		setMessages([]);
 	};
 
-	// --- Render Settings ---
-	if (!gmailClientId || !gmailApiKey || showSettings) {
+	// --- Render Settings Only if explicit ---
+	if (showSettings && (!gmailClientId || !gmailApiKey)) {
 		return (
-			<motion.div
-				layout
-				className="fixed bottom-6 right-6 w-80 z-[100] card p-5 border-t-2 border-lti-coral shadow-2xl bg-navy-950"
-			>
-				<div className="flex items-center justify-between mb-4">
-					<h2 className="text-white font-semibold text-sm flex items-center gap-2">
-						<Settings size={16} className="text-lti-coral" />
-						Configurar Gmail
-					</h2>
-					{gmailClientId && gmailApiKey && (
+			<>
+				<motion.div
+					layout
+					className="fixed bottom-6 right-6 w-80 z-[100] card p-5 border-t-2 border-lti-coral shadow-2xl bg-navy-950"
+				>
+					<div className="flex items-center justify-between mb-4">
+						<h2 className="text-white font-semibold text-sm flex items-center gap-2">
+							<Settings size={16} className="text-lti-coral" />
+							Configurar Gmail
+						</h2>
 						<button
 							onClick={() => setShowSettings(false)}
 							className="text-xs text-slate-400 hover:text-white"
 						>
 							Cerrar
 						</button>
-					)}
-				</div>
-				<div className="space-y-4">
-					<div className="space-y-3">
-						<div>
-							<label className="block text-[10px] font-medium text-slate-500 uppercase mb-1">
-								Client ID
-							</label>
-							<input
-								type="text"
-								value={gmailClientId}
-								onChange={(e) => setGmailClientId(e.target.value)}
-								className="w-full bg-navy-900 border border-navy-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-lti-blue"
-								placeholder="000.apps.googleusercontent.com"
-							/>
-						</div>
-						<div>
-							<label className="block text-[10px] font-medium text-slate-500 uppercase mb-1">
-								API Key
-							</label>
-							<input
-								type="password"
-								value={gmailApiKey}
-								onChange={(e) => setGmailApiKey(e.target.value)}
-								className="w-full bg-navy-900 border border-navy-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-lti-blue"
-								placeholder="AIza..."
-							/>
-						</div>
 					</div>
-					<button
-						onClick={() => setShowSettings(false)}
-						disabled={!gmailClientId || !gmailApiKey}
-						className="w-full py-2 bg-lti-blue text-white text-xs font-bold rounded-lg transition-colors"
-					>
-						Guardar y Cerrar
-					</button>
-				</div>
-			</motion.div>
+					<div className="space-y-4">
+						<div className="bg-navy-900/50 p-3 rounded-lg border border-navy-800 space-y-2">
+							<p className="text-[10px] text-slate-400 leading-tight">
+								¿No tienes credenciales? Sigue nuestra guía paso a paso.
+							</p>
+							<button
+								onClick={() => setShowGuide(true)}
+								className="w-full py-1.5 bg-navy-800 text-lti-blue text-[10px] font-bold rounded-md hover:bg-navy-700 transition-colors flex items-center justify-center gap-2"
+							>
+								Inicia la Guía de Configuración <ExternalLink size={10} />
+							</button>
+						</div>
+
+						<div className="space-y-3">
+							<div>
+								<label className="block text-[10px] font-medium text-slate-500 uppercase mb-1">
+									Client ID
+								</label>
+								<input
+									type="text"
+									value={gmailClientId || ""}
+									onChange={(e) => setGmailClientId(e.target.value)}
+									className="w-full bg-navy-900 border border-navy-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-lti-blue"
+									placeholder="000.apps.googleusercontent.com"
+								/>
+							</div>
+							<div>
+								<label className="block text-[10px] font-medium text-slate-500 uppercase mb-1">
+									API Key
+								</label>
+								<input
+									type="password"
+									value={gmailApiKey || ""}
+									onChange={(e) => setGmailApiKey(e.target.value)}
+									className="w-full bg-navy-900 border border-navy-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-lti-blue"
+									placeholder="AIza..."
+								/>
+							</div>
+						</div>
+						<button
+							onClick={() => setShowSettings(false)}
+							disabled={!gmailClientId || !gmailApiKey}
+							className="w-full py-2 bg-lti-blue text-white text-xs font-bold rounded-lg transition-colors border-none cursor-pointer"
+						>
+							Guardar y Cerrar
+						</button>
+					</div>
+				</motion.div>
+
+				<AnimatePresence>
+					{showGuide && <AssistantGuide onClose={() => setShowGuide(false)} />}
+				</AnimatePresence>
+			</>
 		);
 	}
 
-	// --- Render Minimized ---
-	if (isMinimized) {
+	// --- Render Minimized or Silent ---
+	if (isMinimized || (!gmailClientId || !gmailApiKey)) {
+		const isSilent = !gmailClientId || !gmailApiKey;
 		return (
 			<motion.button
 				layoutId="gmail-widget"
-				onClick={() => setIsMinimized(false)}
-				className="fixed bottom-6 right-6 z-[100] w-12 h-12 bg-lti-blue rounded-full shadow-lg flex items-center justify-center text-white hover:scale-110 transition-transform active:scale-95 group"
+				onClick={() => (isSilent ? setShowSettings(true) : setIsMinimized(false))}
+				className={`fixed bottom-6 right-6 z-[100] w-12 h-12 rounded-full shadow-lg flex items-center justify-center text-white hover:scale-110 transition-transform active:scale-95 group ${
+					isSilent ? "bg-slate-800 opacity-60 border border-slate-700" : "bg-lti-blue"
+				}`}
 			>
-				<Mail size={20} />
-				{messages.length > 0 && (
+				<Mail size={20} className={isSilent ? "text-slate-400" : "text-white"} />
+				{messages.length > 0 && !isSilent && (
 					<span className="absolute -top-1 -right-1 w-5 h-5 bg-lti-coral text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-navy-950">
 						{messages.length}
 					</span>
 				)}
 				{/* Tooltip on hover */}
 				<span className="absolute right-14 bg-navy-800 text-white text-[10px] py-1 px-2 rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap border border-navy-700">
-					{messages.length} correos nuevos
+					{isSilent ? "Conectividad Potencial (Configura Gmail)" : `${messages.length} correos nuevos`}
 				</span>
 			</motion.button>
 		);

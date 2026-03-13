@@ -1,4 +1,5 @@
 import { Award, BookOpen, Clock } from "lucide-react";
+import { useMemo, useState } from "react";
 import { CURRICULUM, TOTAL_CREDITS } from "../data/lti";
 import { useSubjectData } from "../hooks/useSubjectData";
 
@@ -17,7 +18,17 @@ const STATUS_LABELS = {
 };
 
 export default function MallaCurricular() {
-	const { data, allSubjects, customSubjects } = useSubjectData();
+	const { data, allSubjects, customSubjects, updateSubject } = useSubjectData();
+	const [viewMode, setViewMode] = useState<
+		"all" | "focus" | "progress" | "projection"
+	>("all");
+
+	// Current semester is calculated based on active subjects, default to 1
+	const currentSemester = useMemo(() => {
+		const active = allSubjects.filter((s) => data[s.id]?.status === "en_curso");
+		if (active.length === 0) return 1;
+		return Math.min(...active.map((s) => s.semester));
+	}, [allSubjects, data]);
 
 	const subjectsWithStatus = allSubjects.map((s) => ({
 		...s,
@@ -53,11 +64,34 @@ export default function MallaCurricular() {
 	return (
 		<div className="p-6 space-y-5 animate-fade-in">
 			{/* Header */}
-			<div>
-				<h1 className="text-2xl font-bold text-white">Malla Curricular</h1>
-				<p className="text-slate-400 text-sm mt-0.5">
-					Licenciatura en Tecnologías de la Información — Plan 2024
-				</p>
+			<div className="flex items-center justify-between">
+				<div>
+					<h1 className="text-2xl font-bold text-white">Malla Curricular</h1>
+					<p className="text-slate-400 text-sm mt-0.5">
+						Licenciatura en Tecnologías de la Información — Plan 2024
+					</p>
+				</div>
+				<div className="flex bg-navy-900/50 p-1 rounded-xl border border-navy-700/50">
+					{(["all", "focus", "progress", "projection"] as const).map((mode) => (
+						<button
+							key={mode}
+							onClick={() => setViewMode(mode)}
+							className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${
+								viewMode === mode
+									? "bg-lti-blue text-white shadow-lg shadow-lti-blue/20"
+									: "text-slate-500 hover:text-slate-300"
+							}`}
+						>
+							{mode === "all"
+								? "Todo"
+								: mode === "focus"
+									? "Enfoque"
+									: mode === "progress"
+										? "Progreso"
+										: "Proyección"}
+						</button>
+					))}
+				</div>
 			</div>
 
 			{/* Credit counter cards sliced for brevity (keeping logic same) */}
@@ -163,17 +197,22 @@ export default function MallaCurricular() {
 							(a, s) => a + s.credits,
 							0,
 						);
-						const isCurrent = sem.number === 1;
+
+						// Apply opacity/grayscale to non-current semesters
+						const isPast = sem.number < currentSemester;
+						const isFuture = sem.number > currentSemester;
+						const isCurrent = sem.number === currentSemester;
+
 						return (
 							<div
 								key={sem.number}
-								className={`w-52 flex-shrink-0 card p-3 space-y-2 ${
-									isCurrent ? "border-lti-blue/40 glow-blue" : ""
-								}`}
+								className={`w-52 flex-shrink-0 card p-3 space-y-2 transition-all duration-500 ${
+									isCurrent ? "border-lti-blue/40 glow-blue scale-[1.02] z-10" : ""
+								} ${isPast || isFuture ? "opacity-40 grayscale-[0.8] hover:opacity-100 hover:grayscale-0" : ""}`}
 							>
 								{/* Semester Header */}
 								<div
-									className={`rounded-lg p-2 text-center ${
+									className={`rounded-lg p-2 text-center transition-colors ${
 										isCurrent ? "gradient-blue" : "bg-navy-700/50"
 									}`}
 								>
@@ -192,17 +231,45 @@ export default function MallaCurricular() {
 								{/* Subjects */}
 								<div className="space-y-1.5">
 									{allSemSubjects.map((baseSubject) => {
-										const subject =
-											subjectsWithStatus.find((s) => s.id === baseSubject.id) ||
-											baseSubject;
+										const sData = data[baseSubject.id];
+										const subject = {
+											...baseSubject,
+											status: sData?.status || "pendiente",
+										};
+
+										// Filter logic
+										if (viewMode === "focus" && subject.status !== "en_curso")
+											return null;
+										if (viewMode === "progress" && subject.status !== "aprobada")
+											return null;
+
+										// Thermal projection logic (simplified: if prerequisites met or incoming)
+										const isProjection =
+											viewMode === "projection" &&
+											subject.status === "pendiente" &&
+											subject.semester <= currentSemester + 1;
+
 										return (
-											<div
+											<button
+												type="button"
 												key={subject.id}
-												className={`relative overflow-hidden rounded-lg p-2 border text-xs transition-all ${STATUS_STYLES[subject.status as keyof typeof STATUS_STYLES]} ${
-													subject.status === "en_curso"
-														? "animate-pulse-slow"
-														: ""
-												}`}
+												onClick={() => {
+													const nextStatus: Record<string, string> = {
+														pendiente: "en_curso",
+														en_curso: "aprobada",
+														aprobada: "reprobada",
+														reprobada: "pendiente",
+													};
+													updateSubject(subject.id, {
+														status: (nextStatus[subject.status] ||
+															"pendiente") as any,
+													});
+												}}
+												className={`w-full text-left relative overflow-hidden rounded-lg p-2 border text-xs transition-all ${
+													STATUS_STYLES[subject.status as keyof typeof STATUS_STYLES]
+												} ${subject.status === "en_curso" ? "animate-pulse-slow ring-1 ring-lti-blue/50" : ""} ${
+													isProjection ? "ring-2 ring-yellow-500/50 shadow-lg shadow-yellow-500/10" : ""
+												} hover:scale-[1.03] active:scale-95`}
 											>
 												<div className="flex items-start justify-between gap-1">
 													<div
@@ -233,7 +300,7 @@ export default function MallaCurricular() {
 														}
 													</span>
 												</div>
-											</div>
+											</button>
 										);
 									})}
 								</div>
