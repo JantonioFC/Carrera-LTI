@@ -207,7 +207,9 @@ export default function MallaCurricular() {
 							<div
 								key={sem.number}
 								className={`w-52 flex-shrink-0 card p-3 space-y-2 transition-all duration-500 ${
-									isCurrent ? "border-lti-blue/40 glow-blue scale-[1.02] z-10" : ""
+									isCurrent
+										? "border-lti-blue/40 glow-blue scale-[1.02] z-10"
+										: ""
 								} ${isPast || isFuture ? "opacity-40 grayscale-[0.8] hover:opacity-100 hover:grayscale-0" : ""}`}
 							>
 								{/* Semester Header */}
@@ -240,7 +242,10 @@ export default function MallaCurricular() {
 										// Filter logic
 										if (viewMode === "focus" && subject.status !== "en_curso")
 											return null;
-										if (viewMode === "progress" && subject.status !== "aprobada")
+										if (
+											viewMode === "progress" &&
+											subject.status !== "aprobada"
+										)
 											return null;
 
 										// Thermal projection logic (simplified: if prerequisites met or incoming)
@@ -266,9 +271,13 @@ export default function MallaCurricular() {
 													});
 												}}
 												className={`w-full text-left relative overflow-hidden rounded-lg p-2 border text-xs transition-all ${
-													STATUS_STYLES[subject.status as keyof typeof STATUS_STYLES]
+													STATUS_STYLES[
+														subject.status as keyof typeof STATUS_STYLES
+													]
 												} ${subject.status === "en_curso" ? "animate-pulse-slow ring-1 ring-lti-blue/50" : ""} ${
-													isProjection ? "ring-2 ring-yellow-500/50 shadow-lg shadow-yellow-500/10" : ""
+													isProjection
+														? "ring-2 ring-yellow-500/50 shadow-lg shadow-yellow-500/10"
+														: ""
 												} hover:scale-[1.03] active:scale-95`}
 											>
 												<div className="flex items-start justify-between gap-1">

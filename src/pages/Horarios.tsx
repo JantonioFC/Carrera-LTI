@@ -1,11 +1,11 @@
 import {
 	closestCorners,
-	defaultDropAnimationSideEffects,
 	DndContext,
 	type DragEndEvent,
 	type DragOverEvent,
 	DragOverlay,
 	type DragStartEvent,
+	defaultDropAnimationSideEffects,
 	KeyboardSensor,
 	PointerSensor,
 	useSensor,
@@ -19,15 +19,7 @@ import {
 	verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import {
-	Calendar as CalendarIcon,
-	Clock,
-	GripVertical,
-	Plus,
-	Search,
-	Trash2,
-	X,
-} from "lucide-react";
+import { Clock, GripVertical, Plus, Search, Trash2, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import { type Subject, WEEKDAY_SHORT } from "../data/lti";
 import { useSubjectData } from "../hooks/useSubjectData";
@@ -66,12 +58,12 @@ function SortableItem({
 		transform,
 		transition,
 		isDragging,
-	} = useSortable({ 
+	} = useSortable({
 		id,
 		data: {
 			type: "Task",
 			item,
-		}
+		},
 	});
 
 	const style = {
@@ -98,26 +90,26 @@ function SortableItem({
 					<p className="text-xs text-white font-bold truncate mb-1">
 						{subject?.name}
 					</p>
-					
+
 					{isEditing ? (
 						<div className="space-y-2 mt-2">
 							<div className="flex items-center gap-1">
-								<input 
-									type="time" 
+								<input
+									type="time"
 									value={tempStart}
 									onChange={(e) => setTempStart(e.target.value)}
 									className="bg-navy-950 border border-navy-700 rounded px-1.5 py-0.5 text-[10px] text-white w-full outline-none focus:border-lti-blue"
 								/>
 								<span className="text-slate-600">-</span>
-								<input 
-									type="time" 
+								<input
+									type="time"
 									value={tempEnd}
 									onChange={(e) => setTempEnd(e.target.value)}
 									className="bg-navy-950 border border-navy-700 rounded px-1.5 py-0.5 text-[10px] text-white w-full outline-none focus:border-lti-blue"
 								/>
 							</div>
 							<div className="flex gap-1">
-								<button 
+								<button
 									onClick={() => {
 										onUpdateTime(id, tempStart, tempEnd);
 										setIsEditing(false);
@@ -126,7 +118,7 @@ function SortableItem({
 								>
 									OK
 								</button>
-								<button 
+								<button
 									onClick={() => setIsEditing(false)}
 									className="bg-navy-700 text-slate-400 text-[10px] px-2 py-1 rounded hover:text-white"
 								>
@@ -136,14 +128,16 @@ function SortableItem({
 						</div>
 					) : (
 						<div className="flex items-center justify-between">
-							<div 
+							<div
 								onClick={() => setIsEditing(true)}
 								className="flex items-center gap-1 text-[10px] text-slate-400 font-medium hover:text-lti-blue transition-colors cursor-pointer"
 							>
 								<Clock size={10} />
-								<span>{item.startTime || "00:00"} - {item.endTime || "00:00"}</span>
+								<span>
+									{item.startTime || "00:00"} - {item.endTime || "00:00"}
+								</span>
 							</div>
-							<button 
+							<button
 								onClick={() => onRemove(id)}
 								className="opacity-0 group-hover:opacity-100 text-slate-600 hover:text-lti-coral p-1 transition-all"
 							>
@@ -185,7 +179,9 @@ function DroppableColumn({
 			className={`flex flex-col flex-1 min-w-[180px] bg-navy-800/50 rounded-xl p-3 border ${day === null ? "border-lti-coral/30" : "border-navy-700/50 shadow-sm"}`}
 		>
 			<div className="flex items-center justify-between mb-3 px-1">
-				<h3 className={`text-xs font-bold uppercase tracking-wider ${day === null ? "text-lti-coral" : "text-slate-400"}`}>
+				<h3
+					className={`text-xs font-bold uppercase tracking-wider ${day === null ? "text-lti-coral" : "text-slate-400"}`}
+				>
 					{day === null ? "Banco de U.C." : WEEKDAY_SHORT[day]}
 				</h3>
 				{day === null && onAdd && (
@@ -206,11 +202,11 @@ function DroppableColumn({
 					{items.map((item) => {
 						const subject = allSubjects.find((s) => s.id === item.subjectId);
 						return (
-							<SortableItem 
-								key={item.id} 
-								id={item.id} 
-								item={item} 
-								subject={subject} 
+							<SortableItem
+								key={item.id}
+								id={item.id}
+								item={item}
+								subject={subject}
 								onUpdateTime={onUpdateTime}
 								onRemove={onRemove}
 							/>
@@ -253,8 +249,10 @@ export default function Horarios({
 	const [activeId, setActiveId] = useState<string | null>(null);
 
 	const handleUpdateTime = (id: string, start: string, end: string) => {
-		setItems((prev) => 
-			prev.map((i) => (i.id === id ? { ...i, startTime: start, endTime: end } : i))
+		setItems((prev) =>
+			prev.map((i) =>
+				i.id === id ? { ...i, startTime: start, endTime: end } : i,
+			),
 		);
 	};
 
@@ -304,10 +302,10 @@ export default function Horarios({
 			setItems((prev) => {
 				const activeIndex = prev.findIndex((i) => i.id === activeId);
 				const overIndex = prev.findIndex((i) => i.id === overId);
-				
+
 				const newItems = [...prev];
 				newItems[activeIndex] = { ...activeItem, day: overDay };
-				
+
 				if (overIndex !== -1) {
 					return arrayMove(newItems, activeIndex, overIndex);
 				}

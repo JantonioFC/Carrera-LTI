@@ -74,12 +74,26 @@ export function SubjectDataProvider({
 				// Side-effect: Ensure resources directory exists (simulated)
 				if (newData.resources.length === 0) {
 					newData.resources = [
-						{ id: `res-${id}-intro`, name: "Guía de Inicio", url: "#", type: "pdf" },
-						{ id: `res-${id}-drive`, name: "Carpeta Drive", url: "#", type: "drive" }
+						{
+							id: `res-${id}-intro`,
+							name: "Guía de Inicio",
+							url: "#",
+							type: "pdf",
+						},
+						{
+							id: `res-${id}-drive`,
+							name: "Carpeta Drive",
+							url: "#",
+							type: "drive",
+						},
 					];
 				}
 				// Emit a custom event for other modules
-				window.dispatchEvent(new CustomEvent('lti-subject-activated', { detail: { id, name: subject.name } }));
+				window.dispatchEvent(
+					new CustomEvent("lti-subject-activated", {
+						detail: { id, name: subject.name },
+					}),
+				);
 			}
 
 			return {
@@ -99,8 +113,14 @@ export function SubjectDataProvider({
 		// Instead of deleting data, we move it to an 'archived' state if it has content
 		setData((prev) => {
 			if (!prev[id]) return prev;
-			console.log(`[ORCHESTRATOR] Soft Delete: Archiving data for subject ${id}`);
-			const archivedData = { ...prev[id], archived: true, archivedAt: new Date().toISOString() };
+			console.log(
+				`[ORCHESTRATOR] Soft Delete: Archiving data for subject ${id}`,
+			);
+			const archivedData = {
+				...prev[id],
+				archived: true,
+				archivedAt: new Date().toISOString(),
+			};
 			return { ...prev, [id]: archivedData };
 		});
 	};
