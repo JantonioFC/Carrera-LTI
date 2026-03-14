@@ -1,9 +1,11 @@
 import { del, get, set } from "idb-keyval";
 import type { StateStorage } from "zustand/middleware";
+import { deobfuscate, obfuscate } from "./security";
 
 export const idbStorage: StateStorage = {
 	getItem: async (name: string): Promise<string | null> => {
-		let val = await get(name);
+		const rawVal = await get(name);
+		let val = deobfuscate(rawVal);
 
 		// Auto-migration from legacy synchronous storage for Aether
 		if (!val && name === "aether-storage") {
@@ -34,7 +36,8 @@ export const idbStorage: StateStorage = {
 		return val || null;
 	},
 	setItem: async (name: string, value: string): Promise<void> => {
-		await set(name, value);
+		const obfuscatedValue = obfuscate(value);
+		await set(name, obfuscatedValue);
 	},
 	removeItem: async (name: string): Promise<void> => {
 		await del(name);

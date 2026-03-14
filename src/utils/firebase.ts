@@ -80,9 +80,18 @@ class FirebaseSyncService implements ISyncService {
 		try {
 			// Phase 3: Zod validation point (simplifying for now, can add full AppData schema)
 			const userRef = doc(db, "users", userId);
+
+			// V-01 Fix: Sanitize data to avoid leaking API keys in the cloud
+			const {
+				geminiApiKey: _ga,
+				gmailApiKey: _gma,
+				gmailClientId: _gc,
+				...sanitizedData
+			} = data;
+
 			await setDoc(
 				userRef,
-				{ ...data, lastUpdated: Date.now() },
+				{ ...sanitizedData, lastUpdated: Date.now() },
 				{ merge: true },
 			);
 			return true;
