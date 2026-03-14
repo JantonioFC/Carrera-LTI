@@ -26,21 +26,21 @@ La aplicación sigue un enfoque **Local-First**:
 
 ## 3. Instalación Local
 
+La forma recomendada de instalar y configurar el proyecto es a través del asistente interactivo:
+
 ```bash
 # 1. Clonar el repositorio
 git clone <URL_DEL_REPOSITORIO>
 cd "Carrera LTI"
 
-# 2. Instalar dependencias
-npm install
-
-# 3. Configurar variables de entorno (ver sección 6)
-cp .env.example .env
-
-# 4. Iniciar servidor de desarrollo
-npm run dev
+# 2. Ejecutar el Setup Wizard
+# Esto instalará dependencias, validará tu entorno y configurará el .env
+npm run setup
 ```
-La app estará disponible en `http://localhost:5173`.
+
+El asistente te guiará para configurar las claves de Gemini, Gmail y Firebase de forma segura. Si necesitas ayuda visual para obtener tus credenciales, consulta la **[Guía Visual de Configuración (PDF)](GUIA_VISUAL_CONFIGURACION.pdf)** o la [versión Markdown](GUIA_VISUAL_CONFIGURACION.md).
+
+Una vez completado, puedes iniciar el servidor con `npm run dev`.
 
 ---
 
@@ -64,8 +64,8 @@ No requiere configuración manual. La app inicializa automáticamente los esquem
 
 ### 5.1 Google Gemini AI
 1. Obtén tu API Key en [aistudio.google.com](https://aistudio.google.com/).
-2. **Método A (Automático)**: Ingresa la clave directamente en la interfaz de la aplicación (se guarda en IndexedDB).
-3. **Método B (Manual)**: Úsalo para desarrollo si es necesario en las utilidades de `src/services/aiClient.ts`.
+2. **Método A (Automático - Recomendado)**: Ejecuta `npm run setup` y pega la clave cuando se solicite. El asistente la guardará en el archivo `.env`.
+3. **Método B (Interfaz)**: Puedes ingresar o cambiar la clave directamente desde la configuración de Aether dentro de la aplicación.
 
 ### 5.2 Gmail API (OAuth 2.0)
 Requerido para el widget de Gmail en el Dashboard:
@@ -91,6 +91,9 @@ Requerido para el widget de Gmail en el Dashboard:
 | `VITE_FIREBASE_MESSAGING_SENDER_ID` | ID del remitente para notificaciones. |
 | `VITE_FIREBASE_APP_ID` | ID único de la aplicación web en Firebase. |
 | `VITE_FIREBASE_MEASUREMENT_ID` | ID de Google Analytics (opcional). |
+| `VITE_GEMINI_API_KEY` | Llave para el motor de IA Nexus/Aether. |
+| `VITE_GMAIL_CLIENT_ID` | Client ID de Google Cloud para el widget de Gmail. |
+| `VITE_GMAIL_API_KEY` | API Key de Google Cloud para descubrimiento de servicios. |
 
 ---
 
@@ -113,3 +116,21 @@ firebase deploy
 
 > [!IMPORTANT]
 > Asegúrate de configurar las reglas de Firestore (`firestore.rules`) antes de producción para garantizar que solo los usuarios autenticados (incluso de forma anónima) puedan acceder a sus propios datos.
+## Resumen de la Interfaz
+| Sección | Captura de Pantalla |
+| :--- | :--- |
+| Dashboard | ![01-dashboard](img/01-dashboard.png) |
+| Editor Aether | ![02-aether-editor](img/02-aether-editor.png) |
+| Canvas Espacial | ![03-canvas-espacial](img/03-canvas-espacial.png) |
+| Editor Nexus | ![05-nexus-editor](img/05-nexus-editor.png) |
+| Malla Curricular | ![09-malla-curricular](img/09-malla-curricular.png) |
+
+---
+
+## Diagramas y Flujos Críticos
+Consulta el documento [DIAGRAMAS_ARQUITECTURA.md](DIAGRAMAS_ARQUITECTURA.md) para ver detalles sobre:
+- Cifrado AES-256 Local-First.
+- Arquitectura RAG (Retrieval Augmented Generation).
+- Flujo lógico del Setup Wizard.
+
+Para una guía paso a paso con capturas de pantalla, consulta la **[Guía Visual de Configuración (PDF)](GUIA_VISUAL_CONFIGURACION.pdf)**.

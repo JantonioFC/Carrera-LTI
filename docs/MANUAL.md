@@ -27,9 +27,15 @@
 
 ### Instalación
 ```bash
+# 1. Clonar el repositorio
 git clone https://github.com/JantonioFC/Carrera-LTI.git
 cd "Carrera LTI"
-npm install
+
+# 2. Ejecutar el asistente de configuración
+# El wizard instalará las dependencias y configurará tu entorno (.env)
+npm run setup
+
+# 3. Iniciar el servidor de desarrollo
 npm run dev
 ```
 Abrí tu navegador en `http://localhost:5173`.
@@ -44,7 +50,7 @@ La barra lateral izquierda contiene los **13 módulos** de la aplicación. Hacé
 
 ## 2. Dashboard
 
-![Dashboard](docs/screenshots/01_dashboard.png)
+![Dashboard](docs/img/01-dashboard.png)
 
 La pantalla principal te ofrece un **resumen completo** de tu estado académico:
 
@@ -59,7 +65,7 @@ La pantalla principal te ofrece un **resumen completo** de tu estado académico:
 
 ## 3. Unidades Curriculares
 
-![Unidades Curriculares](docs/screenshots/02_materias.png)
+![Unidades Curriculares](docs/img/02-aether-editor.png)
 
 Gestión detallada de tus materias del semestre actual:
 
@@ -72,7 +78,7 @@ Gestión detallada de tus materias del semestre actual:
 
 ## 4. Calendario
 
-![Calendario](docs/screenshots/03_calendario.png)
+![Calendario](docs/img/08-calendario-anual.png)
 
 Vista mensual y semanal del calendario académico:
 
@@ -85,7 +91,7 @@ Vista mensual y semanal del calendario académico:
 
 ## 5. Malla Curricular
 
-![Malla Curricular](docs/screenshots/04_malla.png)
+![Malla Curricular](docs/img/09-malla-curricular.png)
 
 Mapa visual completo de los **8 semestres** de la carrera:
 
@@ -98,7 +104,7 @@ Mapa visual completo de los **8 semestres** de la carrera:
 
 ## 6. Tareas
 
-![Tareas](docs/screenshots/05_tareas.png)
+![Tareas](docs/img/05-nexus-editor.png)
 
 Tablero Kanban para organizar tus entregas y estudios:
 
@@ -112,7 +118,7 @@ Tablero Kanban para organizar tus entregas y estudios:
 
 ## 7. Generador de Horarios
 
-![Horarios](docs/screenshots/06_horarios.png)
+![Horarios](docs/img/01-dashboard.png)
 
 Creá tu rutina semanal ideal de forma visual:
 
@@ -126,7 +132,7 @@ Creá tu rutina semanal ideal de forma visual:
 
 ### 8.1 Bóveda de Conocimiento
 
-![Aether Vault](docs/screenshots/07_aether.png)
+![Aether Vault](docs/img/02-aether-editor.png)
 
 Tu sistema personal de gestión de conocimiento:
 
@@ -138,7 +144,7 @@ Tu sistema personal de gestión de conocimiento:
 
 ### 8.2 Canvas Espacial
 
-![Canvas Espacial](docs/screenshots/08_canvas.png)
+![Canvas Espacial](docs/img/03-canvas-espacial.png)
 
 Tablero infinito para organización espacial libre:
 
@@ -148,7 +154,7 @@ Tablero infinito para organización espacial libre:
 
 ### 8.3 Asistente Aether (Chat IA)
 
-![Asistente Aether](docs/screenshots/09_aether_chat.png)
+![Asistente Aether](docs/img/04-aether-gemini-setup.png)
 
 Chat inteligente que **lee tus notas** para darte respuestas contextualizadas:
 
@@ -162,7 +168,7 @@ Chat inteligente que **lee tus notas** para darte respuestas contextualizadas:
 
 ### 9.1 Editor de Bloques
 
-![Nexus Editor](docs/screenshots/10_nexus_editor.png)
+![Nexus Editor](docs/img/05-nexus-editor.png)
 
 Editor de texto basado en **bloques atómicos** (estilo Notion):
 
@@ -172,7 +178,7 @@ Editor de texto basado en **bloques atómicos** (estilo Notion):
 
 ### 9.2 Bases de Datos
 
-![Nexus Tables](docs/screenshots/11_nexus_tables.png)
+![Nexus Tables](docs/img/06-nexus-tables.png)
 
 Tablas relacionales de alta velocidad:
 
@@ -184,7 +190,7 @@ Tablas relacionales de alta velocidad:
 
 ### 9.3 Nexus AI
 
-![Nexus AI](docs/screenshots/12_nexus_ai.png)
+![Nexus AI](docs/img/07-nexus-ai-setup.png)
 
 El asistente de inteligencia más avanzado de la aplicación:
 

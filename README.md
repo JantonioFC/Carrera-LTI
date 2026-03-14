@@ -64,23 +64,45 @@ Combina gestión académica, un Segundo Cerebro (Aether) y un Espacio de Trabajo
 
 ---
 
-## 🚀 Instalación
+## 🚀 Instalación y Configuración
+
+Carrera LTI utiliza un **Setup Wizard** interactivo para automatizar la configuración del entorno, las APIs de Google y Firebase.
 
 Requiere [Node.js](https://nodejs.org/) v18+.
 
 ```bash
-# Clonar e instalar
+# 1. Clonar el repositorio
 git clone <URL_DEL_REPOSITORIO>
 cd "Carrera LTI"
-npm install
 
-# Desarrollo
-npm run dev          # → http://localhost:5173
+# 2. Ejecutar el asistente de configuración
+# El wizard instalará las dependencias y configurará tu .env
+# 2. Ejecutar el asistente de configuración (CLI)
+# Sigue la [Guía Visual (PDF)](docs/GUIA_VISUAL_CONFIGURACION.pdf) o la [versión Markdown](docs/GUIA_VISUAL_CONFIGURACION.md) si no tienes tus claves.
+npm run setup
 
-# Producción
-npm run build        # TypeScript check + Vite bundle
-npm run preview      # Preview del build
+# 3. Iniciar el entorno de desarrollo
+npm run dev
 ```
+
+> **Nota:** El comando `npm run setup` es la forma recomendada de inicializar el proyecto por primera vez o para actualizar tus credenciales de forma segura.
+
+
+---
+
+## 🖼️ Guía Visual (Tour Rápido)
+
+### Dashboard Principal
+![Dashboard](docs/img/01-dashboard.png)
+
+### Ecosistema Aether & Nexus
+| Aether (Segundo Cerebro) | Nexus (Workspace AI) |
+| :--- | :--- |
+| ![Aether](docs/img/02-aether-editor.png) | ![Nexus](docs/img/05-nexus-editor.png) |
+
+> [!TIP]
+> Para una guía paso a paso con capturas reales y seguras, descarga la **[Guía Visual de Configuración (PDF)](docs/GUIA_VISUAL_CONFIGURACION.pdf)**.
+> Consulta también los [Diagramas de Arquitectura](docs/DIAGRAMAS_ARQUITECTURA.md) para detalles técnicos (AES-256, RAG Flow).
 
 ---
 

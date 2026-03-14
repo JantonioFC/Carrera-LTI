@@ -78,9 +78,9 @@ export const useAetherStore = create<AetherState & AetherActions>()(
 
 			return {
 				notes: defaultNotes,
-				geminiApiKey: "",
-				gmailClientId: "",
-				gmailApiKey: "",
+				geminiApiKey: import.meta.env.VITE_GEMINI_API_KEY || "",
+				gmailClientId: import.meta.env.VITE_GMAIL_CLIENT_ID || "",
+				gmailApiKey: import.meta.env.VITE_GMAIL_API_KEY || "",
 				chatHistory: [],
 
 				addNote: (title = "Nueva Nota") => {
