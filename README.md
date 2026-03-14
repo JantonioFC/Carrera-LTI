@@ -167,4 +167,6 @@ Los datos oficiales están en `src/data/lti.ts`:
 
 ## 📄 Licencia
 
-Proyecto académico — URU/IA.LABS · Generación 2026 · UTEC Uruguay
+Este proyecto está bajo la licencia **Creative Commons Atribución-NoComercial 4.0 Internacional (CC BY-NC 4.0)**.
+
+© 2026 URU/IA.LABS · Generación 2026 · UTEC Uruguay
