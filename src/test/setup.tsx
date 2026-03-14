@@ -7,18 +7,24 @@ afterEach(() => {
 	cleanup();
 });
 
-// Mock lucide-react globally using a Proxy
+// Simplified mock for lucide-react that supports props (specifically className)
 vi.mock("lucide-react", () => {
-	return new Proxy(
-		{},
-		{
-			get: (_target, prop) => {
-				return ({ className }: { className?: string }) => (
-					<span data-testid={`icon-${String(prop)}`} className={className} />
-				);
-			},
-		},
-	);
+	const mockIcon = (name: string) => {
+		const component = ({ className, ...props }: { className?: string }) => (
+			<span data-testid={`icon-${name}`} className={className} {...props} />
+		);
+		component.displayName = name;
+		return component;
+	};
+
+	return {
+		AlertCircle: mockIcon("AlertCircle"),
+		ExternalLink: mockIcon("ExternalLink"),
+		History: mockIcon("History"),
+		Layers: mockIcon("Layers"),
+		FolderRoot: mockIcon("FolderRoot"),
+		Loader2: mockIcon("Loader2"),
+	};
 });
 
 // Mock Recharts globally

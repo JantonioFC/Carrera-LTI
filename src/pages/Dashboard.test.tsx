@@ -3,20 +3,22 @@ import { render, screen } from "../test/test-utils";
 import Dashboard from "./Dashboard";
 
 // Mock sub-components for isolation
-vi.mock("../components/DashboardSummary", () => ({
-	default: () => <div data-testid="dashboard-summary">Summary</div>,
+vi.mock("../components/dashboard/DashboardSummary", () => ({
+	DashboardSummary: () => <div data-testid="dashboard-summary">Summary</div>,
 }));
-vi.mock("../components/PresencialesList", () => ({
-	default: () => <div data-testid="presenciales-list">Presenciales</div>,
+vi.mock("../components/dashboard/PresencialesList", () => ({
+	PresencialesList: () => (
+		<div data-testid="presenciales-list">Presenciales</div>
+	),
 }));
-vi.mock("../components/SemesterSubjects", () => ({
-	default: () => <div data-testid="semester-subjects">Subjects</div>,
+vi.mock("../components/dashboard/SemesterSubjects", () => ({
+	SemesterSubjects: () => <div data-testid="semester-subjects">Subjects</div>,
 }));
-vi.mock("../components/AnalyticsCharts", () => ({
-	default: () => <div data-testid="analytics-charts">Analytics</div>,
+vi.mock("../components/dashboard/AnalyticsCharts", () => ({
+	AnalyticsCharts: () => <div data-testid="analytics-charts">Analytics</div>,
 }));
-vi.mock("../components/EditPresencialModal", () => ({
-	default: () => <div data-testid="edit-modal">Modal</div>,
+vi.mock("../components/dashboard/EditPresencialModal", () => ({
+	EditPresencialModal: () => <div data-testid="edit-modal">Modal</div>,
 }));
 
 describe("Dashboard Page", () => {
@@ -53,8 +55,6 @@ describe("Dashboard Page", () => {
 			/>,
 		);
 
-		expect(
-			screen.getByText(/Introducción y Perspectivas/i),
-		).toBeInTheDocument();
+		expect(screen.getByTestId("semester-subjects")).toBeInTheDocument();
 	});
 });
