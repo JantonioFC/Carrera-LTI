@@ -2,7 +2,7 @@
 
 Una **súper-app académica y de productividad** diseñada para estudiantes de la **Licenciatura en Tecnologías de la Información (Plan 2024)** de la **Universidad Tecnológica (UTEC) de Uruguay**.
 
-Combina gestión académica, un Segundo Cerebro (Aether) y un Espacio de Trabajo Unificado con IA (Nexus) en una sola aplicación local-first y offline-ready. Desarrollada bajo la marca **URU/IA.LABS**.
+Combina gestión académica, un Segundo Cerebro (Aether), un Espacio de Trabajo Unificado con IA (Nexus) y un asistente de IA local (Cortex) en una sola aplicación local-first y offline-ready. Disponible como **PWA** y como **app de escritorio** (Electron). Desarrollada bajo la marca **URU/IA.LABS**.
 
 ---
 
@@ -35,9 +35,18 @@ Combina gestión académica, un Segundo Cerebro (Aether) y un Espacio de Trabajo
 | **Nexus AI** | Chat con RAG multi-fuente (notas + documentos + bases de datos) vía Gemini 2.5 Flash |
 | **Cifrado AES-256** | Protección local con Web Crypto API (PBKDF2 + AES-GCM) |
 
+### 🤖 Cortex (Asistente de IA Local — solo Electron)
+| Módulo | Descripción |
+|--------|-------------|
+| **Observer AI** | Captura de audio en tiempo real vía micrófono — transcribe y convierte en notas automáticamente |
+| **Docling** | Procesamiento de documentos (PDF, DOCX, imágenes) con OCR mediante subproceso Python |
+| **Whisper** | Transcripción de audio offline con modelo OpenAI Whisper (sin conexión a internet) |
+| **RuVector** | Índice vectorial local vía stdio IPC para búsqueda semántica de baja latencia |
+
 ### 🔧 Infraestructura
 - ⏱️ **Pomodoro Global** — Timer flotante de Focus/Break accesible desde cualquier vista
 - 📱 **PWA Instalable** — Service Worker con cache offline (`vite-plugin-pwa`)
+- 🖥️ **App de Escritorio** — Distribución Electron con IPC seguro y acceso nativo al sistema
 - ☁️ **Sync Cloud** — Respaldo/restauración opcional vía Firebase (auth anónima silenciosa)
 - 🛜 **Cola Offline** — Transacciones pendientes se sincronizan automáticamente al recuperar red
 
@@ -47,45 +56,49 @@ Combina gestión académica, un Segundo Cerebro (Aether) y un Espacio de Trabajo
 
 | Capa | Tecnología |
 |------|-----------|
-| Framework | React 18 + Vite 6 |
+| Framework | React 19 + Vite 6 |
 | Lenguaje | TypeScript (strict) |
 | Estilos | Tailwind CSS 3 |
 | Editor de Bloques | BlockNote + ProseMirror |
 | CRDT / Offline | Yjs + y-indexeddb |
 | Base de Datos Local | Dexie.js (IndexedDB) |
 | IA Generativa | Google Gemini API (`@google/genai`) |
-| Cifrado | Web Crypto API (AES-256-GCM) |
+| Cifrado | Web Crypto API (AES-256-GCM) + electron-store (AES en desktop) |
 | Grafos | react-force-graph-2d, @xyflow/react |
 | Charts | Recharts |
 | DnD | @dnd-kit |
 | PWA | vite-plugin-pwa |
 | Cloud (opcional) | Firebase Firestore + Auth anónima |
+| Desktop | Electron 36 + vite-plugin-electron |
+| IPC / Subprocesos | StdioTransport (NDJSON) + Python venv |
+| IA Local (Cortex) | Docling · OpenAI Whisper · RuVector · sounddevice |
 | Iconos | Lucide React |
 
 ---
 
 ## 🚀 Instalación y Configuración
 
-Carrera LTI utiliza un **Setup Wizard** interactivo para automatizar la configuración del entorno, las APIs de Google y Firebase.
+Carrera LTI utiliza un **Setup Wizard** interactivo para automatizar la configuración del entorno, las APIs de Google, Firebase y las dependencias Python para Cortex.
 
-Requiere [Node.js](https://nodejs.org/) v18+.
+Requiere [Node.js](https://nodejs.org/) v18+ y Python 3.10+.
 
 ```bash
 # 1. Clonar el repositorio
-git clone <URL_DEL_REPOSITORIO>
+git clone https://github.com/JantonioFC/Carrera-LTI.git
 cd "Carrera LTI"
 
 # 2. Ejecutar el asistente de configuración
-# El wizard instalará las dependencias y configurará tu .env
-# 2. Ejecutar el asistente de configuración (CLI)
-# Sigue la [Guía Visual (PDF)](docs/GUIA_VISUAL_CONFIGURACION.pdf) o la [versión Markdown](docs/GUIA_VISUAL_CONFIGURACION.md) si no tienes tus claves.
+# Instala dependencias npm, configura .env y crea el venv Python para Cortex
 npm run setup
 
-# 3. Iniciar el entorno de desarrollo
+# 3a. Modo web (PWA)
 npm run dev
+
+# 3b. Modo escritorio (Electron)
+npm run dev:electron
 ```
 
-> **Nota:** El comando `npm run setup` es la forma recomendada de inicializar el proyecto por primera vez o para actualizar tus credenciales de forma segura.
+> **Nota:** El comando `npm run setup` es la forma recomendada de inicializar el proyecto por primera vez o para actualizar tus credenciales de forma segura. Consulta la [Guía Visual (PDF)](docs/GUIA_VISUAL_CONFIGURACION.pdf) si no tienes tus claves.
 
 
 ---
@@ -114,6 +127,10 @@ src/
 │   ├── Sidebar.tsx           # Navegación principal (13 módulos)
 │   ├── CommandPalette.tsx    # Paleta de comandos global (Ctrl+K)
 │   └── Pomodoro.tsx          # Timer flotante
+├── cortex/
+│   ├── bridge/               # Contract tests del contextBridge Electron
+│   ├── observer/             # useObserverIPC — toggle, transcribe, addNote
+│   └── ui/                   # CortexTab + ObserverAIToggle
 ├── hooks/
 │   ├── useAether.tsx         # Context Provider de Aether (notas, links, grafo)
 │   ├── useNexus.tsx          # Context Provider de Nexus (docs Yjs + IndexedDB)
@@ -138,6 +155,22 @@ src/
 │   └── NexusAI.tsx           # Chat IA multi-fuente (Nexus)
 ├── index.css                 # Sistema de diseño + dark theme premium
 └── App.tsx                   # Router y providers globales
+electron/
+├── main.ts                   # Proceso principal Electron (IPC handlers init)
+├── preload.ts                # contextBridge — expone APIs a renderer
+├── types.d.ts                # Tipos globales window.cortexAPI
+├── handlers/
+│   ├── configHandlers.ts     # Config IPC (electron-store cifrado)
+│   ├── doclingHandlers.ts    # processDocument + ocr
+│   ├── observerHandlers.ts   # Observer AI toggle on/off
+│   └── whisperHandlers.ts    # Transcripción de audio offline
+└── transports/
+    └── StdioTransport.ts     # NDJSON stdio IPC (inyectable para tests)
+scripts/
+├── setup.mjs                 # Wizard: configura .env + instala venv Python
+├── docling_runner.py         # Runner Docling (NDJSON)
+├── observer_runner.py        # Runner Observer AI con sounddevice
+└── whisper_runner.py         # Runner Whisper (borra WAV tras transcripción)
 ```
 
 ---

@@ -3,7 +3,7 @@
 Carrera LTI utiliza una arquitectura moderna de **Single Page Application (SPA)** centrada en el rendimiento, la capacidad offline y la privacidad del usuario.
 
 ## 🏗️ Visión General
-La aplicación se basa en **React 19** y **Vite 6**, estructurada en tres dominios principales que comparten una capa de infraestructura común.
+La aplicación se basa en **React 19** y **Vite 6**, estructurada en cuatro dominios principales que comparten una capa de infraestructura común. En modo escritorio (Electron), se agrega la capa **Cortex** con subprocesos Python.
 
 ### Diagrama de Flujo
 ```mermaid
@@ -14,6 +14,9 @@ graph TD
     Router --> DomainA[Dominio Académico]
     Router --> DomainB[Dominio Aether]
     Router --> DomainC[Dominio Nexus]
+    Router --> DomainD[Cortex — solo Electron]
+    DomainD -->|IPC contextBridge| Electron[main.ts]
+    Electron --> Python[Subprocesos Python\nDocling · Whisper · Observer · RuVector]
 ```
 
 ## 🛤️ Enrutamiento y Navegación

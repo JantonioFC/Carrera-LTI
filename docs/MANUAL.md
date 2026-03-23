@@ -1,7 +1,7 @@
 # 📖 Manual de Usuario — Carrera LTI
 
-**Versión:** 2.0 · Marzo 2026
-**Plataforma:** Web (PWA) — Compatible con Windows, macOS, Linux, Android e iOS
+**Versión:** 3.0 · Marzo 2026
+**Plataforma:** Web (PWA) y App de Escritorio (Electron) — Compatible con Windows, macOS, Linux, Android e iOS
 **Marca:** URU/IA.LABS · UTEC Uruguay
 
 ---
@@ -17,9 +17,10 @@
 7. [Generador de Horarios](#7-generador-de-horarios)
 8. [Aether — Segundo Cerebro](#8-aether--segundo-cerebro)
 9. [Nexus — Espacio de Trabajo Unificado](#9-nexus--espacio-de-trabajo-unificado)
-10. [Herramientas Globales](#10-herramientas-globales)
-11. [Configuración de IA](#11-configuración-de-ia)
-12. [Atajos de Teclado](#12-atajos-de-teclado)
+10. [Cortex — Asistente de IA Local (Electron)](#10-cortex--asistente-de-ia-local)
+11. [Herramientas Globales](#11-herramientas-globales)
+12. [Configuración de IA](#12-configuración-de-ia)
+13. [Atajos de Teclado](#13-atajos-de-teclado)
 
 ---
 
@@ -201,7 +202,42 @@ El asistente de inteligencia más avanzado de la aplicación:
 
 ---
 
-## 10. Herramientas Globales
+## 10. Cortex — Asistente de IA Local
+
+> **Requiere la app de escritorio (Electron).** No disponible en la versión PWA.
+
+Cortex es el módulo de inteligencia artificial que corre **completamente en tu dispositivo**, sin enviar datos a ningún servicio externo.
+
+### Observer AI
+El Observer captura audio de tu micrófono y convierte lo que escuchás (clase, reunión, explicación) en notas automáticas:
+
+1. Abrí la pestaña **Cortex** en el sidebar.
+2. Hacé clic en el toggle **Observer AI** para activarlo. Verás el banner "Grabando…".
+3. Al desactivarlo, el sistema transcribe el audio capturado y crea una nota en Aether automáticamente.
+
+> En macOS se solicita permiso de micrófono al primer uso.
+
+### Docling — Procesamiento de Documentos
+Procesá PDFs, DOCX e imágenes directamente desde Nexus:
+
+- **processDocument**: Extrae el texto estructurado de un archivo.
+- **ocr**: Reconocimiento óptico de caracteres sobre imágenes o PDFs escaneados.
+
+### Whisper — Transcripción Offline
+Transcribí archivos de audio sin conexión a internet usando el modelo Whisper (por defecto `small`):
+
+- Disponible desde Nexus AI o vía Observer al cerrar la grabación.
+- El archivo WAV temporal se elimina automáticamente tras la transcripción.
+
+### Requisitos de Cortex
+El wizard `npm run setup` instala automáticamente el entorno Python necesario en `~/.carrera-lti/venv/`:
+- `docling`
+- `openai-whisper`
+- `sounddevice`
+
+---
+
+## 11. Herramientas Globales
 
 ### ⏱️ Pomodoro Timer
 El temporizador Pomodoro aparece como un **widget flotante** en la esquina inferior derecha, accesible desde cualquier vista:
@@ -222,7 +258,7 @@ En la parte inferior del sidebar:
 
 ---
 
-## 11. Configuración de IA
+## 12. Configuración de IA
 
 Tanto **Asistente Aether** como **Nexus AI** requieren una API Key gratuita de Google:
 
@@ -236,7 +272,7 @@ Tanto **Asistente Aether** como **Nexus AI** requieren una API Key gratuita de G
 
 ---
 
-## 12. Atajos de Teclado
+## 13. Atajos de Teclado
 
 | Atajo | Acción |
 |-------|--------|
@@ -246,4 +282,4 @@ Tanto **Asistente Aether** como **Nexus AI** requieren una API Key gratuita de G
 
 ---
 
-*Manual generado el 8 de marzo de 2026 · URU/IA.LABS · Carrera LTI v2.0*
+*Manual actualizado el 23 de marzo de 2026 · URU/IA.LABS · Carrera LTI v3.0*
