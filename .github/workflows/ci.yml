@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "cortex/develop", "cortex/**" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "cortex/develop" ]
 
 jobs:
   build-and-test:

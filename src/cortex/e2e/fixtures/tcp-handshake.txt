@@ -1,0 +1,11 @@
+TCP Three-Way Handshake
+
+El three-way handshake es el proceso de establecimiento de conexión en TCP.
+Consta de tres pasos: SYN, SYN-ACK y ACK.
+
+1. SYN: El cliente envía un segmento SYN al servidor para iniciar la conexión.
+2. SYN-ACK: El servidor responde con SYN-ACK, confirmando la recepción.
+3. ACK: El cliente envía ACK, completando el establecimiento.
+
+El número de secuencia inicial (ISN) se intercambia durante este proceso.
+Una vez completado, la conexión está establecida y se puede transferir datos.

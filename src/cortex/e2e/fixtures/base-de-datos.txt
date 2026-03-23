@@ -1,0 +1,20 @@
+Bases de Datos Relacionales - SQL y Normalización
+
+SQL (Structured Query Language) es el lenguaje estándar para bases de datos relacionales.
+
+Comandos DML:
+- SELECT: Consulta datos. SELECT col FROM tabla WHERE condición.
+- INSERT: Inserta filas. INSERT INTO tabla (cols) VALUES (valores).
+- UPDATE: Modifica filas. UPDATE tabla SET col=val WHERE condición.
+- DELETE: Elimina filas. DELETE FROM tabla WHERE condición.
+
+Formas Normales (normalización):
+- 1FN: Atributos atómicos, sin grupos repetitivos.
+- 2FN: En 1FN + todo atributo no clave depende de la clave completa.
+- 3FN: En 2FN + no hay dependencias transitivas entre atributos no clave.
+- BCNF: Toda dependencia funcional X→Y, X es superclave.
+
+JOINs:
+- INNER JOIN: Solo filas con coincidencia en ambas tablas.
+- LEFT JOIN: Todas las filas de la tabla izquierda + coincidencias de la derecha.
+- RIGHT JOIN: Todas las filas de la derecha + coincidencias de la izquierda.
