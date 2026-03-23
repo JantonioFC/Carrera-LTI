@@ -6,6 +6,56 @@ Versionado semántico: [SemVer](https://semver.org/lang/es/).
 
 ---
 
+## [3.0.0] — 2026-03-23
+
+### 🚀 Migración Electron — Cortex IPC nativo (RFC-002)
+
+Integración completa del motor Cortex con el proceso principal de Electron.
+Todo el procesamiento de IA (indexación, OCR, transcripción, captura de audio)
+ocurre ahora en el Main Process mediante subprocesos nativos, sin dependencia
+del contexto del navegador.
+
+#### Fase A — Estructura base Electron
+- `electron/main.ts`, `electron/preload.ts`, `electron/types.d.ts`
+- `contextBridge` con `window.cortexAPI` (config + cortex + observer)
+- `tsconfig.electron.json` separado (`moduleResolution: node`)
+- `src/vite-env.d.ts`: referencia a los tipos del bridge para el Renderer
+
+#### Fase B — Configuración cifrada
+- `electron/handlers/configHandlers.ts`: `config:set` / `config:get`
+- `electron-store` con cifrado AES-256; migración automática desde `.env`
+
+#### Fase C — RuVector IPC
+- `electron/transports/StdioTransport.ts`: NDJSON stdio con `spawnFn` injectable
+- `electron/handlers/ruVectorHandlers.ts`: `cortex:index` / `cortex:query`
+- `scripts/setup.mjs`: descarga verificada de RuVector (SHA-256)
+
+#### Fase D — Docling + Whisper
+- `electron/handlers/doclingHandlers.ts`: `cortex:process-document` / `cortex:ocr`
+- `electron/handlers/whisperHandlers.ts`: `cortex:transcribe` (modelo "small")
+- `scripts/docling_runner.py` + `scripts/whisper_runner.py`: runners NDJSON Python
+- `scripts/setup.mjs`: venv Python con docling + openai-whisper + sounddevice
+
+#### Fase E — Observer AI
+- `electron/handlers/observerHandlers.ts`: proceso long-running (toggle on/off)
+- `scripts/observer_runner.py`: captura audio 16 kHz mono (sounddevice), WAV al SIGTERM
+- `systemPreferences.askForMediaAccess('microphone')` en macOS
+- `src/cortex/observer/useObserverIPC.ts`: toggle → transcribe → nota en Aether
+- `src/cortex/ui/CortexTab.tsx`: `ObserverAIToggle` + banner informativo
+
+### 🔒 Seguridad
+- `serialize-javascript@7.0.3` forzado via npm overrides (CVE RCE en ≤ 7.0.2)
+
+### 🧪 Tests
+- **242 tests · 32 archivos · 0 fallos**
+- TDD completo para todos los handlers IPC (observerHandlers: 8 tests)
+- Contract tests del contextBridge: Fases B + C + D + E
+
+### 🏗️ CI
+- `python3 -m py_compile` valida sintaxis de los 3 runners Python en cada push
+
+---
+
 ## [2.0.0] — 2026-03-23
 
 ### 🚀 Cortex — Motor de IA local integrado

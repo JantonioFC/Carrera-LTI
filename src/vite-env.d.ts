@@ -1,4 +1,5 @@
 /// <reference types="vite/client" />
+/// <reference path="../electron/types.d.ts" />
 
 interface ImportMetaEnv {
 	readonly VITE_FIREBASE_API_KEY: string;

@@ -39,9 +39,17 @@ export interface CortexIPC {
 	): Promise<{ text: string; language: string }>;
 }
 
+export interface ObserverIPC {
+	/** Inicia (active=true) o detiene (active=false) la captura de audio. */
+	toggle(active: boolean): Promise<{ active: boolean; wavPath?: string }>;
+	/** Devuelve el estado actual del subproceso Observer. */
+	status(): Promise<{ active: boolean }>;
+}
+
 export interface CortexAPI {
 	config: ConfigAPI;
 	cortex: CortexIPC;
+	observer: ObserverIPC;
 }
 
 declare global {

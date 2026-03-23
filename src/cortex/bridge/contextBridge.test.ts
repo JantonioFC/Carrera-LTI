@@ -44,6 +44,16 @@ function buildMockCortexAPI() {
 				>()
 				.mockResolvedValue({ text: "", language: "unknown" }),
 		},
+		observer: {
+			toggle: vi
+				.fn<
+					(active: boolean) => Promise<{ active: boolean; wavPath?: string }>
+				>()
+				.mockResolvedValue({ active: false }),
+			status: vi
+				.fn<() => Promise<{ active: boolean }>>()
+				.mockResolvedValue({ active: false }),
+		},
 	};
 }
 
@@ -178,5 +188,44 @@ describe("contextBridge — contrato cortexAPI.cortex (Fase D)", () => {
 			"/audio/clase.wav",
 			"medium",
 		);
+	});
+});
+
+describe("contextBridge — contrato cortexAPI.observer (Fase E)", () => {
+	let api: ReturnType<typeof buildMockCortexAPI>;
+
+	beforeEach(() => {
+		api = buildMockCortexAPI();
+	});
+
+	it("should_expose_observer_toggle_as_function", () => {
+		expect(typeof api.observer.toggle).toBe("function");
+	});
+
+	it("should_expose_observer_status_as_function", () => {
+		expect(typeof api.observer.status).toBe("function");
+	});
+
+	it("should_observer_toggle_true_returns_active_true", async () => {
+		api.observer.toggle.mockResolvedValueOnce({ active: true });
+		const result = await api.observer.toggle(true);
+		expect(result.active).toBe(true);
+		expect(api.observer.toggle).toHaveBeenCalledWith(true);
+	});
+
+	it("should_observer_toggle_false_returns_active_false_with_wav_path", async () => {
+		api.observer.toggle.mockResolvedValueOnce({
+			active: false,
+			wavPath: "/recordings/recording_1234567890.wav",
+		});
+		const result = await api.observer.toggle(false);
+		expect(result.active).toBe(false);
+		expect(result.wavPath).toMatch(/\.wav$/);
+	});
+
+	it("should_observer_status_return_active_state", async () => {
+		api.observer.status.mockResolvedValueOnce({ active: true });
+		const result = await api.observer.status();
+		expect(result.active).toBe(true);
 	});
 });

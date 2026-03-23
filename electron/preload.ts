@@ -36,4 +36,10 @@ contextBridge.exposeInMainWorld("cortexAPI", {
 		): Promise<{ text: string; language: string }> =>
 			ipcRenderer.invoke("cortex:transcribe", wavPath, model),
 	},
+	observer: {
+		toggle: (active: boolean): Promise<{ active: boolean; wavPath?: string }> =>
+			ipcRenderer.invoke("observer:toggle", active),
+		status: (): Promise<{ active: boolean }> =>
+			ipcRenderer.invoke("observer:status"),
+	},
 });

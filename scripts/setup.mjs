@@ -274,15 +274,18 @@ async function installPythonDeps() {
 	// Instalar dependencias Python
 	s.start("Instalando Docling y Whisper (esto puede tardar varios minutos)...");
 	try {
-		execSync(`"${VENV_PIP}" install --quiet docling openai-whisper`, {
-			stdio: "ignore",
-		});
+		execSync(
+			`"${VENV_PIP}" install --quiet docling openai-whisper sounddevice`,
+			{
+				stdio: "ignore",
+			},
+		);
 		s.stop("Docling y Whisper instalados con éxito.");
 	} catch (err) {
 		s.stop(pc.red(`Error al instalar dependencias Python: ${err.message}`));
 		note(
 			pc.yellow(
-				`Instala manualmente con:\n${pc.cyan(`"${VENV_PIP}" install docling openai-whisper`)}`,
+				`Instala manualmente con:\n${pc.cyan(`"${VENV_PIP}" install docling openai-whisper sounddevice`)}`,
 			),
 		);
 	}

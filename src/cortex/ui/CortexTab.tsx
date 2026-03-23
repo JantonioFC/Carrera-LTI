@@ -1,3 +1,5 @@
+import { ObserverAIToggle } from "../observer/ObserverAIToggle";
+import { useObserverIPC } from "../observer/useObserverIPC";
 import { type CortexActivity, useCortexStore } from "./cortexStore";
 
 function activityLabel(activity: CortexActivity): string {
@@ -24,16 +26,22 @@ function formatTs(ts: number | null): string {
 }
 
 /**
- * Tab dedicado de Cortex: muestra estado del índice, actividad actual
- * y provee acciones de configuración manual.
+ * Tab dedicado de Cortex: muestra estado del índice, actividad actual,
+ * toggle de Observer AI y banner informativo.
  */
 export function CortexTab() {
 	const indexedDocCount = useCortexStore((s) => s.indexedDocCount);
 	const lastIndexedAt = useCortexStore((s) => s.lastIndexedAt);
 	const activity = useCortexStore((s) => s.activity);
+	const { onStart, onStop } = useObserverIPC();
+	const isElectron = typeof window.cortexAPI !== "undefined";
 
 	return (
 		<div className="cortex-tab">
+			<p data-testid="cortex-banner" className="cortex-banner">
+				Cortex responde solo con tu material indexado
+			</p>
+
 			<section className="cortex-section">
 				<h2 className="cortex-section-title">Estado del índice</h2>
 				<dl className="cortex-stats">
@@ -49,6 +57,13 @@ export function CortexTab() {
 				<h2 className="cortex-section-title">Actividad</h2>
 				<span data-testid="cortex-activity">{activityLabel(activity)}</span>
 			</section>
+
+			{isElectron && (
+				<section className="cortex-section">
+					<h2 className="cortex-section-title">Observer AI</h2>
+					<ObserverAIToggle onStart={onStart} onStop={onStop} />
+				</section>
+			)}
 		</div>
 	);
 }

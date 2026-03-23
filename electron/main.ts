@@ -1,13 +1,14 @@
 import { existsSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
-import { app, BrowserWindow, ipcMain } from "electron";
+import { app, BrowserWindow, ipcMain, systemPreferences } from "electron";
 import { SubprocessAdapter } from "../src/cortex/subprocess/SubprocessAdapter";
 import {
 	type ConfigStore,
 	makeConfigHandlers,
 } from "./handlers/configHandlers";
 import { makeDoclingHandlers } from "./handlers/doclingHandlers";
+import { makeObserverHandlers } from "./handlers/observerHandlers";
 import { makeRuVectorHandlers } from "./handlers/ruVectorHandlers";
 import { makeWhisperHandlers } from "./handlers/whisperHandlers";
 import { StdioTransport } from "./transports/StdioTransport";
@@ -34,7 +35,14 @@ const SCRIPTS_DIR = isDev
 	? join(process.cwd(), "scripts")
 	: join(app.getAppPath(), "scripts");
 const DOCLING_SCRIPT = join(SCRIPTS_DIR, "docling_runner.py");
+const OBSERVER_SCRIPT = join(SCRIPTS_DIR, "observer_runner.py");
 const WHISPER_SCRIPT = join(SCRIPTS_DIR, "whisper_runner.py");
+const OBSERVER_RECORDINGS_DIR = join(
+	homedir(),
+	".carrera-lti",
+	"observer",
+	"recordings",
+);
 
 // ── Store de configuración ────────────────────────────────────────────────────
 // electron-store se importa dinámicamente para compatibilidad con ESM.
@@ -131,6 +139,35 @@ function initWhisper(): void {
 	console.log("[Whisper] handlers registrados");
 }
 
+// ── Observer AI ───────────────────────────────────────────────────────────────
+function initObserver(): void {
+	if (!existsSync(VENV_PYTHON) || !existsSync(OBSERVER_SCRIPT)) {
+		console.warn(
+			"[Observer] entorno Python no encontrado. Ejecuta: npm run setup",
+		);
+		return;
+	}
+
+	const observer = makeObserverHandlers(VENV_PYTHON, OBSERVER_SCRIPT, {
+		recordingsDir: OBSERVER_RECORDINGS_DIR,
+	});
+
+	ipcMain.handle("observer:toggle", async (_event, active: boolean) => {
+		// En macOS solicitar permiso de micrófono antes de capturar.
+		if (active && process.platform === "darwin") {
+			const granted = await systemPreferences.askForMediaAccess("microphone");
+			if (!granted) {
+				return { active: false, error: "Permiso de micrófono denegado" };
+			}
+		}
+		return observer.toggle(active);
+	});
+
+	ipcMain.handle("observer:status", () => observer.status());
+
+	console.log("[Observer] handlers registrados");
+}
+
 // ── Ventana principal ─────────────────────────────────────────────────────────
 function createWindow(): void {
 	const win = new BrowserWindow({
@@ -166,6 +203,7 @@ app.whenReady().then(async () => {
 	initRuVector();
 	initDocling();
 	initWhisper();
+	initObserver();
 
 	createWindow();
 
