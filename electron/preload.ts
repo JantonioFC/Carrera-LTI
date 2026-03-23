@@ -4,9 +4,10 @@ import { contextBridge, ipcRenderer } from "electron";
  * API expuesta al Renderer Process vía contextBridge.
  *
  * Fase A: base vacía
- * Fase B: agrega config.set / config.get
- * Fase C: agrega cortex.index / cortex.query
- * Fase D+: agrega transcribe, observer
+ * Fase B: config.set / config.get
+ * Fase C: cortex.index / cortex.query
+ * Fase D: cortex.processDocument / cortex.ocr / cortex.transcribe ← actual
+ * Fase E: observer
  *
  * Regla de seguridad: nunca exponer ipcRenderer directamente.
  * Solo wrappers explícitos de ipcRenderer.invoke().
@@ -23,5 +24,16 @@ contextBridge.exposeInMainWorld("cortexAPI", {
 			ipcRenderer.invoke("cortex:index", docPath),
 		query: (text: string, topK?: number): Promise<unknown[]> =>
 			ipcRenderer.invoke("cortex:query", text, topK),
+		processDocument: (
+			docPath: string,
+		): Promise<{ chunks: number; text: string }> =>
+			ipcRenderer.invoke("cortex:process-document", docPath),
+		ocr: (imagePath: string): Promise<{ text: string }> =>
+			ipcRenderer.invoke("cortex:ocr", imagePath),
+		transcribe: (
+			wavPath: string,
+			model?: string,
+		): Promise<{ text: string; language: string }> =>
+			ipcRenderer.invoke("cortex:transcribe", wavPath, model),
 	},
 });

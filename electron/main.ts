@@ -7,20 +7,34 @@ import {
 	type ConfigStore,
 	makeConfigHandlers,
 } from "./handlers/configHandlers";
+import { makeDoclingHandlers } from "./handlers/doclingHandlers";
 import { makeRuVectorHandlers } from "./handlers/ruVectorHandlers";
+import { makeWhisperHandlers } from "./handlers/whisperHandlers";
 import { StdioTransport } from "./transports/StdioTransport";
 
 const DEV_URL = "http://localhost:5173";
 const PROD_HTML = join(__dirname, "../dist/index.html");
 const isDev = !app.isPackaged;
 
-// Ruta del binario RuVector instalado por npm run setup
+// ── Rutas de binarios/scripts instalados por npm run setup ────────────────────
+const CARRERA_BIN = join(homedir(), ".carrera-lti", "bin");
 const RUVECTOR_BIN = join(
-	homedir(),
-	".carrera-lti",
-	"bin",
+	CARRERA_BIN,
 	process.platform === "win32" ? "ruvector.exe" : "ruvector",
 );
+const VENV_PYTHON = join(
+	homedir(),
+	".carrera-lti",
+	"venv",
+	"bin",
+	process.platform === "win32" ? "python.exe" : "python",
+);
+// Scripts Python: en dev desde el proyecto, en prod desde resources
+const SCRIPTS_DIR = isDev
+	? join(process.cwd(), "scripts")
+	: join(app.getAppPath(), "scripts");
+const DOCLING_SCRIPT = join(SCRIPTS_DIR, "docling_runner.py");
+const WHISPER_SCRIPT = join(SCRIPTS_DIR, "whisper_runner.py");
 
 // ── Store de configuración ────────────────────────────────────────────────────
 // electron-store se importa dinámicamente para compatibilidad con ESM.
@@ -50,9 +64,6 @@ async function initStore() {
 }
 
 // ── RuVector ─────────────────────────────────────────────────────────────────
-// Registra los handlers IPC solo si el binario está instalado.
-// Si no está, los canales no se registran y el renderer recibe un error
-// de Electron al invocarlos (comportamiento esperado hasta instalar).
 function initRuVector(): void {
 	if (!existsSync(RUVECTOR_BIN)) {
 		console.warn(
@@ -73,6 +84,51 @@ function initRuVector(): void {
 	);
 
 	console.log("[RuVector] handlers registrados");
+}
+
+// ── Docling ───────────────────────────────────────────────────────────────────
+function initDocling(): void {
+	if (!existsSync(VENV_PYTHON) || !existsSync(DOCLING_SCRIPT)) {
+		console.warn(
+			"[Docling] entorno Python no encontrado. Ejecuta: npm run setup",
+		);
+		return;
+	}
+
+	const transport = new StdioTransport(VENV_PYTHON, [DOCLING_SCRIPT]);
+	const adapter = new SubprocessAdapter({ name: "docling", transport });
+	const docling = makeDoclingHandlers(adapter);
+
+	ipcMain.handle("cortex:process-document", (_event, docPath: string) =>
+		docling.processDocument(docPath),
+	);
+	ipcMain.handle("cortex:ocr", (_event, imagePath: string) =>
+		docling.ocr(imagePath),
+	);
+
+	console.log("[Docling] handlers registrados");
+}
+
+// ── Whisper ───────────────────────────────────────────────────────────────────
+function initWhisper(): void {
+	if (!existsSync(VENV_PYTHON) || !existsSync(WHISPER_SCRIPT)) {
+		console.warn(
+			"[Whisper] entorno Python no encontrado. Ejecuta: npm run setup",
+		);
+		return;
+	}
+
+	const transport = new StdioTransport(VENV_PYTHON, [WHISPER_SCRIPT]);
+	const adapter = new SubprocessAdapter({ name: "whisper", transport });
+	const whisper = makeWhisperHandlers(adapter);
+
+	ipcMain.handle(
+		"cortex:transcribe",
+		(_event, wavPath: string, model?: string) =>
+			whisper.transcribe(wavPath, model),
+	);
+
+	console.log("[Whisper] handlers registrados");
 }
 
 // ── Ventana principal ─────────────────────────────────────────────────────────
@@ -108,6 +164,8 @@ app.whenReady().then(async () => {
 	ipcMain.handle("config:get", (_event, key: string) => config.configGet(key));
 
 	initRuVector();
+	initDocling();
+	initWhisper();
 
 	createWindow();
 

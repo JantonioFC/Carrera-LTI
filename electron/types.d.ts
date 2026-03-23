@@ -4,8 +4,8 @@
  *
  * Fase A: base vacía
  * Fase B: config.set / config.get
- * Fase C: cortex.index / cortex.query ← actual
- * Fase D: processDocument, transcribe
+ * Fase C: cortex.index / cortex.query
+ * Fase D: cortex.processDocument / cortex.ocr / cortex.transcribe ← actual
  * Fase E: observer
  */
 
@@ -28,6 +28,15 @@ export interface CortexIPC {
 	index(docPath: string): Promise<{ chunks: number }>;
 	/** Ejecuta una consulta semántica. Devuelve chunks relevantes ordenados por score. */
 	query(text: string, topK?: number): Promise<CortexChunk[]>;
+	/** Convierte un PDF/DOCX a texto estructurado via Docling. */
+	processDocument(docPath: string): Promise<{ chunks: number; text: string }>;
+	/** Extrae texto de una imagen via Docling OCR. */
+	ocr(imagePath: string): Promise<{ text: string }>;
+	/** Transcribe un archivo WAV 16kHz mono via Whisper. */
+	transcribe(
+		wavPath: string,
+		model?: string,
+	): Promise<{ text: string; language: string }>;
 }
 
 export interface CortexAPI {

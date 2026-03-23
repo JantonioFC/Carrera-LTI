@@ -210,6 +210,84 @@ async function installRuVector() {
 	}
 }
 
+// --- Python (Docling + Whisper) ---
+
+const VENV_DIR = join(homedir(), ".carrera-lti", "venv");
+const VENV_PYTHON = join(
+	VENV_DIR,
+	"bin",
+	process.platform === "win32" ? "python.exe" : "python",
+);
+const VENV_PIP = join(
+	VENV_DIR,
+	"bin",
+	process.platform === "win32" ? "pip.exe" : "pip",
+);
+
+async function installPythonDeps() {
+	const shouldInstall = await confirm({
+		message:
+			"¿Instalar herramientas de IA local (Docling + Whisper)? Requiere Python 3.10+ y ~2 GB de espacio.",
+		initialValue: !existsSync(VENV_PYTHON),
+	});
+
+	if (isCancel(shouldInstall) || !shouldInstall) {
+		note(
+			pc.yellow(
+				"Docling y Whisper no instalados. El procesamiento de documentos y transcripción no estarán disponibles.",
+			),
+		);
+		return;
+	}
+
+	const s = spinner();
+
+	// Verificar Python disponible
+	s.start("Verificando Python 3...");
+	try {
+		execSync("python3 --version", { stdio: "ignore" });
+		s.stop("Python 3 detectado.");
+	} catch {
+		s.stop(pc.red("Python 3 no encontrado en el PATH."));
+		note(
+			pc.yellow(
+				"Instala Python 3.10+ desde https://python.org y vuelve a ejecutar el setup.",
+			),
+		);
+		return;
+	}
+
+	// Crear virtualenv si no existe
+	if (!existsSync(VENV_DIR)) {
+		s.start("Creando entorno virtual Python...");
+		try {
+			execSync(`python3 -m venv "${VENV_DIR}"`, { stdio: "ignore" });
+			s.stop(`Entorno virtual creado en ${pc.cyan(VENV_DIR)}`);
+		} catch (err) {
+			s.stop(pc.red(`Error al crear el entorno virtual: ${err.message}`));
+			return;
+		}
+	} else {
+		note(`Entorno virtual ya existe en ${pc.cyan(VENV_DIR)}`);
+	}
+
+	// Instalar dependencias Python
+	s.start("Instalando Docling y Whisper (esto puede tardar varios minutos)...");
+	try {
+		execSync(`"${VENV_PIP}" install --quiet docling openai-whisper`, {
+			stdio: "ignore",
+		});
+		s.stop("Docling y Whisper instalados con éxito.");
+	} catch (err) {
+		s.stop(pc.red(`Error al instalar dependencias Python: ${err.message}`));
+		note(
+			pc.yellow(
+				`Instala manualmente con:\n${pc.cyan(`"${VENV_PIP}" install docling openai-whisper`)}`,
+			),
+		);
+	}
+}
+
 // --- Main Script ---
 
 async function main() {
@@ -385,6 +463,9 @@ Redirect URI: ${pc.cyan("http://localhost:5173/")} (¡No olvides la barra final!
 
 	// 6. RuVector
 	await installRuVector();
+
+	// 7. Python (Docling + Whisper)
+	await installPythonDeps();
 
 	outro(pc.green("Tu sistema está listo para operar en Estado de Flow."));
 

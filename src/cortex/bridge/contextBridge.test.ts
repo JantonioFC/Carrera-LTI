@@ -29,6 +29,20 @@ function buildMockCortexAPI() {
 			query: vi
 				.fn<(text: string, topK?: number) => Promise<unknown[]>>()
 				.mockResolvedValue([]),
+			processDocument: vi
+				.fn<(docPath: string) => Promise<{ chunks: number; text: string }>>()
+				.mockResolvedValue({ chunks: 0, text: "" }),
+			ocr: vi
+				.fn<(imagePath: string) => Promise<{ text: string }>>()
+				.mockResolvedValue({ text: "" }),
+			transcribe: vi
+				.fn<
+					(
+						wavPath: string,
+						model?: string,
+					) => Promise<{ text: string; language: string }>
+				>()
+				.mockResolvedValue({ text: "", language: "unknown" }),
 		},
 	};
 }
@@ -107,5 +121,62 @@ describe("contextBridge — contrato cortexAPI.cortex (Fase C)", () => {
 		const results = await api.cortex.query("que es el three-way handshake");
 		expect(Array.isArray(results)).toBe(true);
 		expect(results).toHaveLength(1);
+	});
+});
+
+describe("contextBridge — contrato cortexAPI.cortex (Fase D)", () => {
+	let api: ReturnType<typeof buildMockCortexAPI>;
+
+	beforeEach(() => {
+		api = buildMockCortexAPI();
+	});
+
+	it("should_expose_process_document_as_function", () => {
+		expect(typeof api.cortex.processDocument).toBe("function");
+	});
+
+	it("should_expose_ocr_as_function", () => {
+		expect(typeof api.cortex.ocr).toBe("function");
+	});
+
+	it("should_expose_transcribe_as_function", () => {
+		expect(typeof api.cortex.transcribe).toBe("function");
+	});
+
+	it("should_process_document_return_chunks_and_text", async () => {
+		api.cortex.processDocument.mockResolvedValueOnce({
+			chunks: 5,
+			text: "contenido extraído del PDF",
+		});
+		const result = await api.cortex.processDocument("/docs/tesis.pdf");
+		expect(result.chunks).toBe(5);
+		expect(result.text).toBe("contenido extraído del PDF");
+		expect(api.cortex.processDocument).toHaveBeenCalledWith("/docs/tesis.pdf");
+	});
+
+	it("should_ocr_return_extracted_text", async () => {
+		api.cortex.ocr.mockResolvedValueOnce({ text: "texto de la imagen" });
+		const result = await api.cortex.ocr("/imgs/captura.png");
+		expect(result.text).toBe("texto de la imagen");
+		expect(api.cortex.ocr).toHaveBeenCalledWith("/imgs/captura.png");
+	});
+
+	it("should_transcribe_return_text_and_language", async () => {
+		api.cortex.transcribe.mockResolvedValueOnce({
+			text: "hola mundo",
+			language: "es",
+		});
+		const result = await api.cortex.transcribe("/audio/clase.wav");
+		expect(result.text).toBe("hola mundo");
+		expect(result.language).toBe("es");
+		expect(api.cortex.transcribe).toHaveBeenCalledWith("/audio/clase.wav");
+	});
+
+	it("should_transcribe_accept_optional_model_parameter", async () => {
+		await api.cortex.transcribe("/audio/clase.wav", "medium");
+		expect(api.cortex.transcribe).toHaveBeenCalledWith(
+			"/audio/clase.wav",
+			"medium",
+		);
 	});
 });
