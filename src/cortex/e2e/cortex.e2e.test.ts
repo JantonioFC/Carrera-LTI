@@ -54,7 +54,6 @@ describe("Cortex E2E — GroundingValidator con índice controlado (REQ-22)", ()
 	const chunks = FIXTURES.map((f) => fixtureAsChunk(f.file, f.docId));
 
 	it("should_be_grounded_for_tcp_query", () => {
-		const _query = "qué es el three-way handshake";
 		const response =
 			"El three-way handshake consta de SYN, SYN-ACK y ACK para establecer conexión TCP.";
 		expect(isGrounded(response, chunks)).toBe(true);

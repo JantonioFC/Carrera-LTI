@@ -51,15 +51,18 @@ export default defineConfig({
 		cssMinify: false,
 		rollupOptions: {
 			output: {
-				manualChunks: {
-					"vendor-ai": ["@google/genai"],
-					"vendor-ui": [
-						"framer-motion",
-						"recharts",
-						"lucide-react",
-						"@radix-ui/react-dialog",
-						"@uiw/react-md-editor",
-					],
+				manualChunks(id) {
+					if (id.includes("@google/genai")) return "vendor-ai";
+					if (
+						[
+							"framer-motion",
+							"recharts",
+							"lucide-react",
+							"@radix-ui/react-dialog",
+							"@uiw/react-md-editor",
+						].some((pkg) => id.includes(pkg))
+					)
+						return "vendor-ui";
 				},
 			},
 		},

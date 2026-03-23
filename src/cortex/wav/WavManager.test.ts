@@ -45,11 +45,11 @@ describe("WavManager — pruneExpiredRecordings", () => {
 		vol.writeFileSync("/tmp/old.wav", WAV_CONTENT);
 		// Parchear stat para simular archivo de 25h de antigüedad
 		const origStat = vol.statSync.bind(vol);
-		vol.statSync = (p: unknown) => {
+		vol.statSync = ((p: unknown) => {
 			const s = origStat(p as string);
-			(s as Record<string, unknown>).mtimeMs = now - 25 * 3_600_000;
+			(s as unknown as Record<string, unknown>).mtimeMs = now - 25 * 3_600_000;
 			return s;
-		};
+		}) as never;
 
 		const time = new MockTimeProvider(now);
 		const wav = new WavManager({ fs: vol as never, time });
@@ -63,11 +63,11 @@ describe("WavManager — pruneExpiredRecordings", () => {
 		vol.mkdirSync("/tmp", { recursive: true });
 		vol.writeFileSync("/tmp/fresh.wav", WAV_CONTENT);
 		const origStat = vol.statSync.bind(vol);
-		vol.statSync = (p: unknown) => {
+		vol.statSync = ((p: unknown) => {
 			const s = origStat(p as string);
-			(s as Record<string, unknown>).mtimeMs = now - 1 * 3_600_000; // 1h
+			(s as unknown as Record<string, unknown>).mtimeMs = now - 1 * 3_600_000; // 1h
 			return s;
-		};
+		}) as never;
 
 		const time = new MockTimeProvider(now);
 		const wav = new WavManager({ fs: vol as never, time });
@@ -82,11 +82,11 @@ describe("WavManager — pruneExpiredRecordings", () => {
 		vol.writeFileSync("/tmp/old.wav", WAV_CONTENT);
 		vol.writeFileSync("/tmp/notes.txt", "keep me");
 		const origStat = vol.statSync.bind(vol);
-		vol.statSync = (p: unknown) => {
+		vol.statSync = ((p: unknown) => {
 			const s = origStat(p as string);
-			(s as Record<string, unknown>).mtimeMs = now - 25 * 3_600_000;
+			(s as unknown as Record<string, unknown>).mtimeMs = now - 25 * 3_600_000;
 			return s;
-		};
+		}) as never;
 
 		const time = new MockTimeProvider(now);
 		const wav = new WavManager({ fs: vol as never, time });

@@ -50,7 +50,9 @@ export class QueueManager {
 
 	/** Serializa la cola al archivo configurado. */
 	persistQueue(): void {
-		this.fs.writeFileSync(this.queuePath, JSON.stringify(this.items), "utf8");
+		this.fs.writeFileSync(this.queuePath, JSON.stringify(this.items), {
+			encoding: "utf8",
+		});
 	}
 
 	/**
