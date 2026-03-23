@@ -1,26 +1,26 @@
 /** Valores válidos para el campo status según el RFC-001 */
-const VALID_STATUSES = ['ok', 'error', 'progress'] as const;
+const VALID_STATUSES = ["ok", "error", "progress"] as const;
 type IPCStatus = (typeof VALID_STATUSES)[number];
 
 export interface IPCMessage {
-  id: string;
-  status: IPCStatus;
-  data?: unknown;
-  error?: string | null;
+	id: string;
+	status: IPCStatus;
+	data?: unknown;
+	error?: string | null;
 }
 
 export class IPCParseError extends Error {
-  constructor(message: string) {
-    super(`IPCParseError: ${message}`);
-    this.name = 'IPCParseError';
-  }
+	constructor(message: string) {
+		super(`IPCParseError: ${message}`);
+		this.name = "IPCParseError";
+	}
 }
 
 export class IPCValidationError extends Error {
-  constructor(message: string) {
-    super(`IPCValidationError: ${message}`);
-    this.name = 'IPCValidationError';
-  }
+	constructor(message: string) {
+		super(`IPCValidationError: ${message}`);
+		this.name = "IPCValidationError";
+	}
 }
 
 /**
@@ -33,42 +33,42 @@ export class IPCValidationError extends Error {
  * @throws IPCValidationError — si faltan campos obligatorios o tienen valores inválidos.
  */
 export function parseIPCMessage(rawLine: string): IPCMessage {
-  const trimmed = rawLine.trim();
+	const trimmed = rawLine.trim();
 
-  if (!trimmed) {
-    throw new IPCParseError('empty input');
-  }
+	if (!trimmed) {
+		throw new IPCParseError("empty input");
+	}
 
-  let parsed: unknown;
-  try {
-    parsed = JSON.parse(trimmed);
-  } catch {
-    throw new IPCParseError(`invalid JSON: ${trimmed.slice(0, 80)}`);
-  }
+	let parsed: unknown;
+	try {
+		parsed = JSON.parse(trimmed);
+	} catch {
+		throw new IPCParseError(`invalid JSON: ${trimmed.slice(0, 80)}`);
+	}
 
-  if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
-    throw new IPCParseError('message must be a JSON object');
-  }
+	if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
+		throw new IPCParseError("message must be a JSON object");
+	}
 
-  const obj = parsed as Record<string, unknown>;
+	const obj = parsed as Record<string, unknown>;
 
-  // Validar campo id
-  if (!('id' in obj) || typeof obj.id !== 'string' || obj.id === '') {
-    throw new IPCValidationError('missing or empty field: id');
-  }
+	// Validar campo id
+	if (!("id" in obj) || typeof obj.id !== "string" || obj.id === "") {
+		throw new IPCValidationError("missing or empty field: id");
+	}
 
-  // Validar campo status
-  if (!('status' in obj)) {
-    throw new IPCValidationError('missing field: status');
-  }
-  if (!VALID_STATUSES.includes(obj.status as IPCStatus)) {
-    throw new IPCValidationError(`invalid status value: "${obj.status}"`);
-  }
+	// Validar campo status
+	if (!("status" in obj)) {
+		throw new IPCValidationError("missing field: status");
+	}
+	if (!VALID_STATUSES.includes(obj.status as IPCStatus)) {
+		throw new IPCValidationError(`invalid status value: "${obj.status}"`);
+	}
 
-  return {
-    id: obj.id as string,
-    status: obj.status as IPCStatus,
-    data: obj.data,
-    error: typeof obj.error === 'string' ? obj.error : null,
-  };
+	return {
+		id: obj.id as string,
+		status: obj.status as IPCStatus,
+		data: obj.data,
+		error: typeof obj.error === "string" ? obj.error : null,
+	};
 }

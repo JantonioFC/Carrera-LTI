@@ -1,18 +1,18 @@
-export type UpdateChannel = 'stable' | 'beta';
+export type UpdateChannel = "stable" | "beta";
 
 export interface UpdateCheckResult {
-  available: boolean;
-  version?: string;
+	available: boolean;
+	version?: string;
 }
 
 export interface ElectronUpdaterClient {
-  setChannel(channel: UpdateChannel): Promise<void>;
-  getChannel(): UpdateChannel;
-  checkForUpdates(): Promise<UpdateCheckResult>;
+	setChannel(channel: UpdateChannel): Promise<void>;
+	getChannel(): UpdateChannel;
+	checkForUpdates(): Promise<UpdateCheckResult>;
 }
 
 interface UpdaterConfigOptions {
-  client: ElectronUpdaterClient;
+	client: ElectronUpdaterClient;
 }
 
 /**
@@ -25,26 +25,26 @@ interface UpdaterConfigOptions {
  * En tests se inyecta un mock para no depender de Electron.
  */
 export class UpdaterConfig {
-  private readonly client: ElectronUpdaterClient;
-  private currentChannel: UpdateChannel;
+	private readonly client: ElectronUpdaterClient;
+	private currentChannel: UpdateChannel;
 
-  constructor({ client }: UpdaterConfigOptions) {
-    this.client = client;
-    this.currentChannel = client.getChannel();
-  }
+	constructor({ client }: UpdaterConfigOptions) {
+		this.client = client;
+		this.currentChannel = client.getChannel();
+	}
 
-  getChannel(): UpdateChannel {
-    return this.currentChannel;
-  }
+	getChannel(): UpdateChannel {
+		return this.currentChannel;
+	}
 
-  /** Cambia el canal. No-op si ya está en ese canal. */
-  async setChannel(channel: UpdateChannel): Promise<void> {
-    if (this.currentChannel === channel) return;
-    await this.client.setChannel(channel);
-    this.currentChannel = channel;
-  }
+	/** Cambia el canal. No-op si ya está en ese canal. */
+	async setChannel(channel: UpdateChannel): Promise<void> {
+		if (this.currentChannel === channel) return;
+		await this.client.setChannel(channel);
+		this.currentChannel = channel;
+	}
 
-  async checkForUpdates(): Promise<UpdateCheckResult> {
-    return this.client.checkForUpdates();
-  }
+	async checkForUpdates(): Promise<UpdateCheckResult> {
+		return this.client.checkForUpdates();
+	}
 }

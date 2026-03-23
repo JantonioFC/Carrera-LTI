@@ -5,8 +5,8 @@ const MAX_CRASH_COUNT = 3;
 const STABILITY_RESET_MS = 60_000;
 
 export interface RestartState {
-  crashCount: number;
-  lastStableAt: number | null;
+	crashCount: number;
+	lastStableAt: number | null;
 }
 
 /**
@@ -19,19 +19,19 @@ export interface RestartState {
  * - En cualquier otro caso → no reiniciar (bucle de crashes detectado).
  */
 export function shouldRestart(state: RestartState): boolean {
-  const count = state.crashCount ?? 0;
+	const count = state.crashCount ?? 0;
 
-  if (count < MAX_CRASH_COUNT) {
-    return true;
-  }
+	if (count < MAX_CRASH_COUNT) {
+		return true;
+	}
 
-  // Verificar si hubo un período de estabilidad suficiente
-  if (state.lastStableAt !== null) {
-    const stableFor = Date.now() - state.lastStableAt;
-    if (stableFor >= STABILITY_RESET_MS) {
-      return true;
-    }
-  }
+	// Verificar si hubo un período de estabilidad suficiente
+	if (state.lastStableAt !== null) {
+		const stableFor = Date.now() - state.lastStableAt;
+		if (stableFor >= STABILITY_RESET_MS) {
+			return true;
+		}
+	}
 
-  return false;
+	return false;
 }

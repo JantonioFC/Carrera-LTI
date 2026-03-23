@@ -1,21 +1,26 @@
-import { useCortexStore, type CortexActivity } from './cortexStore';
+import { type CortexActivity, useCortexStore } from "./cortexStore";
 
 function activityLabel(activity: CortexActivity): string {
-  switch (activity.type) {
-    case 'idle': return 'Inactivo';
-    case 'indexing': return `Indexando: ${activity.docTitle}`;
-    case 'transcribing': return `Transcribiendo: ${activity.filename}`;
-    case 'querying': return `Consultando: ${activity.query}`;
-    case 'ocr': return `OCR: ${activity.filename}`;
-  }
+	switch (activity.type) {
+		case "idle":
+			return "Inactivo";
+		case "indexing":
+			return `Indexando: ${activity.docTitle}`;
+		case "transcribing":
+			return `Transcribiendo: ${activity.filename}`;
+		case "querying":
+			return `Consultando: ${activity.query}`;
+		case "ocr":
+			return `OCR: ${activity.filename}`;
+	}
 }
 
 function formatTs(ts: number | null): string {
-  if (ts === null) return 'Nunca';
-  return new Date(ts).toLocaleString('es-AR', {
-    dateStyle: 'short',
-    timeStyle: 'short',
-  });
+	if (ts === null) return "Nunca";
+	return new Date(ts).toLocaleString("es-AR", {
+		dateStyle: "short",
+		timeStyle: "short",
+	});
 }
 
 /**
@@ -23,27 +28,27 @@ function formatTs(ts: number | null): string {
  * y provee acciones de configuración manual.
  */
 export function CortexTab() {
-  const indexedDocCount = useCortexStore((s) => s.indexedDocCount);
-  const lastIndexedAt = useCortexStore((s) => s.lastIndexedAt);
-  const activity = useCortexStore((s) => s.activity);
+	const indexedDocCount = useCortexStore((s) => s.indexedDocCount);
+	const lastIndexedAt = useCortexStore((s) => s.lastIndexedAt);
+	const activity = useCortexStore((s) => s.activity);
 
-  return (
-    <div className="cortex-tab">
-      <section className="cortex-section">
-        <h2 className="cortex-section-title">Estado del índice</h2>
-        <dl className="cortex-stats">
-          <dt>Documentos indexados</dt>
-          <dd data-testid="cortex-doc-count">{indexedDocCount}</dd>
+	return (
+		<div className="cortex-tab">
+			<section className="cortex-section">
+				<h2 className="cortex-section-title">Estado del índice</h2>
+				<dl className="cortex-stats">
+					<dt>Documentos indexados</dt>
+					<dd data-testid="cortex-doc-count">{indexedDocCount}</dd>
 
-          <dt>Última indexación</dt>
-          <dd data-testid="cortex-last-indexed">{formatTs(lastIndexedAt)}</dd>
-        </dl>
-      </section>
+					<dt>Última indexación</dt>
+					<dd data-testid="cortex-last-indexed">{formatTs(lastIndexedAt)}</dd>
+				</dl>
+			</section>
 
-      <section className="cortex-section">
-        <h2 className="cortex-section-title">Actividad</h2>
-        <span data-testid="cortex-activity">{activityLabel(activity)}</span>
-      </section>
-    </div>
-  );
+			<section className="cortex-section">
+				<h2 className="cortex-section-title">Actividad</h2>
+				<span data-testid="cortex-activity">{activityLabel(activity)}</span>
+			</section>
+		</div>
+	);
 }

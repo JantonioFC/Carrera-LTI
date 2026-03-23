@@ -1,19 +1,19 @@
 export interface StorageUploadRequest {
-  uid: string;
-  localPath: string;
-  remotePath: string;
+	uid: string;
+	localPath: string;
+	remotePath: string;
 }
 
 export interface StorageUploadResult {
-  url: string;
+	url: string;
 }
 
 export interface CloudStorage {
-  upload(req: StorageUploadRequest): Promise<StorageUploadResult>;
+	upload(req: StorageUploadRequest): Promise<StorageUploadResult>;
 }
 
 interface IndexExporterOptions {
-  storage: CloudStorage;
+	storage: CloudStorage;
 }
 
 /**
@@ -24,20 +24,23 @@ interface IndexExporterOptions {
  * En tests se inyecta un mock para no depender de Firebase real.
  */
 export class IndexExporter {
-  private readonly storage: CloudStorage;
+	private readonly storage: CloudStorage;
 
-  constructor({ storage }: IndexExporterOptions) {
-    this.storage = storage;
-  }
+	constructor({ storage }: IndexExporterOptions) {
+		this.storage = storage;
+	}
 
-  async exportToFirebase(req: { uid: string; indexPath: string }): Promise<StorageUploadResult> {
-    const timestamp = Date.now();
-    const remotePath = `users/${req.uid}/cortex/backup_${timestamp}.zip`;
+	async exportToFirebase(req: {
+		uid: string;
+		indexPath: string;
+	}): Promise<StorageUploadResult> {
+		const timestamp = Date.now();
+		const remotePath = `users/${req.uid}/cortex/backup_${timestamp}.zip`;
 
-    return this.storage.upload({
-      uid: req.uid,
-      localPath: req.indexPath,
-      remotePath,
-    });
-  }
+		return this.storage.upload({
+			uid: req.uid,
+			localPath: req.indexPath,
+			remotePath,
+		});
+	}
 }
