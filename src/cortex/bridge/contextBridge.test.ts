@@ -18,9 +18,7 @@ function buildMockCortexAPI() {
 			set: vi
 				.fn<[string, string], Promise<void>>()
 				.mockResolvedValue(undefined),
-			get: vi
-				.fn<[string], Promise<string | null>>()
-				.mockResolvedValue(null),
+			get: vi.fn<[string], Promise<string | null>>().mockResolvedValue(null),
 		},
 	};
 }

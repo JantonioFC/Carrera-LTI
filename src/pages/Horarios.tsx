@@ -366,7 +366,7 @@ export default function Horarios({
 			if (activeIndex === -1) return prev;
 
 			const overData = over.data.current;
-			let overDay: number | null | undefined = undefined;
+			let overDay: number | null | undefined;
 
 			if (overData?.type === "Column") {
 				overDay = overData.day;

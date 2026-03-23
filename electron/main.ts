@@ -1,5 +1,5 @@
-import { BrowserWindow, app, ipcMain } from "electron";
 import { join } from "node:path";
+import { app, BrowserWindow, ipcMain } from "electron";
 import {
 	type ConfigStore,
 	makeConfigHandlers,
@@ -66,9 +66,7 @@ app.whenReady().then(async () => {
 	ipcMain.handle("config:set", (_event, key: string, value: string) =>
 		config.configSet(key, value),
 	);
-	ipcMain.handle("config:get", (_event, key: string) =>
-		config.configGet(key),
-	);
+	ipcMain.handle("config:get", (_event, key: string) => config.configGet(key));
 
 	createWindow();
 

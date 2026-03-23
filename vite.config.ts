@@ -2,8 +2,8 @@
 
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
-import { VitePWA } from "vite-plugin-pwa";
 import electron from "vite-plugin-electron/simple";
+import { VitePWA } from "vite-plugin-pwa";
 import { defineConfig } from "vitest/config";
 
 // El plugin de Electron solo se activa cuando se invoca en modo desktop.
