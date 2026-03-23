@@ -3,12 +3,25 @@
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
+import electron from "vite-plugin-electron/simple";
 import { defineConfig } from "vitest/config";
+
+// El plugin de Electron solo se activa cuando se invoca en modo desktop.
+// En modo web (vite dev) y en tests (vitest) permanece desactivado.
+const isElectron = process.env.VITE_ELECTRON === "true";
 
 export default defineConfig({
 	plugins: [
 		tailwindcss(),
 		react(),
+		...(isElectron
+			? [
+					electron({
+						main: { entry: "electron/main.ts" },
+						preload: { input: "electron/preload.ts" },
+					}),
+				]
+			: []),
 		VitePWA({
 			registerType: "autoUpdate",
 			includeAssets: ["favicon.ico", "apple-touch-icon.png", "masked-icon.svg"],
