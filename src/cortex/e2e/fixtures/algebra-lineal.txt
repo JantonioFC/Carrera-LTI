@@ -1,0 +1,17 @@
+Álgebra Lineal - Conceptos Fundamentales
+
+Una matriz es un arreglo rectangular de números dispuestos en filas y columnas.
+
+Operaciones básicas:
+- Suma: Se suman elemento a elemento. Solo posible entre matrices del mismo orden.
+- Multiplicación escalar: Cada elemento se multiplica por un escalar.
+- Producto matricial: A(m×n) * B(n×p) = C(m×p). No es conmutativo en general.
+
+Determinante: Valor escalar asociado a una matriz cuadrada.
+- det(AB) = det(A) * det(B)
+- Una matriz es invertible si y solo si su determinante es distinto de cero.
+
+Espacios vectoriales: Conjunto con operaciones de suma y producto escalar
+que satisfacen 8 axiomas (cerradura, asociatividad, conmutatividad, etc.)
+
+Transformaciones lineales: Funciones T: V→W que preservan la estructura del espacio.

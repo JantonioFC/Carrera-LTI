@@ -1,0 +1,18 @@
+Sistemas Operativos - Gestión de Procesos
+
+Un proceso es un programa en ejecución con su propio espacio de memoria.
+
+Estados de un proceso:
+- Nuevo: Proceso creado pero no admitido en el pool de procesos ejecutables.
+- Listo: Proceso en espera de ser asignado a un procesador.
+- Ejecutando: Instrucciones siendo ejecutadas en la CPU.
+- Esperando: Proceso en espera de un evento (E/S, señal).
+- Terminado: Proceso que terminó su ejecución.
+
+Scheduling (planificación):
+- FCFS (First-Come First-Served): No apropiativo, simple pero puede causar convoy.
+- SJF (Shortest Job First): Minimiza tiempo promedio de espera, difícil de predecir.
+- Round Robin: Apropiativo con quantum de tiempo, bueno para sistemas interactivos.
+- Priority Scheduling: Cada proceso tiene prioridad; posible starvation.
+
+Context switch: Guardar el estado del proceso actual y restaurar el del siguiente.

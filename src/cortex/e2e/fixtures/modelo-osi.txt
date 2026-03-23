@@ -1,0 +1,13 @@
+Modelo OSI - 7 Capas
+
+El modelo OSI (Open Systems Interconnection) define 7 capas de red:
+
+1. Física: Transmisión de bits en el medio físico (cables, señales).
+2. Enlace de datos: Control de acceso al medio, detección de errores (Ethernet, Wi-Fi).
+3. Red: Enrutamiento de paquetes entre redes (IP, ICMP).
+4. Transporte: Control de flujo, confiabilidad extremo a extremo (TCP, UDP).
+5. Sesión: Gestión de sesiones y diálogos entre aplicaciones.
+6. Presentación: Codificación, cifrado y compresión de datos.
+7. Aplicación: Interfaz con aplicaciones del usuario (HTTP, FTP, DNS).
+
+Nemotécnica: "Personas Del Norte Trabajan Sus Proyectos Activamente".
