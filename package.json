@@ -73,7 +73,7 @@
 		"vitest": "^4.1.0"
 	},
 	"overrides": {
-		"serialize-javascript": "^6.0.2",
+		"serialize-javascript": "7.0.3",
 		"@tailwindcss/vite": {
 			"vite": "^8.0.0"
 		},
