@@ -1,8 +1,20 @@
-import { contextBridge } from "electron";
+import { contextBridge, ipcRenderer } from "electron";
 
 /**
- * API expuesta al Renderer Process.
- * Fase A: objeto vacío tipado — se extiende en Fases B-E.
- * El Renderer detecta su presencia para saber si corre en Electron.
+ * API expuesta al Renderer Process vía contextBridge.
+ *
+ * Fase A: base vacía
+ * Fase B: agrega config.set / config.get
+ * Fase C+: agrega index, query, transcribe, observer
+ *
+ * Regla de seguridad: nunca exponer ipcRenderer directamente.
+ * Solo wrappers explícitos de ipcRenderer.invoke().
  */
-contextBridge.exposeInMainWorld("cortexAPI", {});
+contextBridge.exposeInMainWorld("cortexAPI", {
+	config: {
+		set: (key: string, value: string): Promise<void> =>
+			ipcRenderer.invoke("config:set", key, value),
+		get: (key: string): Promise<string | null> =>
+			ipcRenderer.invoke("config:get", key),
+	},
+});

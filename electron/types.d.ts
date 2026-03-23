@@ -2,14 +2,22 @@
  * Tipos del contextBridge expuestos al Renderer Process.
  * Se extiende en cada fase de la migración Electron.
  *
- * Fase A: API vacía — solo permite detectar si la app corre en Electron.
- * Fase B: agrega cortexAPI.config
- * Fase C: agrega cortexAPI.index, cortexAPI.query
- * Fase D: agrega cortexAPI.processDocument, cortexAPI.transcribe
- * Fase E: agrega cortexAPI.observer
+ * Fase A: base vacía
+ * Fase B: config.set / config.get ← actual
+ * Fase C: index, query
+ * Fase D: processDocument, transcribe
+ * Fase E: observer
  */
+
+export interface ConfigAPI {
+	/** Persiste una clave de configuración (API key, token, etc.) de forma cifrada. */
+	set(key: string, value: string): Promise<void>;
+	/** Recupera una clave de configuración. Retorna null si no existe. */
+	get(key: string): Promise<string | null>;
+}
+
 export interface CortexAPI {
-	// Extender en fases B-E
+	config: ConfigAPI;
 }
 
 declare global {
