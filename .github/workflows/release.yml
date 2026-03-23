@@ -99,7 +99,7 @@ jobs:
         with:
           name: installer-${{ matrix.os }}
           path: |
-            dist-electron/${{ matrix.artifact }}
+            dist-electron/release/${{ matrix.artifact }}
           retention-days: 7
 
   # ── Job 3: Crear GitHub Release con los instaladores ─────────────────────
