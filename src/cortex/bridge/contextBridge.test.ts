@@ -16,9 +16,11 @@ function buildMockCortexAPI() {
 	return {
 		config: {
 			set: vi
-				.fn<[string, string], Promise<void>>()
+				.fn<(key: string, value: string) => Promise<void>>()
 				.mockResolvedValue(undefined),
-			get: vi.fn<[string], Promise<string | null>>().mockResolvedValue(null),
+			get: vi
+				.fn<(key: string) => Promise<string | null>>()
+				.mockResolvedValue(null),
 		},
 	};
 }
@@ -57,6 +59,8 @@ describe("contextBridge — contrato cortexAPI.config (Fase B)", () => {
 	it("should_not_expose_window_electron_in_renderer", () => {
 		// nodeIntegration: false + contextIsolation: true garantizan esto.
 		// Este test verifica que el entorno de test no lo expone tampoco.
-		expect((window as Record<string, unknown>).electron).toBeUndefined();
+		expect(
+			(window as unknown as Record<string, unknown>).electron,
+		).toBeUndefined();
 	});
 });
