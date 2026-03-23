@@ -1,5 +1,15 @@
 import { execSync } from "node:child_process";
-import { copyFileSync, existsSync, readFileSync, writeFileSync } from "node:fs";
+import { createHash } from "node:crypto";
+import {
+	chmodSync,
+	copyFileSync,
+	existsSync,
+	mkdirSync,
+	readFileSync,
+	writeFileSync,
+} from "node:fs";
+import { writeFile } from "node:fs/promises";
+import { homedir } from "node:os";
 import { join } from "node:path";
 import {
 	cancel,
@@ -101,6 +111,103 @@ function checkGitignore() {
 		return true;
 	}
 	return true; // Asumimos seguro si no hay gitignore
+}
+
+// --- RuVector ---
+
+const RUVECTOR_VERSION = "0.1.0";
+const RUVECTOR_DIR = join(homedir(), ".carrera-lti", "bin");
+const RUVECTOR_BIN = join(
+	RUVECTOR_DIR,
+	process.platform === "win32" ? "ruvector.exe" : "ruvector",
+);
+
+const PLATFORM_MAP = {
+	linux: "linux-x64",
+	darwin: "darwin-x64",
+	win32: "win32-x64",
+};
+
+// SHA-256 de cada binario — se actualiza con cada release de RuVector.
+// "0000..." es un placeholder hasta que exista el primer release real.
+const SHA256 = {
+	"linux-x64":
+		"0000000000000000000000000000000000000000000000000000000000000000",
+	"darwin-x64":
+		"0000000000000000000000000000000000000000000000000000000000000000",
+	"win32-x64":
+		"0000000000000000000000000000000000000000000000000000000000000000",
+};
+
+async function installRuVector() {
+	if (existsSync(RUVECTOR_BIN)) {
+		note(`RuVector ya instalado en ${pc.cyan(RUVECTOR_BIN)}`);
+		return;
+	}
+
+	const platform = PLATFORM_MAP[process.platform];
+	if (!platform) {
+		note(
+			pc.yellow(
+				`Plataforma ${process.platform} no soportada. Instala RuVector manualmente.`,
+			),
+		);
+		return;
+	}
+
+	const shouldInstall = await confirm({
+		message:
+			"RuVector (motor de búsqueda semántica) no está instalado. ¿Descargarlo ahora?",
+		initialValue: true,
+	});
+
+	if (isCancel(shouldInstall) || !shouldInstall) {
+		note(
+			pc.yellow(
+				"RuVector no instalado. La búsqueda semántica no estará disponible.",
+			),
+		);
+		return;
+	}
+
+	const s = spinner();
+	s.start("Descargando RuVector...");
+
+	try {
+		mkdirSync(RUVECTOR_DIR, { recursive: true });
+
+		const ext = process.platform === "win32" ? ".exe" : "";
+		const url = `https://github.com/JantonioFC/Carrera-LTI/releases/download/ruvector-${RUVECTOR_VERSION}/ruvector-${platform}${ext}`;
+		const res = await fetch(url);
+		if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+
+		const buffer = await res.arrayBuffer();
+		const bytes = new Uint8Array(buffer);
+
+		// Verificar checksum SHA-256
+		const hash = createHash("sha256").update(bytes).digest("hex");
+		const expected = SHA256[platform];
+		if (hash !== expected) {
+			throw new Error(
+				`Checksum inválido: esperado ${expected}, obtenido ${hash}`,
+			);
+		}
+
+		await writeFile(RUVECTOR_BIN, bytes);
+
+		if (process.platform !== "win32") {
+			chmodSync(RUVECTOR_BIN, 0o755);
+		}
+
+		s.stop(`RuVector instalado en ${pc.cyan(RUVECTOR_BIN)}`);
+	} catch (err) {
+		s.stop(pc.red(`Error al descargar RuVector: ${err.message}`));
+		note(
+			pc.yellow(
+				`Descarga manual desde:\nhttps://github.com/JantonioFC/Carrera-LTI/releases/tag/ruvector-${RUVECTOR_VERSION}`,
+			),
+		);
+	}
 }
 
 // --- Main Script ---
@@ -275,6 +382,9 @@ Redirect URI: ${pc.cyan("http://localhost:5173/")} (¡No olvides la barra final!
 			note(".env añadido a .gitignore.");
 		}
 	}
+
+	// 6. RuVector
+	await installRuVector();
 
 	outro(pc.green("Tu sistema está listo para operar en Estado de Flow."));
 

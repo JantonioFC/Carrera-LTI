@@ -1,13 +1,26 @@
+import { existsSync } from "node:fs";
+import { homedir } from "node:os";
 import { join } from "node:path";
 import { app, BrowserWindow, ipcMain } from "electron";
+import { SubprocessAdapter } from "../src/cortex/subprocess/SubprocessAdapter";
 import {
 	type ConfigStore,
 	makeConfigHandlers,
 } from "./handlers/configHandlers";
+import { makeRuVectorHandlers } from "./handlers/ruVectorHandlers";
+import { StdioTransport } from "./transports/StdioTransport";
 
 const DEV_URL = "http://localhost:5173";
 const PROD_HTML = join(__dirname, "../dist/index.html");
 const isDev = !app.isPackaged;
+
+// Ruta del binario RuVector instalado por npm run setup
+const RUVECTOR_BIN = join(
+	homedir(),
+	".carrera-lti",
+	"bin",
+	process.platform === "win32" ? "ruvector.exe" : "ruvector",
+);
 
 // ── Store de configuración ────────────────────────────────────────────────────
 // electron-store se importa dinámicamente para compatibilidad con ESM.
@@ -34,6 +47,32 @@ async function initStore() {
 	}
 
 	return store;
+}
+
+// ── RuVector ─────────────────────────────────────────────────────────────────
+// Registra los handlers IPC solo si el binario está instalado.
+// Si no está, los canales no se registran y el renderer recibe un error
+// de Electron al invocarlos (comportamiento esperado hasta instalar).
+function initRuVector(): void {
+	if (!existsSync(RUVECTOR_BIN)) {
+		console.warn(
+			`[RuVector] binario no encontrado en ${RUVECTOR_BIN}. Ejecuta: npm run setup`,
+		);
+		return;
+	}
+
+	const transport = new StdioTransport(RUVECTOR_BIN);
+	const adapter = new SubprocessAdapter({ name: "ruvector", transport });
+	const ruVector = makeRuVectorHandlers(adapter);
+
+	ipcMain.handle("cortex:index", (_event, docPath: string) =>
+		ruVector.cortexIndex(docPath),
+	);
+	ipcMain.handle("cortex:query", (_event, text: string, topK?: number) =>
+		ruVector.cortexQuery(text, topK),
+	);
+
+	console.log("[RuVector] handlers registrados");
 }
 
 // ── Ventana principal ─────────────────────────────────────────────────────────
@@ -67,6 +106,8 @@ app.whenReady().then(async () => {
 		config.configSet(key, value),
 	);
 	ipcMain.handle("config:get", (_event, key: string) => config.configGet(key));
+
+	initRuVector();
 
 	createWindow();
 

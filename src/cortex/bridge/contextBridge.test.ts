@@ -22,6 +22,14 @@ function buildMockCortexAPI() {
 				.fn<(key: string) => Promise<string | null>>()
 				.mockResolvedValue(null),
 		},
+		cortex: {
+			index: vi
+				.fn<(docPath: string) => Promise<{ chunks: number }>>()
+				.mockResolvedValue({ chunks: 0 }),
+			query: vi
+				.fn<(text: string, topK?: number) => Promise<unknown[]>>()
+				.mockResolvedValue([]),
+		},
 	};
 }
 
@@ -62,5 +70,42 @@ describe("contextBridge — contrato cortexAPI.config (Fase B)", () => {
 		expect(
 			(window as unknown as Record<string, unknown>).electron,
 		).toBeUndefined();
+	});
+});
+
+describe("contextBridge — contrato cortexAPI.cortex (Fase C)", () => {
+	let api: ReturnType<typeof buildMockCortexAPI>;
+
+	beforeEach(() => {
+		api = buildMockCortexAPI();
+	});
+
+	it("should_expose_cortex_index_as_function", () => {
+		expect(typeof api.cortex.index).toBe("function");
+	});
+
+	it("should_expose_cortex_query_as_function", () => {
+		expect(typeof api.cortex.query).toBe("function");
+	});
+
+	it("should_cortex_index_accept_docpath_and_return_chunks", async () => {
+		api.cortex.index.mockResolvedValueOnce({ chunks: 12 });
+		const result = await api.cortex.index("/docs/tesis.pdf");
+		expect(result.chunks).toBe(12);
+		expect(api.cortex.index).toHaveBeenCalledWith("/docs/tesis.pdf");
+	});
+
+	it("should_cortex_query_return_array", async () => {
+		api.cortex.query.mockResolvedValueOnce([
+			{
+				chunkId: "c1",
+				score: 0.95,
+				content: "fragmento relevante",
+				docId: "d1",
+			},
+		]);
+		const results = await api.cortex.query("que es el three-way handshake");
+		expect(Array.isArray(results)).toBe(true);
+		expect(results).toHaveLength(1);
 	});
 });
