@@ -121,19 +121,18 @@ export const useAetherStore = create<AetherState & AetherActions>()(
 				getGraphData: () => {
 					const { notes } = get();
 					const nodes = notes.map((n) => ({ id: n.id, name: n.title, val: 1 }));
+					// O(n) index: title → id para evitar notes.find() dentro del bucle (#67)
+					const titleMap = new Map(
+						notes.map((n) => [n.title.toLowerCase(), n.id]),
+					);
 					const links: GraphLink[] = [];
 
-					notes.forEach((note) => {
-						const referencedTitles = extractLinks(note.content);
-						referencedTitles.forEach((targetTitle) => {
-							const targetNote = notes.find(
-								(n) => n.title.toLowerCase() === targetTitle.toLowerCase(),
-							);
-							if (targetNote) {
-								links.push({ source: note.id, target: targetNote.id });
-							}
-						});
-					});
+					for (const note of notes) {
+						for (const targetTitle of extractLinks(note.content)) {
+							const targetId = titleMap.get(targetTitle.toLowerCase());
+							if (targetId) links.push({ source: note.id, target: targetId });
+						}
+					}
 
 					return { nodes, links };
 				},
@@ -143,11 +142,11 @@ export const useAetherStore = create<AetherState & AetherActions>()(
 					const currentNote = getNote(nodeId);
 					if (!currentNote) return [];
 
+					const titleLower = currentNote.title.toLowerCase();
 					return notes.filter((n) => {
 						if (n.id === nodeId) return false;
-						const refs = extractLinks(n.content);
-						return refs.some(
-							(ref) => ref.toLowerCase() === currentNote.title.toLowerCase(),
+						return extractLinks(n.content).some(
+							(ref) => ref.toLowerCase() === titleLower,
 						);
 					});
 				},

@@ -51,15 +51,21 @@ export default function AetherVault() {
 	);
 
 	useEffect(() => {
+		let cancelled = false;
 		const fetchSimilar = async () => {
 			if (activeNote?.embedding && activeNote.content.length > 10) {
 				const results = await semanticSearch(activeNote.content, 5);
-				setSimilarNotes(results.filter((n) => n.id !== activeNoteId));
+				if (!cancelled)
+					setSimilarNotes(results.filter((n) => n.id !== activeNoteId));
 			} else {
-				setSimilarNotes([]);
+				if (!cancelled) setSimilarNotes([]);
 			}
 		};
 		fetchSimilar();
+		// Cancelar si la nota activa cambia antes de que termine la búsqueda (#71)
+		return () => {
+			cancelled = true;
+		};
 	}, [
 		activeNoteId,
 		activeNote?.embedding,
@@ -205,8 +211,12 @@ export default function AetherVault() {
 			}
 		};
 		window.addEventListener("resize", updateDimensions);
-		setTimeout(updateDimensions, 100);
-		return () => window.removeEventListener("resize", updateDimensions);
+		// Cancelar el timer en cleanup para evitar memory leak (#79)
+		const timer = setTimeout(updateDimensions, 100);
+		return () => {
+			window.removeEventListener("resize", updateDimensions);
+			clearTimeout(timer);
+		};
 	}, []);
 
 	return (

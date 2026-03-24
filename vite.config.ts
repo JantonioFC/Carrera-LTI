@@ -61,11 +61,16 @@ export default defineConfig({
 		port: 5173,
 	},
 	build: {
-		cssMinify: false,
+		cssMinify: true,
 		rollupOptions: {
 			output: {
 				manualChunks(id) {
 					if (id.includes("@google/genai")) return "vendor-ai";
+					if (id.includes("@blocknote")) return "vendor-blocknote";
+					if (id.includes("@xyflow") || id.includes("react-flow"))
+						return "vendor-xyflow";
+					if (id.includes("react-force-graph") || id.includes("three"))
+						return "vendor-3d";
 					if (
 						[
 							"framer-motion",

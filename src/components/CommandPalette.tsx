@@ -1,6 +1,7 @@
 import { BrainCircuit, Database, FileText, Search, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { SEARCH_DEBOUNCE_MS } from "../config/app.config";
 import { useNexusDB } from "../hooks/useNexusDB";
 import { useNexusStore } from "../store/nexusStore";
 
@@ -12,9 +13,16 @@ export function CommandPalette({
 	onClose: () => void;
 }) {
 	const [query, setQuery] = useState("");
+	const [debouncedQuery, setDebouncedQuery] = useState("");
 	const { documents } = useNexusStore();
 	const { allDatabases } = useNexusDB();
 	const navigate = useNavigate();
+
+	// Debounce para evitar filtrados en cada keystroke (#70)
+	useEffect(() => {
+		const timer = setTimeout(() => setDebouncedQuery(query), SEARCH_DEBOUNCE_MS);
+		return () => clearTimeout(timer);
+	}, [query]);
 
 	const navigateTo = (path: string) => {
 		navigate(path);
@@ -39,10 +47,10 @@ export function CommandPalette({
 	if (!isOpen) return null;
 
 	const filteredDocs = documents
-		.filter((d) => d.title.toLowerCase().includes(query.toLowerCase()))
+		.filter((d) => d.title.toLowerCase().includes(debouncedQuery.toLowerCase()))
 		.slice(0, 5);
 	const filteredDbs = allDatabases
-		.filter((d) => d.name.toLowerCase().includes(query.toLowerCase()))
+		.filter((d) => d.name.toLowerCase().includes(debouncedQuery.toLowerCase()))
 		.slice(0, 5);
 
 	return (
@@ -73,7 +81,7 @@ export function CommandPalette({
 				{/* Results Body */}
 				<div className="max-h-[60vh] overflow-y-auto p-2">
 					{/* Section: Acciones Rápidas */}
-					{query.length === 0 && (
+					{debouncedQuery.length === 0 && (
 						<div className="mb-4">
 							<div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 px-3">
 								Acciones Rápidas
@@ -124,7 +132,7 @@ export function CommandPalette({
 					)}
 
 					{/* Section: Documentos */}
-					{(query.length > 0 || documents.length > 0) && (
+					{(debouncedQuery.length > 0 || documents.length > 0) && (
 						<div className="mb-4">
 							<div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 px-3">
 								Documentos Blocks
@@ -153,7 +161,7 @@ export function CommandPalette({
 					)}
 
 					{/* Section: Bases de Datos */}
-					{(query.length > 0 || allDatabases.length > 0) && (
+					{(debouncedQuery.length > 0 || allDatabases.length > 0) && (
 						<div className="mb-4">
 							<div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 px-3">
 								Tablas / Bases de Datos
