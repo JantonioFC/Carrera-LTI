@@ -1,16 +1,35 @@
-# 0002: Patrón Reducer para Gestión de Estado Complejo
+# 0002: Gestión de Estado con Zustand (reemplaza useReducer)
 
 ## Estado
-Aceptado
+Aceptado — Actualizado en v2.x, revisado en v3.4.0
 
 ## Contexto
-Tanto `useAether` como `useNexus` acumulaban mucha lógica manejando múltiples estados mediante `useState` por separado (`notes`, `chatHistory`, etc.). Cuando varias piezas de estado cambian en respuesta de un solo evento, `useState` puede resultar en renderizados adicionales e inconsistencias.
+Originalmente se planificó usar `useReducer` + Context para el estado global de Aether y Nexus. La lógica de transición de estado era compleja (múltiples campos de `AppData` actualizados en respuesta a un solo evento) y `useState` producía renderizados adicionales e inconsistencias.
 
 ## Decisión
-- Refactorizar el estado complejo en `useReducer` cuando el siguiente estado dependa fuertemente del estado anterior en contextos globales.
-- Esta decisión afecta principalmente a los Context Providers, no a los subsistemas locales de componentes UI menores.
-- Utilizar el tipo `Result<T, Error>` en operaciones asíncronas de la capa de datos para controlar rigurosamente el flujo de errores e impedir crasheos en la UI.
+**Zustand** reemplazó a `useReducer` como gestor de estado global. Se mantienen dos stores principales:
+
+| Store | Archivo | Persistencia |
+|---|---|---|
+| `aetherStore` | `src/store/aetherStore.ts` | IndexedDB via `idb-keyval` |
+| `nexusStore` | `src/store/nexusStore.ts` | IndexedDB via Yjs + `y-indexeddb` |
+
+### Razones del cambio
+
+- Zustand elimina el boilerplate de actions/dispatch/reducers sin sacrificar aislamiento de estado.
+- La persistencia con `idb-keyval` supera el límite de `localStorage` (~5 MB) y soporta datos binarios (embeddings).
+- El patrón de selectores de Zustand (`useAetherStore(s => s.notes)`) evita renderizados innecesarios de forma nativa.
+
+### Invariantes mantenidos del ADR original
+
+- El estado complejo (listas de notas, embeddings, historial de chat) sigue aislado de la lógica de componentes UI.
+- Las operaciones asíncronas usan el tipo `Result<T, Error>` de `src/utils/result.ts` para control de errores sin crasheos en UI.
 
 ## Consecuencias
-- **Positivas**: La lógica de transición de estado queda aislada de la lógica del componente, facilitando las pruebas unitarias puras. Las llamadas asíncronas son predecibles.
-- **Negativas**: Aumenta levemente el boilerplate (acciones, dispatch, tipado complejo).
+
+- **Positivas**: Menor boilerplate, mejor DX, soporte nativo de devtools. Las pruebas unitarias mockean Zustand directamente sin Context providers.
+- **Negativas**: La hidratación asíncrona desde IDB introduce una ventana breve donde el store está vacío (mitigada con estado inicial explícito).
+
+## Notas
+- `nexusStore` usa `Y.Doc` + `IndexeddbPersistence` de Yjs para sincronización de documentos ricos (BlockNote).
+- `aetherStore` tiene test suite completa en `src/store/aetherStore.test.ts`.
