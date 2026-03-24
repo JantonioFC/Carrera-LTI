@@ -44,3 +44,24 @@ jobs:
 
     - name: Typecheck and Build
       run: npm run build
+
+  e2e:
+    name: E2E Tests (grounding + fixtures)
+    runs-on: ubuntu-latest
+    needs: build-and-test
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 20.x
+        cache: npm
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run E2E tests (grounding + fixtures, sin binarios)
+      run: E2E=false npx vitest run src/cortex/e2e/
+      # E2E=false → los tests de subprocesos reales se saltean (describe.skipIf),
+      # pero los tests de GroundingValidator y fixtures siempre corren.
