@@ -1,3 +1,4 @@
+import { useAetherStore } from "../../store/aetherStore";
 import { ObserverAIToggle } from "../observer/ObserverAIToggle";
 import { useObserverIPC } from "../observer/useObserverIPC";
 import { type CortexActivity, useCortexStore } from "./cortexStore";
@@ -33,7 +34,14 @@ export function CortexTab() {
 	const indexedDocCount = useCortexStore((s) => s.indexedDocCount);
 	const lastIndexedAt = useCortexStore((s) => s.lastIndexedAt);
 	const activity = useCortexStore((s) => s.activity);
-	const { onStart, onStop } = useObserverIPC();
+	const addNote = useAetherStore((s) => s.addNote);
+	const updateNote = useAetherStore((s) => s.updateNote);
+	const ingestNote = useAetherStore((s) => s.ingestNote);
+	const { onStart, onStop } = useObserverIPC({
+		addNote,
+		updateNote,
+		ingestNote,
+	});
 	const isElectron = typeof window.cortexAPI !== "undefined";
 
 	return (

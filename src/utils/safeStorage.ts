@@ -4,6 +4,7 @@
  */
 
 import type { ZodType } from "zod";
+import { logger } from "./logger";
 import { err, ok, type Result } from "./result";
 
 /**
@@ -26,8 +27,9 @@ export function parseJSON<T>(key: string): Result<T, Error> {
 export function safeParseJSON<T>(key: string, fallback: T): T {
 	const result = parseJSON<T>(key);
 	if (result.ok) return result.value;
-	console.warn(
-		`[safeStorage] Error leyendo "${key}" de localStorage, usando fallback.`,
+	logger.warn(
+		"safeStorage",
+		`Error leyendo "${key}" de localStorage, usando fallback.`,
 	);
 	return fallback;
 }
@@ -46,8 +48,9 @@ export function parseSessionJSON<T>(key: string): Result<T, Error> {
 export function safeParseSessionJSON<T>(key: string, fallback: T): T {
 	const result = parseSessionJSON<T>(key);
 	if (result.ok) return result.value;
-	console.warn(
-		`[safeStorage] Error leyendo "${key}" de sessionStorage, usando fallback.`,
+	logger.warn(
+		"safeStorage",
+		`Error leyendo "${key}" de sessionStorage, usando fallback.`,
 	);
 	return fallback;
 }
@@ -84,7 +87,7 @@ export function safeParseValidatedJSON<T>(
 ): T {
 	const result = parseValidatedJSON(key, schema);
 	if (result.ok) return result.value;
-	console.warn(`[safeStorage] ${result.error.message}. Usando fallback.`);
+	logger.warn("safeStorage", `${result.error.message}. Usando fallback.`);
 	return fallback;
 }
 

@@ -1,4 +1,5 @@
 import { GoogleGenAI } from "@google/genai";
+import { logger } from "./logger";
 
 /**
  * Generates an embedding vector for a given text using Gemini.
@@ -17,7 +18,7 @@ export async function generateEmbedding(
 		});
 		return response.embeddings?.[0]?.values || null;
 	} catch (error) {
-		console.error("Error generating embedding:", error);
+		logger.error("Embeddings", "Error generating embedding", error);
 		return null;
 	}
 }

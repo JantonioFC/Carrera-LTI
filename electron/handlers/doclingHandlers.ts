@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import type { SubprocessAdapter } from "../../src/cortex/subprocess/SubprocessAdapter";
+import type { SubprocessAdapter } from "../subprocess/SubprocessAdapter";
 
 /**
  * Handlers de Docling para ipcMain.

@@ -1,28 +1,14 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-
-// Mocks de dependencias del store (deben ir antes del import del store)
-vi.mock("idb-keyval", () => ({
-	get: vi.fn().mockResolvedValue(undefined),
-	set: vi.fn().mockResolvedValue(undefined),
-	del: vi.fn().mockResolvedValue(undefined),
-}));
-
-vi.mock("../../utils/security", () => ({
-	obfuscate: vi.fn((v: string) => Promise.resolve(v)),
-	deobfuscate: vi.fn((v: unknown) =>
-		Promise.resolve(typeof v === "string" ? v : null),
-	),
-}));
+import { afterEach, describe, expect, it, vi } from "vitest";
+import type { AetherNoteId } from "../../store/aetherStore";
 
 import { renderHook } from "@testing-library/react";
-import { useAetherStore } from "../../store/aetherStore";
 import { useObserverIPC } from "./useObserverIPC";
 
 /**
  * Tests de integración: pipeline Observer → Transcribe → Aether.
- * Se mockea window.cortexAPI y se usa el store real para verificar
- * que la nota queda efectivamente guardada en el estado.
- * Ref: Issue #88 — v3.3.0 Testing Coverage
+ * Los callbacks de Aether se inyectan como mocks — no se depende del store
+ * concreto, lo que valida el desacoplamiento del Issue #90.
+ * Ref: Issue #88 / #90 — v3.3.0 / v3.4.0
  */
 
 function makeCortexAPI(
@@ -47,61 +33,57 @@ function makeCortexAPI(
 	};
 }
 
-function resetStore() {
-	useAetherStore.setState({
-		notes: [],
-		chatHistory: [],
-		geminiApiKey: "",
-		gmailClientId: "",
-		gmailApiKey: "",
-	});
+function makeCallbacks() {
+	return {
+		addNote: vi.fn((title: string) => ({ id: `note_${title}` as AetherNoteId })),
+		updateNote: vi.fn(),
+		ingestNote: vi.fn().mockResolvedValue(undefined),
+	};
 }
 
-beforeEach(() => {
-	resetStore();
-});
-
 afterEach(() => {
-	resetStore();
 	vi.restoreAllMocks();
 	delete (window as unknown as { cortexAPI?: unknown }).cortexAPI;
 });
 
-// ─── onStart ────────────────────────────────────────────────────────────────
+// --- onStart ----------------------------------------------------------------
 
 describe("useObserverIPC — onStart", () => {
 	it("llama a observer.toggle(true)", async () => {
 		const api = makeCortexAPI();
 		(window as unknown as { cortexAPI: typeof api }).cortexAPI = api;
 
-		const { result } = renderHook(() => useObserverIPC());
+		const cb = makeCallbacks();
+		const { result } = renderHook(() => useObserverIPC(cb));
 		await result.current.onStart();
 
 		expect(api.observer.toggle).toHaveBeenCalledWith(true);
 	});
 
 	it("es no-op si cortexAPI no está disponible", async () => {
-		// sin asignar window.cortexAPI
-		const { result } = renderHook(() => useObserverIPC());
+		const cb = makeCallbacks();
+		const { result } = renderHook(() => useObserverIPC(cb));
 		await expect(result.current.onStart()).resolves.toBeUndefined();
 	});
 });
 
-// ─── onStop ─────────────────────────────────────────────────────────────────
+// --- onStop -----------------------------------------------------------------
 
 describe("useObserverIPC — onStop", () => {
 	it("llama a observer.toggle(false)", async () => {
 		const api = makeCortexAPI({ toggleResult: { wavPath: undefined } });
 		(window as unknown as { cortexAPI: typeof api }).cortexAPI = api;
 
-		const { result } = renderHook(() => useObserverIPC());
+		const cb = makeCallbacks();
+		const { result } = renderHook(() => useObserverIPC(cb));
 		await result.current.onStop();
 
 		expect(api.observer.toggle).toHaveBeenCalledWith(false);
 	});
 
 	it("es no-op si cortexAPI no está disponible", async () => {
-		const { result } = renderHook(() => useObserverIPC());
+		const cb = makeCallbacks();
+		const { result } = renderHook(() => useObserverIPC(cb));
 		await expect(result.current.onStop()).resolves.toBeUndefined();
 	});
 
@@ -109,7 +91,8 @@ describe("useObserverIPC — onStop", () => {
 		const api = makeCortexAPI({ toggleResult: { wavPath: undefined } });
 		(window as unknown as { cortexAPI: typeof api }).cortexAPI = api;
 
-		const { result } = renderHook(() => useObserverIPC());
+		const cb = makeCallbacks();
+		const { result } = renderHook(() => useObserverIPC(cb));
 		await result.current.onStop();
 
 		expect(api.cortex.transcribe).not.toHaveBeenCalled();
@@ -122,13 +105,14 @@ describe("useObserverIPC — onStop", () => {
 		});
 		(window as unknown as { cortexAPI: typeof api }).cortexAPI = api;
 
-		const { result } = renderHook(() => useObserverIPC());
+		const cb = makeCallbacks();
+		const { result } = renderHook(() => useObserverIPC(cb));
 		await result.current.onStop();
 
 		expect(api.cortex.transcribe).toHaveBeenCalledWith("/tmp/clase.wav");
 	});
 
-	it("crea una nota en aetherStore con el texto transcripto", async () => {
+	it("llama a addNote y updateNote con el texto transcripto", async () => {
 		const texto = "El three-way handshake consta de SYN, SYN-ACK y ACK.";
 		const api = makeCortexAPI({
 			toggleResult: { wavPath: "/tmp/clase.wav" },
@@ -136,51 +120,58 @@ describe("useObserverIPC — onStop", () => {
 		});
 		(window as unknown as { cortexAPI: typeof api }).cortexAPI = api;
 
-		const { result } = renderHook(() => useObserverIPC());
+		const cb = makeCallbacks();
+		const { result } = renderHook(() => useObserverIPC(cb));
 		await result.current.onStop();
 
-		const { notes } = useAetherStore.getState();
-		expect(notes).toHaveLength(1);
-		expect(notes[0].content).toBe(texto);
+		expect(cb.addNote).toHaveBeenCalledWith(expect.stringMatching(/^Clase /));
+		expect(cb.updateNote).toHaveBeenCalledWith(expect.any(String), {
+			content: texto,
+		});
 	});
 
-	it("el título de la nota incluye 'Clase' y una fecha", async () => {
+	it("llama a ingestNote con el id de la nota creada", async () => {
 		const api = makeCortexAPI({
 			toggleResult: { wavPath: "/tmp/clase.wav" },
-			transcribeResult: { text: "contenido de la clase" },
+			transcribeResult: { text: "contenido válido" },
 		});
 		(window as unknown as { cortexAPI: typeof api }).cortexAPI = api;
 
-		const { result } = renderHook(() => useObserverIPC());
+		const noteId = "note_test_123" as AetherNoteId;
+		const cb = makeCallbacks();
+		cb.addNote.mockReturnValue({ id: noteId as AetherNoteId });
+
+		const { result } = renderHook(() => useObserverIPC(cb));
 		await result.current.onStop();
 
-		const { notes } = useAetherStore.getState();
-		expect(notes[0].title).toMatch(/^Clase /);
+		expect(cb.ingestNote).toHaveBeenCalledWith(noteId);
 	});
 
-	it("no crea nota si el texto transcripto está vacío", async () => {
+	it("no llama a addNote si el texto transcripto está vacío", async () => {
 		const api = makeCortexAPI({
 			toggleResult: { wavPath: "/tmp/silencio.wav" },
 			transcribeResult: { text: "   " },
 		});
 		(window as unknown as { cortexAPI: typeof api }).cortexAPI = api;
 
-		const { result } = renderHook(() => useObserverIPC());
+		const cb = makeCallbacks();
+		const { result } = renderHook(() => useObserverIPC(cb));
 		await result.current.onStop();
 
-		expect(useAetherStore.getState().notes).toHaveLength(0);
+		expect(cb.addNote).not.toHaveBeenCalled();
 	});
 
-	it("no crea nota si el texto transcripto está vacío (string vacío)", async () => {
+	it("no llama a addNote si el texto transcripto es string vacío", async () => {
 		const api = makeCortexAPI({
 			toggleResult: { wavPath: "/tmp/vacio.wav" },
 			transcribeResult: { text: "" },
 		});
 		(window as unknown as { cortexAPI: typeof api }).cortexAPI = api;
 
-		const { result } = renderHook(() => useObserverIPC());
+		const cb = makeCallbacks();
+		const { result } = renderHook(() => useObserverIPC(cb));
 		await result.current.onStop();
 
-		expect(useAetherStore.getState().notes).toHaveLength(0);
+		expect(cb.addNote).not.toHaveBeenCalled();
 	});
 });

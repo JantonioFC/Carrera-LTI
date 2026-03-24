@@ -1,4 +1,4 @@
-import { useAetherStore } from "../../store/aetherStore";
+import { type AetherNoteId, useAetherStore } from "../../store/aetherStore";
 
 /**
  * Hook que conecta el ObserverAIToggle con la API IPC de Electron.
@@ -13,15 +13,30 @@ import { useAetherStore } from "../../store/aetherStore";
  *
  * En modo web (sin window.cortexAPI) las funciones son no-ops.
  *
+ * Los callbacks de Aether se inyectan desde el componente padre para
+ * desacoplar este hook del store concreto (Issue #90).
+ *
  * Ref: RFC-002 §4.4 Fase E — Issue #58
  */
-export function useObserverIPC(): {
+
+export interface ObserverIPCCallbacks {
+	addNote: (title: string) => { id: AetherNoteId };
+	updateNote: (id: AetherNoteId, data: { content: string }) => void;
+	ingestNote: (id: AetherNoteId) => Promise<void>;
+}
+
+export function useObserverIPC(callbacks?: ObserverIPCCallbacks): {
 	onStart: () => Promise<void>;
 	onStop: () => Promise<void>;
 } {
-	const addNote = useAetherStore((s) => s.addNote);
-	const updateNote = useAetherStore((s) => s.updateNote);
-	const ingestNote = useAetherStore((s) => s.ingestNote);
+	// Si no se inyectan callbacks, los tomamos del store (compatibilidad)
+	const storeAddNote = useAetherStore((s) => s.addNote);
+	const storeUpdateNote = useAetherStore((s) => s.updateNote);
+	const storeIngestNote = useAetherStore((s) => s.ingestNote);
+
+	const addNote = callbacks?.addNote ?? storeAddNote;
+	const updateNote = callbacks?.updateNote ?? storeUpdateNote;
+	const ingestNote = callbacks?.ingestNote ?? storeIngestNote;
 
 	const onStart = async (): Promise<void> => {
 		const api = window.cortexAPI;

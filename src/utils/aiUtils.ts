@@ -1,5 +1,6 @@
 import type { GoogleGenAI } from "@google/genai";
 import type { ZodType } from "zod";
+import { logger } from "./logger";
 import { err, ok, type Result } from "./result";
 
 /**
@@ -32,8 +33,9 @@ export async function generateContentWithRetry(
 			if (isRetryable && attempt < maxRetries - 1) {
 				attempt++;
 				const delayMs = 2 ** (attempt - 1) * 1000 + Math.random() * 500; // Exponential backoff with jitter
-				console.warn(
-					`[Gemini API] Error ${status || "Network"}. Intento ${attempt}/${maxRetries} en ${Math.round(delayMs)}ms...`,
+				logger.warn(
+					"Gemini",
+					`Error ${status || "Network"}. Intento ${attempt}/${maxRetries} en ${Math.round(delayMs)}ms...`,
 				);
 				await new Promise((resolve) => setTimeout(resolve, delayMs));
 			} else {
