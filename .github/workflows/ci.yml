@@ -8,11 +8,16 @@ on:
 
 jobs:
   build-and-test:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
 
     strategy:
       matrix:
-        node-version: [20.x] # Use current active LTS
+        node-version: [18.x, 20.x]
+        os: [ubuntu-latest, macos-latest]
+      include:
+        - os: ubuntu-latest
+          node-version: 20.x
+          run-gitleaks: true
 
     steps:
     - uses: actions/checkout@v4
@@ -24,11 +29,12 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-        
+
     - name: Install dependencies
       run: npm ci
-      
+
     - name: Secret scanning (gitleaks)
+      if: matrix.run-gitleaks == true
       uses: gitleaks/gitleaks-action@v2
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -38,6 +44,14 @@ jobs:
       
     - name: Run tests
       run: npm run test
+
+    - name: Cache Python venv
+      uses: actions/cache@v4
+      with:
+        path: ~/.carrera-lti/venv
+        key: python-venv-${{ runner.os }}-${{ hashFiles('scripts/requirements*.txt', 'scripts/setup.py', 'scripts/*.py') }}
+        restore-keys: |
+          python-venv-${{ runner.os }}-
 
     - name: Python syntax check (Fase D runners)
       run: python3 -m py_compile scripts/docling_runner.py scripts/whisper_runner.py scripts/observer_runner.py
