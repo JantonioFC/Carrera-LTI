@@ -1,7 +1,7 @@
 # ADR-003: Estrategia de RAG Local y Embeddings
 
 ## Estatus
-Implementado — v3.x
+Implementado — v3.4.0
 
 ## Contexto
 Para que el asistente IA en **Aether Vault** tenga contexto sobre las notas del usuario, se necesita un mecanismo eficiente de recuperación. Enviar todas las notas en cada prompt no escala (ventana de contexto + costo de tokens).

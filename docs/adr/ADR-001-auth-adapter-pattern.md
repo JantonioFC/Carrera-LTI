@@ -1,7 +1,7 @@
 # ADR-001: Patrón de Adaptador para Autenticación e Integraciones
 
 ## Estatus
-Parcialmente implementado — v3.x
+Parcialmente implementado — v3.4.0
 
 ## Contexto
 La aplicación **Carrera LTI** usa Firebase para autenticación y sincronización cloud, y la API de Gmail para el widget de correo. Acoplar directamente los SDKs externos en hooks de React dificulta el testing y crea vendor lock-in.

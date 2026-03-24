@@ -1,7 +1,7 @@
 # ADR-002: Validación de Esquemas en Capa de Sincronización
 
 ## Estatus
-Implementado — v3.x
+Implementado — v3.4.0
 
 ## Contexto
 La aplicación sincroniza datos entre:
