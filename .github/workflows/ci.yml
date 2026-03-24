@@ -16,7 +16,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    
+      with:
+        fetch-depth: 0  # Requerido por gitleaks para escanear el historial completo
+
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v4
       with:
@@ -26,6 +28,11 @@ jobs:
     - name: Install dependencies
       run: npm ci
       
+    - name: Secret scanning (gitleaks)
+      uses: gitleaks/gitleaks-action@v2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
     - name: Check Formatting & Lint (Biome)
       run: npm run lint
       

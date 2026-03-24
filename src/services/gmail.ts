@@ -1,7 +1,82 @@
 /**
  * GmailService: Handles Google Identity Services (GSI) and Gmail API (GAPI)
  * for client-side inbox monitoring.
+ *
+ * Type declarations for Google APIs loaded via <script> tag. Issue #64
  */
+
+interface GoogleOAuthTokenResponse {
+	error?: string;
+}
+
+interface GoogleOAuthTokenClient {
+	callback: ((resp: GoogleOAuthTokenResponse) => void) | string;
+	requestAccessToken(opts: { prompt: string }): void;
+}
+
+interface GapiMessageHeader {
+	name: string;
+	value: string;
+}
+
+interface GapiMessageDetail {
+	result: {
+		snippet: string;
+		payload: { headers: GapiMessageHeader[] };
+	};
+}
+
+interface GapiMessageListResult {
+	result: { messages: Array<{ id: string; threadId: string }> };
+}
+
+interface GapiToken {
+	access_token: string;
+}
+
+interface GapiClient {
+	init(config: { apiKey: string; discoveryDocs: string[] }): Promise<void>;
+	getToken(): GapiToken | null;
+	setToken(token: string): void;
+	gmail: {
+		users: {
+			messages: {
+				list(params: {
+					userId: string;
+					q: string;
+					maxResults: number;
+				}): Promise<GapiMessageListResult>;
+				get(params: { userId: string; id: string }): Promise<GapiMessageDetail>;
+			};
+		};
+	};
+}
+
+interface Gapi {
+	load(
+		lib: string,
+		callbacks: { callback: () => void; onerror: (e: unknown) => void },
+	): void;
+	client: GapiClient;
+}
+
+interface GoogleAccounts {
+	oauth2: {
+		initTokenClient(config: {
+			client_id: string;
+			scope: string;
+			callback: string;
+		}): GoogleOAuthTokenClient;
+		revoke(token: string, done?: () => void): void;
+	};
+}
+
+declare global {
+	interface Window {
+		gapi: Gapi;
+		google: { accounts: GoogleAccounts };
+	}
+}
 
 export interface GmailMessage {
 	id: string;
@@ -14,7 +89,7 @@ export interface GmailMessage {
 
 export class GmailService {
 	private static instance: GmailService;
-	private tokenClient: any = null;
+	private tokenClient: GoogleOAuthTokenClient | null = null;
 	private gapiInitialized = false;
 	private gisInitialized = false;
 
@@ -36,14 +111,14 @@ export class GmailService {
 		try {
 			// 1. Initialize GAPI
 			if (!this.gapiInitialized) {
-				await new Promise((resolve, reject) => {
-					(window as any).gapi.load("client", {
-						callback: resolve,
+				await new Promise<void>((resolve, reject) => {
+					window.gapi.load("client", {
+						callback: () => resolve(),
 						onerror: reject,
 					});
 				});
 
-				await (window as any).gapi.client.init({
+				await window.gapi.client.init({
 					apiKey: apiKey,
 					discoveryDocs: [
 						"https://www.googleapis.com/discovery/v1/apis/gmail/v1/rest",
@@ -75,9 +150,10 @@ export class GmailService {
 	public async authenticate(): Promise<void> {
 		if (!this.tokenClient) throw new Error("Google GIS client not initialized");
 
+		const client = this.tokenClient;
 		return new Promise((resolve, reject) => {
 			try {
-				this.tokenClient.callback = async (resp: any) => {
+				client.callback = async (resp: GoogleOAuthTokenResponse) => {
 					if (resp.error !== undefined) {
 						reject(resp);
 					}
@@ -85,10 +161,10 @@ export class GmailService {
 				};
 
 				// Request access token
-				if ((window as any).gapi.client.getToken() === null) {
-					this.tokenClient.requestAccessToken({ prompt: "consent" });
+				if (window.gapi.client.getToken() === null) {
+					client.requestAccessToken({ prompt: "consent" });
 				} else {
-					this.tokenClient.requestAccessToken({ prompt: "" });
+					client.requestAccessToken({ prompt: "" });
 				}
 			} catch (err) {
 				reject(err);
@@ -103,9 +179,7 @@ export class GmailService {
 		if (!this.gapiInitialized) throw new Error("GAPI not initialized");
 
 		try {
-			const response = await (
-				window as any
-			).gapi.client.gmail.users.messages.list({
+			const response = await window.gapi.client.gmail.users.messages.list({
 				userId: "me",
 				q: "is:unread label:inbox",
 				maxResults: maxResults,
@@ -113,18 +187,22 @@ export class GmailService {
 
 			const messages = response.result.messages || [];
 			const detailedMessages = await Promise.all(
-				messages.map(async (m: any) => {
-					const detail = await (
-						window as any
-					).gapi.client.gmail.users.messages.get({
+				messages.map(async (m: { id: string; threadId: string }) => {
+					const detail = await window.gapi.client.gmail.users.messages.get({
 						userId: "me",
 						id: m.id,
 					});
 
 					const headers = detail.result.payload.headers;
-					const subject = headers.find((h: any) => h.name === "Subject")?.value;
-					const from = headers.find((h: any) => h.name === "From")?.value;
-					const date = headers.find((h: any) => h.name === "Date")?.value;
+					const subject = headers.find(
+						(h: GapiMessageHeader) => h.name === "Subject",
+					)?.value;
+					const from = headers.find(
+						(h: GapiMessageHeader) => h.name === "From",
+					)?.value;
+					const date = headers.find(
+						(h: GapiMessageHeader) => h.name === "Date",
+					)?.value;
 
 					return {
 						id: m.id,
@@ -145,14 +223,14 @@ export class GmailService {
 	}
 
 	public isAuthenticated(): boolean {
-		return (window as any).gapi?.client?.getToken() !== null;
+		return window.gapi?.client?.getToken() !== null;
 	}
 
 	public signOut(): void {
-		const token = (window as any).gapi?.client?.getToken();
+		const token = window.gapi?.client?.getToken();
 		if (token !== null) {
-			(window as any).google.accounts.oauth2.revoke(token.access_token);
-			(window as any).gapi.client.setToken("");
+			window.google.accounts.oauth2.revoke(token.access_token);
+			window.gapi.client.setToken("");
 		}
 	}
 }
