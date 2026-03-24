@@ -1,6 +1,9 @@
 import { CURRICULUM, TOTAL_CREDITS } from "../data/lti";
 import type { SubjectData } from "../hooks/useSubjectData";
 
+// Calculado una sola vez al cargar el módulo para evitar flatMap repetido (#69)
+const ALL_SUBJECTS = CURRICULUM.flatMap((s) => s.subjects);
+
 export interface ProgressStats {
 	totalApproved: number;
 	totalInProgress: number;
@@ -15,13 +18,13 @@ export interface SemesterAverage {
 export function calculateProgressStats(
 	data: Record<string, SubjectData>,
 ): ProgressStats {
-	const totalApproved = CURRICULUM.flatMap((s) => s.subjects)
-		.filter((s) => data[s.id]?.status === "aprobada")
-		.reduce((acc, s) => acc + s.credits, 0);
+	const totalApproved = ALL_SUBJECTS.filter(
+		(s) => data[s.id]?.status === "aprobada",
+	).reduce((acc, s) => acc + s.credits, 0);
 
-	const totalInProgress = CURRICULUM.flatMap((s) => s.subjects)
-		.filter((s) => data[s.id]?.status === "en_curso")
-		.reduce((acc, s) => acc + s.credits, 0);
+	const totalInProgress = ALL_SUBJECTS.filter(
+		(s) => data[s.id]?.status === "en_curso",
+	).reduce((acc, s) => acc + s.credits, 0);
 
 	const totalMissing = TOTAL_CREDITS - totalApproved - totalInProgress;
 

@@ -20,6 +20,9 @@ export interface SubprocessTransport {
 interface SubprocessAdapterOptions {
 	name: string;
 	transport: SubprocessTransport;
+	/** Timeouts específicos por acción (e.g. { transcribe: 120_000 }). (#78)
+	 *  Si una acción no tiene entrada aquí, se usa DEFAULT_TIMEOUT_MS. */
+	actionTimeouts?: Record<string, number>;
 }
 
 /**
@@ -32,10 +35,16 @@ interface SubprocessAdapterOptions {
 export class SubprocessAdapter {
 	private readonly name: string;
 	private readonly transport: SubprocessTransport;
+	private readonly actionTimeouts: Record<string, number>;
 
-	constructor({ name, transport }: SubprocessAdapterOptions) {
+	constructor({
+		name,
+		transport,
+		actionTimeouts = {},
+	}: SubprocessAdapterOptions) {
 		this.name = name;
 		this.transport = transport;
+		this.actionTimeouts = actionTimeouts;
 	}
 
 	/**
@@ -46,7 +55,8 @@ export class SubprocessAdapter {
 		req: AdapterRequest,
 		opts: RequestOptions = {},
 	): Promise<IPCMessage> {
-		const timeoutMs = opts.timeoutMs ?? DEFAULT_TIMEOUT_MS;
+		const timeoutMs =
+			opts.timeoutMs ?? this.actionTimeouts[req.action] ?? DEFAULT_TIMEOUT_MS;
 
 		const msg: IPCMessage = {
 			id: req.id,

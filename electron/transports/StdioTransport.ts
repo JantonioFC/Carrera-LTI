@@ -18,6 +18,7 @@ type SpawnFn = (
 
 export interface StdioTransportOptions {
 	timeoutMs?: number;
+	maxPending?: number;
 	spawnFn?: SpawnFn;
 }
 
@@ -31,9 +32,12 @@ export interface StdioTransportOptions {
  *
  * Ref: RFC-002 §4.4 Fase C — Issue #52
  */
+const DEFAULT_MAX_PENDING = 100;
+
 export class StdioTransport implements SubprocessTransport {
 	private readonly proc: ChildProcess;
 	private readonly timeoutMs: number;
+	private readonly maxPending: number;
 	private readonly pending = new Map<
 		string,
 		{ resolve: (msg: IPCMessage) => void; reject: (err: Error) => void }
@@ -45,6 +49,7 @@ export class StdioTransport implements SubprocessTransport {
 		opts: StdioTransportOptions = {},
 	) {
 		this.timeoutMs = opts.timeoutMs ?? DEFAULT_TIMEOUT_MS;
+		this.maxPending = opts.maxPending ?? DEFAULT_MAX_PENDING;
 		const spawnFn = opts.spawnFn ?? spawn;
 
 		this.proc = spawnFn(binaryPath, args, {
@@ -84,6 +89,12 @@ export class StdioTransport implements SubprocessTransport {
 	}
 
 	async send(msg: IPCMessage): Promise<IPCMessage> {
+		// Protección contra memory leak por acumulación de requests (#72)
+		if (this.pending.size >= this.maxPending) {
+			throw new Error(
+				`StdioTransport: pending queue llena (${this.maxPending}) — id=${msg.id}`,
+			);
+		}
 		return new Promise<IPCMessage>((resolve, reject) => {
 			const timer = setTimeout(() => {
 				this.pending.delete(msg.id);
