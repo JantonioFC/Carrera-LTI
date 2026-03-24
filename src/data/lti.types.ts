@@ -33,4 +33,3 @@ export interface Semester {
 	label: string;
 	subjects: Subject[];
 }
-

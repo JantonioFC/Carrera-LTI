@@ -37,7 +37,11 @@ export class SubprocessAdapter {
 	private readonly transport: SubprocessTransport;
 	private readonly actionTimeouts: Record<string, number>;
 
-	constructor({ name, transport, actionTimeouts = {} }: SubprocessAdapterOptions) {
+	constructor({
+		name,
+		transport,
+		actionTimeouts = {},
+	}: SubprocessAdapterOptions) {
 		this.name = name;
 		this.transport = transport;
 		this.actionTimeouts = actionTimeouts;

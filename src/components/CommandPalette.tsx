@@ -20,7 +20,10 @@ export function CommandPalette({
 
 	// Debounce para evitar filtrados en cada keystroke (#70)
 	useEffect(() => {
-		const timer = setTimeout(() => setDebouncedQuery(query), SEARCH_DEBOUNCE_MS);
+		const timer = setTimeout(
+			() => setDebouncedQuery(query),
+			SEARCH_DEBOUNCE_MS,
+		);
 		return () => clearTimeout(timer);
 	}, [query]);
 

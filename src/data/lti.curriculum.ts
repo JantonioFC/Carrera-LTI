@@ -725,4 +725,3 @@ export const CURRICULUM: Semester[] = [
 		],
 	},
 ];
-
