@@ -13,6 +13,7 @@ import type { Task } from "../pages/Tareas";
 import type { IAuthService, ISyncService } from "../services/types";
 import type { AetherNote } from "../store/aetherStore";
 import type { NexusDocument } from "../store/nexusStore";
+import { logger } from "./logger";
 
 const firebaseConfig = {
 	apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -33,7 +34,7 @@ try {
 	auth = getAuth(app);
 	db = getFirestore(app);
 } catch (error) {
-	console.warn("Firebase initialization failed:", error);
+	logger.warn("Firebase", "initialization failed", error);
 }
 
 export type AppData = {
@@ -64,7 +65,7 @@ class FirebaseAuthService implements IAuthService {
 			const result = await firebaseSignInAnonymously(auth);
 			return result.user.uid;
 		} catch (error) {
-			console.error("Anonymous sign-in failed:", error);
+			logger.error("Firebase", "Anonymous sign-in failed", error);
 			return null;
 		}
 	}
@@ -96,7 +97,7 @@ class FirebaseSyncService implements ISyncService {
 			);
 			return true;
 		} catch (error) {
-			console.error("Cloud sync failed:", error);
+			logger.error("Firebase", "Cloud sync failed", error);
 			return false;
 		}
 	}
@@ -112,7 +113,7 @@ class FirebaseSyncService implements ISyncService {
 				return data;
 			}
 		} catch (error) {
-			console.error("Failed to get data from cloud:", error);
+			logger.error("Firebase", "Failed to get data from cloud", error);
 		}
 		return null;
 	}

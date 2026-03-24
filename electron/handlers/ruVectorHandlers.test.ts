@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import type { SubprocessAdapter } from "../../src/cortex/subprocess/SubprocessAdapter";
+import type { SubprocessAdapter } from "../subprocess/SubprocessAdapter";
 import { makeRuVectorHandlers } from "./ruVectorHandlers";
 
 /**

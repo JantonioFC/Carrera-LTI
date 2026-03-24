@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { IPCMessage } from "../ipc/IPCProtocol";
+import type { IPCMessage } from "../../src/cortex/ipc/IPCProtocol";
 import { SubprocessAdapter } from "./SubprocessAdapter";
 
 /** Stub mínimo de un subproceso IPC */

@@ -1,5 +1,6 @@
 import { del, get, set } from "idb-keyval";
 import type { StateStorage } from "zustand/middleware";
+import { logger } from "./logger";
 import { deobfuscate, obfuscate } from "./security";
 
 export const idbStorage: StateStorage = {
@@ -28,7 +29,7 @@ export const idbStorage: StateStorage = {
 					localStorage.removeItem("lti_aether_vault");
 					localStorage.removeItem("lti_aether_chat");
 				} catch (e) {
-					console.error("Failed to migrate legacy Aether data", e);
+					logger.error("idbStorage", "Failed to migrate legacy Aether data", e);
 				}
 			}
 		}

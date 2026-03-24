@@ -6,7 +6,7 @@ import {
 import { createInterface } from "node:readline";
 import type { IPCMessage } from "../../src/cortex/ipc/IPCProtocol";
 import { parseIPCMessage } from "../../src/cortex/ipc/IPCProtocol";
-import type { SubprocessTransport } from "../../src/cortex/subprocess/SubprocessAdapter";
+import type { SubprocessTransport } from "../subprocess/SubprocessAdapter";
 
 const DEFAULT_TIMEOUT_MS = 30_000;
 

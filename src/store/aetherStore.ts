@@ -4,6 +4,7 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 import { findSimilarNotes, generateEmbedding } from "../utils/embeddings";
 import { idbStorage } from "../utils/idbStorage";
+import { logger } from "../utils/logger";
 
 export type AetherNoteId = `note_${string}`;
 export type ChatMessageId = `msg_${string}`;
@@ -245,7 +246,7 @@ export const useAetherStore = create<AetherState & AetherActions>()(
 							});
 						});
 					} catch (e) {
-						console.error("Failed to import notes", e);
+						logger.error("AetherStore", "Failed to import notes", e);
 					}
 				},
 			};

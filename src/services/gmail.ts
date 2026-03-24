@@ -4,6 +4,7 @@
  *
  * Type declarations for Google APIs loaded via <script> tag. Issue #64
  */
+import { logger } from "../utils/logger";
 
 interface GoogleOAuthTokenResponse {
 	error?: string;
@@ -139,7 +140,7 @@ export class GmailService {
 				this.gisInitialized = true;
 			}
 		} catch (error) {
-			console.error("GmailService initialization failed:", error);
+			logger.error("GmailService", "initialization failed", error);
 			throw error;
 		}
 	}
@@ -217,7 +218,7 @@ export class GmailService {
 
 			return detailedMessages;
 		} catch (error) {
-			console.error("Error fetching unread messages:", error);
+			logger.error("GmailService", "Error fetching unread messages", error);
 			throw error;
 		}
 	}

@@ -9,7 +9,7 @@ import {
 	safeStorage,
 	systemPreferences,
 } from "electron";
-import { SubprocessAdapter } from "../src/cortex/subprocess/SubprocessAdapter";
+import { logger } from "../src/utils/logger";
 import {
 	type ConfigStore,
 	makeConfigHandlers,
@@ -18,6 +18,7 @@ import { makeDoclingHandlers } from "./handlers/doclingHandlers";
 import { makeObserverHandlers } from "./handlers/observerHandlers";
 import { makeRuVectorHandlers } from "./handlers/ruVectorHandlers";
 import { makeWhisperHandlers } from "./handlers/whisperHandlers";
+import { SubprocessAdapter } from "./subprocess/SubprocessAdapter";
 import { StdioTransport } from "./transports/StdioTransport";
 
 const DEV_URL = "http://localhost:5173";
@@ -62,8 +63,9 @@ async function getEncryptionKey(): Promise<string> {
 	}
 
 	if (!safeStorage.isEncryptionAvailable()) {
-		console.warn(
-			"[Config] safeStorage no disponible. Configura CORTEX_MASTER_SECRET.",
+		logger.warn(
+			"Config",
+			"safeStorage no disponible. Configura CORTEX_MASTER_SECRET.",
 		);
 		// En CI o entornos sin keychain usamos una clave derivada del nombre del host
 		// (no ideal, pero evita el fallback a literal "dev-only-key").
@@ -118,8 +120,9 @@ let _whisperTransport: StdioTransport | null = null;
 // ── RuVector ─────────────────────────────────────────────────────────────────
 function initRuVector(): void {
 	if (!existsSync(RUVECTOR_BIN)) {
-		console.warn(
-			`[RuVector] binario no encontrado en ${RUVECTOR_BIN}. Ejecuta: npm run setup`,
+		logger.warn(
+			"RuVector",
+			`binario no encontrado en ${RUVECTOR_BIN}. Ejecuta: npm run setup`,
 		);
 		return;
 	}
@@ -138,14 +141,15 @@ function initRuVector(): void {
 		ruVector.cortexQuery(text, topK),
 	);
 
-	console.log("[RuVector] handlers registrados");
+	logger.info("RuVector", "handlers registrados");
 }
 
 // ── Docling ───────────────────────────────────────────────────────────────────
 function initDocling(): void {
 	if (!existsSync(VENV_PYTHON) || !existsSync(DOCLING_SCRIPT)) {
-		console.warn(
-			"[Docling] entorno Python no encontrado. Ejecuta: npm run setup",
+		logger.warn(
+			"Docling",
+			"entorno Python no encontrado. Ejecuta: npm run setup",
 		);
 		return;
 	}
@@ -164,14 +168,15 @@ function initDocling(): void {
 		docling.ocr(imagePath),
 	);
 
-	console.log("[Docling] handlers registrados");
+	logger.info("Docling", "handlers registrados");
 }
 
 // ── Whisper ───────────────────────────────────────────────────────────────────
 function initWhisper(): void {
 	if (!existsSync(VENV_PYTHON) || !existsSync(WHISPER_SCRIPT)) {
-		console.warn(
-			"[Whisper] entorno Python no encontrado. Ejecuta: npm run setup",
+		logger.warn(
+			"Whisper",
+			"entorno Python no encontrado. Ejecuta: npm run setup",
 		);
 		return;
 	}
@@ -189,14 +194,15 @@ function initWhisper(): void {
 			whisper.transcribe(wavPath, model),
 	);
 
-	console.log("[Whisper] handlers registrados");
+	logger.info("Whisper", "handlers registrados");
 }
 
 // ── Observer AI ───────────────────────────────────────────────────────────────
 function initObserver(): void {
 	if (!existsSync(VENV_PYTHON) || !existsSync(OBSERVER_SCRIPT)) {
-		console.warn(
-			"[Observer] entorno Python no encontrado. Ejecuta: npm run setup",
+		logger.warn(
+			"Observer",
+			"entorno Python no encontrado. Ejecuta: npm run setup",
 		);
 		return;
 	}
@@ -218,7 +224,7 @@ function initObserver(): void {
 
 	ipcMain.handle("observer:status", () => observer.status());
 
-	console.log("[Observer] handlers registrados");
+	logger.info("Observer", "handlers registrados");
 }
 
 // ── Ventana principal ─────────────────────────────────────────────────────────
