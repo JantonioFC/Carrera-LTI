@@ -16,7 +16,7 @@ function approveAll(grade = 8): Record<string, SubjectData> {
 	const data: Record<string, SubjectData> = {};
 	for (const sem of CURRICULUM) {
 		for (const sub of sem.subjects) {
-			data[sub.id] = { status: "aprobada", grade };
+			data[sub.id] = { status: "aprobada", grade, resources: [] };
 		}
 	}
 	return data;
@@ -26,7 +26,7 @@ function approveAll(grade = 8): Record<string, SubjectData> {
 function someInProgress(ids: string[]): Record<string, SubjectData> {
 	const data: Record<string, SubjectData> = {};
 	for (const id of ids) {
-		data[id] = { status: "en_curso" };
+		data[id] = { status: "en_curso", resources: [] };
 	}
 	return data;
 }
@@ -66,7 +66,7 @@ describe("calculateProgressStats", () => {
 	it("status desconocido no cuenta como aprobada ni en_curso", () => {
 		const id = CURRICULUM[0].subjects[0].id;
 		const data: Record<string, SubjectData> = {
-			[id]: { status: "pendiente" },
+			[id]: { status: "pendiente", resources: [] },
 		};
 		const stats = calculateProgressStats(data);
 		expect(stats.totalApproved).toBe(0);
@@ -94,7 +94,7 @@ describe("calculateSemesterAverages", () => {
 		const sem = CURRICULUM[0];
 		const data: Record<string, SubjectData> = {};
 		for (const sub of sem.subjects) {
-			data[sub.id] = { status: "aprobada", grade: 10 };
+			data[sub.id] = { status: "aprobada", grade: 10, resources: [] };
 		}
 		const averages = calculateSemesterAverages(data);
 		expect(averages[0].Promedio).toBe(10);
@@ -104,7 +104,7 @@ describe("calculateSemesterAverages", () => {
 		const sem = CURRICULUM[0];
 		const data: Record<string, SubjectData> = {};
 		for (const sub of sem.subjects) {
-			data[sub.id] = { status: "aprobada" }; // sin grade
+			data[sub.id] = { status: "aprobada", resources: [] }; // sin grade
 		}
 		const averages = calculateSemesterAverages(data);
 		// Sin notas, el filtro excluye todas → Promedio 0
@@ -115,7 +115,11 @@ describe("calculateSemesterAverages", () => {
 		const sem = CURRICULUM[0];
 		const data: Record<string, SubjectData> = {};
 		sem.subjects.forEach((sub, i) => {
-			data[sub.id] = { status: "aprobada", grade: i % 2 === 0 ? 7 : 8 };
+			data[sub.id] = {
+				status: "aprobada",
+				grade: i % 2 === 0 ? 7 : 8,
+				resources: [],
+			};
 		});
 		const averages = calculateSemesterAverages(data);
 		const promedioStr = averages[0].Promedio.toString();
