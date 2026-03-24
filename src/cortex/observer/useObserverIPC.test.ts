@@ -1,7 +1,6 @@
+import { renderHook } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { AetherNoteId } from "../../store/aetherStore";
-
-import { renderHook } from "@testing-library/react";
 import { useObserverIPC } from "./useObserverIPC";
 
 /**
@@ -35,7 +34,9 @@ function makeCortexAPI(
 
 function makeCallbacks() {
 	return {
-		addNote: vi.fn((title: string) => ({ id: `note_${title}` as AetherNoteId })),
+		addNote: vi.fn((title: string) => ({
+			id: `note_${title}` as AetherNoteId,
+		})),
 		updateNote: vi.fn(),
 		ingestNote: vi.fn().mockResolvedValue(undefined),
 	};

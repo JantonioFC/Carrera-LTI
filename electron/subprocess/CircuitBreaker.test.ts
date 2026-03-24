@@ -119,9 +119,9 @@ describe("CircuitBreaker — HALF_OPEN", () => {
 	it("vuelve a OPEN si la llamada de prueba falla", async () => {
 		vi.useFakeTimers();
 		await openAndWait();
-		await cb.call(() => Promise.reject(new Error("still broken"))).catch(
-			() => {},
-		);
+		await cb
+			.call(() => Promise.reject(new Error("still broken")))
+			.catch(() => {});
 		expect(cb.getState()).toBe("OPEN");
 		vi.useRealTimers();
 	});

@@ -99,7 +99,10 @@ export class CircuitBreaker {
 
 	private onFailure(): void {
 		this.failureCount++;
-		if (this.state === "HALF_OPEN" || this.failureCount >= this.failureThreshold) {
+		if (
+			this.state === "HALF_OPEN" ||
+			this.failureCount >= this.failureThreshold
+		) {
 			this.state = "OPEN";
 			this.openedAt = Date.now();
 		}

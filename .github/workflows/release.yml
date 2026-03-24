@@ -117,10 +117,19 @@ jobs:
         with:
           path: installers/
 
+      - name: Generate SHA-256 checksums
+        run: |
+          cd installers
+          find . -type f \( -name "*.exe" -o -name "*.dmg" -o -name "*.AppImage" \) \
+            | sort | xargs sha256sum > SHA256SUMS.txt
+          cat SHA256SUMS.txt
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: installers/**/*
+          files: |
+            installers/**/*
+            installers/SHA256SUMS.txt
           generate_release_notes: true
           draft: false
           prerelease: ${{ contains(github.ref_name, '-beta') || contains(github.ref_name, '-rc') }}

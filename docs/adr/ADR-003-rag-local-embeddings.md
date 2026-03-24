@@ -1,19 +1,47 @@
 # ADR-003: Estrategia de RAG Local y Embeddings
 
 ## Estatus
-Propuesto
+Implementado — v3.x
 
 ## Contexto
-Para mejorar las capacidades de la IA en **Aether Vault**, necesitamos que el asistente tenga contexto sobre las notas del usuario. Dado que las notas pueden ser extensas y numerosas, no es eficiente enviar todas las notas en cada prompt (problema de ventana de contexto y tokens).
+Para que el asistente IA en **Aether Vault** tenga contexto sobre las notas del usuario, se necesita un mecanismo eficiente de recuperación. Enviar todas las notas en cada prompt no escala (ventana de contexto + costo de tokens).
 
 ## Decisión
-Implementaremos un sistema de **RAG (Retrieval Augmented Generation)** con las siguientes características:
-1. **Generación de Embeddings**: Utilizaremos el modelo `text-embedding-004` de Gemini para convertir el contenido de las notas en vectores de 768 dimensiones.
-2. **Almacenamiento**: Los vectores se guardarán directamente en el objeto `AetherNote` dentro de `IndexedDB` (vía Zustand persist).
-3. **Búsqueda Semántica**: Se implementará búsqueda por similitud de coseno (cosine similarity) en el frontend para recuperar las $k$ notas más relevantes según el prompt del usuario.
-4. **Contexto Dinámico**: El `AetherChat` inyectará automáticamente los fragmentos de las notas recuperadas en el "System Instruction" antes de enviar la consulta al LLM.
+Sistema de **RAG (Retrieval Augmented Generation)** completamente local:
+
+### Implementación actual
+
+| Componente | Archivo | Descripción |
+|---|---|---|
+| Generación de embeddings | `src/utils/embeddings.ts` | `text-embedding-004` de Gemini, 768 dimensiones |
+| Almacenamiento | `src/store/aetherStore.ts` (`AetherNote.embedding`) | Vector guardado en el objeto nota en IDB |
+| Búsqueda semántica | `src/utils/embeddings.ts` — `findSimilarNotes()` | Cosine similarity en el frontend |
+| Ingesta | `aetherStore.ingestNote()` | Genera embedding y lo persiste |
+| Contexto dinámico | `src/utils/aiUtils.ts` — `buildRagContext()` | Inyecta fragmentos en el System Instruction |
+
+### Flujo completo
+
+```
+Usuario escribe nota
+  → ingestNote(id) → embeddings.ts → Gemini API → vector[768]
+  → AetherNote.embedding guardado en IDB
+
+Usuario escribe mensaje en AetherChat
+  → buildRagContext(query, notes) → findSimilarNotes() → top-K notas
+  → System Instruction += fragmentos recuperados
+  → Gemini LLM responde con contexto personalizado
+```
+
+### Integración con Cortex (v3.x)
+
+`cortex:index` (RuVector) indexa también documentos externos (PDF, DOCX via Docling) en un índice vectorial separado. El contexto RAG de Aether (notas personales) y el de Cortex (documentos) son complementarios.
 
 ## Consecuencias
-- **Positivas**: Respuestas mucho más precisas y personalizadas, ahorro de tokens, mayor privacidad (la búsqueda ocurre localmente).
-- **Neutras**: Necesidad de regenerar embeddings cuando una nota es editada (se hará de forma asíncrona).
-- **Negativas**: Mayor uso de almacenamiento local (mínimo, ~3KB por nota para el vector).
+
+- **Positivas**: Respuestas personalizadas con contexto del usuario, ahorro de tokens, privacidad (búsqueda 100% local).
+- **Neutras**: Embedding se regenera asincrónicamente al editar una nota.
+- **Negativas**: ~3KB extra por nota en IDB para el vector (despreciable a escala actual).
+
+## Notas
+- Tests completos en `src/utils/embeddings.test.ts`.
+- La búsqueda vectorial de Cortex (documentos) corre en el subproceso `ruvector` (proceso separado), no en el renderer.
