@@ -103,9 +103,7 @@ describe("GmailService.initialize", () => {
 	it("inicializa el tokenClient con el clientId", async () => {
 		const svc = GmailService.getInstance();
 		await svc.initialize("my-client-id", "api-key");
-		expect(
-			window.google.accounts.oauth2.initTokenClient,
-		).toHaveBeenCalledWith(
+		expect(window.google.accounts.oauth2.initTokenClient).toHaveBeenCalledWith(
 			expect.objectContaining({ client_id: "my-client-id" }),
 		);
 	});
@@ -150,9 +148,7 @@ describe("GmailService.authenticate", () => {
 
 		// Simular que requestAccessToken dispara el callback con éxito
 		const tokenClient = (
-			window.google.accounts.oauth2.initTokenClient as ReturnType<
-				typeof vi.fn
-			>
+			window.google.accounts.oauth2.initTokenClient as ReturnType<typeof vi.fn>
 		).mock.results[0].value;
 		tokenClient.requestAccessToken = vi.fn(() => {
 			(tokenClient.callback as (r: { error?: string }) => void)({});
@@ -166,9 +162,7 @@ describe("GmailService.authenticate", () => {
 		await svc.initialize("client-id", "api-key");
 
 		const tokenClient = (
-			window.google.accounts.oauth2.initTokenClient as ReturnType<
-				typeof vi.fn
-			>
+			window.google.accounts.oauth2.initTokenClient as ReturnType<typeof vi.fn>
 		).mock.results[0].value;
 		tokenClient.requestAccessToken = vi.fn(() => {
 			(tokenClient.callback as (r: { error?: string }) => void)({
@@ -185,9 +179,7 @@ describe("GmailService.authenticate", () => {
 		await svc.initialize("client-id", "api-key");
 
 		const tokenClient = (
-			window.google.accounts.oauth2.initTokenClient as ReturnType<
-				typeof vi.fn
-			>
+			window.google.accounts.oauth2.initTokenClient as ReturnType<typeof vi.fn>
 		).mock.results[0].value;
 		tokenClient.requestAccessToken = vi.fn((opts: { prompt: string }) => {
 			expect(opts.prompt).toBe("consent");
@@ -205,9 +197,7 @@ describe("GmailService.authenticate", () => {
 		await svc.initialize("client-id", "api-key");
 
 		const tokenClient = (
-			window.google.accounts.oauth2.initTokenClient as ReturnType<
-				typeof vi.fn
-			>
+			window.google.accounts.oauth2.initTokenClient as ReturnType<typeof vi.fn>
 		).mock.results[0].value;
 		tokenClient.requestAccessToken = vi.fn((opts: { prompt: string }) => {
 			expect(opts.prompt).toBe("");
@@ -245,9 +235,9 @@ describe("GmailService.fetchUnreadMessages", () => {
 			{ name: "From", value: "prof@universidad.edu" },
 			{ name: "Date", value: "Mon, 24 Mar 2025" },
 		];
-		window.gapi.client.gmail.users.messages.list = vi
-			.fn()
-			.mockResolvedValue({ result: { messages: [{ id: "m1", threadId: "t1" }] } });
+		window.gapi.client.gmail.users.messages.list = vi.fn().mockResolvedValue({
+			result: { messages: [{ id: "m1", threadId: "t1" }] },
+		});
 		window.gapi.client.gmail.users.messages.get = vi.fn().mockResolvedValue({
 			result: {
 				snippet: "El examen será el viernes",
@@ -266,9 +256,9 @@ describe("GmailService.fetchUnreadMessages", () => {
 	});
 
 	it("usa '(Sin asunto)' cuando Subject no está en headers", async () => {
-		window.gapi.client.gmail.users.messages.list = vi
-			.fn()
-			.mockResolvedValue({ result: { messages: [{ id: "m2", threadId: "t2" }] } });
+		window.gapi.client.gmail.users.messages.list = vi.fn().mockResolvedValue({
+			result: { messages: [{ id: "m2", threadId: "t2" }] },
+		});
 		window.gapi.client.gmail.users.messages.get = vi.fn().mockResolvedValue({
 			result: {
 				snippet: "texto",
@@ -283,9 +273,9 @@ describe("GmailService.fetchUnreadMessages", () => {
 	});
 
 	it("usa 'Desconocido' cuando From no está en headers", async () => {
-		window.gapi.client.gmail.users.messages.list = vi
-			.fn()
-			.mockResolvedValue({ result: { messages: [{ id: "m3", threadId: "t3" }] } });
+		window.gapi.client.gmail.users.messages.list = vi.fn().mockResolvedValue({
+			result: { messages: [{ id: "m3", threadId: "t3" }] },
+		});
 		window.gapi.client.gmail.users.messages.get = vi.fn().mockResolvedValue({
 			result: {
 				snippet: "texto",
