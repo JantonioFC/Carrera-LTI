@@ -76,7 +76,7 @@ describe("findSimilarNotes", () => {
 	});
 
 	it("todos sin embedding devuelve array vacío", () => {
-		const noEmbed = [{ id: "x" }, { id: "y" }];
+		const noEmbed: { embedding?: number[] }[] = [{}, {}];
 		expect(findSimilarNotes([1, 0, 0], noEmbed, 5)).toEqual([]);
 	});
 });
