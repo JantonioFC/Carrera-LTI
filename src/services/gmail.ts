@@ -111,9 +111,9 @@ export class GmailService {
 		try {
 			// 1. Initialize GAPI
 			if (!this.gapiInitialized) {
-				await new Promise((resolve, reject) => {
+				await new Promise<void>((resolve, reject) => {
 					window.gapi.load("client", {
-						callback: resolve,
+						callback: () => resolve(),
 						onerror: reject,
 					});
 				});
@@ -150,9 +150,10 @@ export class GmailService {
 	public async authenticate(): Promise<void> {
 		if (!this.tokenClient) throw new Error("Google GIS client not initialized");
 
+		const client = this.tokenClient;
 		return new Promise((resolve, reject) => {
 			try {
-				this.tokenClient.callback = async (resp: GoogleOAuthTokenResponse) => {
+				client.callback = async (resp: GoogleOAuthTokenResponse) => {
 					if (resp.error !== undefined) {
 						reject(resp);
 					}
@@ -161,9 +162,9 @@ export class GmailService {
 
 				// Request access token
 				if (window.gapi.client.getToken() === null) {
-					this.tokenClient.requestAccessToken({ prompt: "consent" });
+					client.requestAccessToken({ prompt: "consent" });
 				} else {
-					this.tokenClient.requestAccessToken({ prompt: "" });
+					client.requestAccessToken({ prompt: "" });
 				}
 			} catch (err) {
 				reject(err);
