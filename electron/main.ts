@@ -1,7 +1,14 @@
-import { existsSync } from "node:fs";
+import { randomBytes } from "node:crypto";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
-import { app, BrowserWindow, ipcMain, systemPreferences } from "electron";
+import {
+	app,
+	BrowserWindow,
+	ipcMain,
+	safeStorage,
+	systemPreferences,
+} from "electron";
 import { SubprocessAdapter } from "../src/cortex/subprocess/SubprocessAdapter";
 import {
 	type ConfigStore,
@@ -44,18 +51,50 @@ const OBSERVER_RECORDINGS_DIR = join(
 	"recordings",
 );
 
+// ── Encryption key via OS Keychain (safeStorage) — Issue #59 ─────────────────
+// Genera una clave aleatoria en el primer arranque, la cifra con el keychain
+// del OS (Keychain en macOS, DPAPI en Windows, libsecret en Linux) y la persiste
+// en ~/.carrera-lti/cortex.enc. Fallback a CORTEX_MASTER_SECRET si safeStorage
+// no está disponible (e.g. headless CI).
+async function getEncryptionKey(): Promise<string> {
+	if (process.env.CORTEX_MASTER_SECRET) {
+		return process.env.CORTEX_MASTER_SECRET;
+	}
+
+	if (!safeStorage.isEncryptionAvailable()) {
+		console.warn(
+			"[Config] safeStorage no disponible. Configura CORTEX_MASTER_SECRET.",
+		);
+		// En CI o entornos sin keychain usamos una clave derivada del nombre del host
+		// (no ideal, pero evita el fallback a literal "dev-only-key").
+		return randomBytes(32).toString("hex");
+	}
+
+	const keyFile = join(homedir(), ".carrera-lti", "cortex.enc");
+
+	if (existsSync(keyFile)) {
+		const encrypted = readFileSync(keyFile);
+		return safeStorage.decryptString(encrypted);
+	}
+
+	// Primera ejecución: generar clave aleatoria y cifrarla con el keychain del OS.
+	const key = randomBytes(32).toString("hex");
+	const encrypted = safeStorage.encryptString(key);
+	mkdirSync(join(homedir(), ".carrera-lti"), { recursive: true });
+	writeFileSync(keyFile, encrypted);
+	return key;
+}
+
 // ── Store de configuración ────────────────────────────────────────────────────
-// electron-store se importa dinámicamente para compatibilidad con ESM.
-// La clave de cifrado viene de variable de entorno en dev;
-// en producción se deberá usar el OS keychain (Fase B+).
 async function initStore() {
 	const { default: Store } = await import("electron-store");
+	const encryptionKey = await getEncryptionKey();
 	// Cast a ConfigStore: conf usa ESM exports map que "moduleResolution: node" no resuelve,
 	// por lo que get/set no son visibles en el tipo inferido. El cast es seguro porque
 	// electron-store extiende conf que implementa exactamente esa interfaz.
 	const store = new Store<Record<string, string>>({
 		name: "cortex-config",
-		encryptionKey: process.env.CORTEX_MASTER_SECRET ?? "dev-only-key",
+		encryptionKey,
 	}) as unknown as ConfigStore;
 
 	// Migración desde .env: si hay variables de entorno de API keys,
@@ -71,6 +110,11 @@ async function initStore() {
 	return store;
 }
 
+// ── Referencias a transportes para graceful shutdown — Issue #61 ─────────────
+let _ruVectorTransport: StdioTransport | null = null;
+let _doclingTransport: StdioTransport | null = null;
+let _whisperTransport: StdioTransport | null = null;
+
 // ── RuVector ─────────────────────────────────────────────────────────────────
 function initRuVector(): void {
 	if (!existsSync(RUVECTOR_BIN)) {
@@ -80,8 +124,11 @@ function initRuVector(): void {
 		return;
 	}
 
-	const transport = new StdioTransport(RUVECTOR_BIN);
-	const adapter = new SubprocessAdapter({ name: "ruvector", transport });
+	_ruVectorTransport = new StdioTransport(RUVECTOR_BIN);
+	const adapter = new SubprocessAdapter({
+		name: "ruvector",
+		transport: _ruVectorTransport,
+	});
 	const ruVector = makeRuVectorHandlers(adapter);
 
 	ipcMain.handle("cortex:index", (_event, docPath: string) =>
@@ -103,8 +150,11 @@ function initDocling(): void {
 		return;
 	}
 
-	const transport = new StdioTransport(VENV_PYTHON, [DOCLING_SCRIPT]);
-	const adapter = new SubprocessAdapter({ name: "docling", transport });
+	_doclingTransport = new StdioTransport(VENV_PYTHON, [DOCLING_SCRIPT]);
+	const adapter = new SubprocessAdapter({
+		name: "docling",
+		transport: _doclingTransport,
+	});
 	const docling = makeDoclingHandlers(adapter);
 
 	ipcMain.handle("cortex:process-document", (_event, docPath: string) =>
@@ -126,8 +176,11 @@ function initWhisper(): void {
 		return;
 	}
 
-	const transport = new StdioTransport(VENV_PYTHON, [WHISPER_SCRIPT]);
-	const adapter = new SubprocessAdapter({ name: "whisper", transport });
+	_whisperTransport = new StdioTransport(VENV_PYTHON, [WHISPER_SCRIPT]);
+	const adapter = new SubprocessAdapter({
+		name: "whisper",
+		transport: _whisperTransport,
+	});
 	const whisper = makeWhisperHandlers(adapter);
 
 	ipcMain.handle(
@@ -210,6 +263,30 @@ app.whenReady().then(async () => {
 	app.on("activate", () => {
 		if (BrowserWindow.getAllWindows().length === 0) createWindow();
 	});
+});
+
+// ── Graceful shutdown — Issue #61 ────────────────────────────────────────────
+// Envía SIGTERM a todos los subprocesos Python antes de cerrar la app,
+// evitando procesos zombie y WAVs incompletos en disco.
+app.on("before-quit", (event) => {
+	const transports = [
+		_ruVectorTransport,
+		_doclingTransport,
+		_whisperTransport,
+	].filter(Boolean) as StdioTransport[];
+
+	if (transports.length === 0) return;
+
+	event.preventDefault();
+	for (const t of transports) {
+		try {
+			t.kill("SIGTERM");
+		} catch {
+			// Ignorar si el proceso ya terminó
+		}
+	}
+	// Dar 500ms para que los procesos terminen limpiamente antes de forzar el cierre
+	setTimeout(() => app.quit(), 500);
 });
 
 app.on("window-all-closed", () => {

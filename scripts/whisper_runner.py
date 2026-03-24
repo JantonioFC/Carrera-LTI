@@ -21,6 +21,26 @@ Ref: RFC-002 §4.4 Fase D — Issue #56
 import json
 import os
 import sys
+from pathlib import Path
+
+# Directorio de grabaciones — Issue #66
+_RECORDINGS_DIR = Path.home() / ".carrera-lti" / "observer" / "recordings"
+
+
+def _safe_delete_wav(wav_path: str) -> None:
+    """Elimina el WAV solo si está dentro del directorio de grabaciones permitido."""
+    try:
+        resolved = Path(wav_path).resolve()
+        if str(resolved).startswith(str(_RECORDINGS_DIR.resolve())):
+            os.remove(resolved)
+        else:
+            # Log a stderr (no interrumpe el flujo principal)
+            print(
+                f"[whisper] delete rechazado fuera de RECORDINGS_DIR: {resolved}",
+                file=sys.stderr,
+            )
+    except OSError:
+        pass  # No crítico si falla la eliminación
 
 
 def _respond(msg_id: str, status: str, data=None, error=None):
@@ -46,10 +66,7 @@ def _transcribe(msg_id: str, payload: dict):
         language = result.get("language", "unknown")
 
         # Eliminar el WAV tras transcripción exitosa (ADR-003: privacidad)
-        try:
-            os.remove(path)
-        except OSError:
-            pass  # No crítico si falla la eliminación
+        _safe_delete_wav(path)
 
         _respond(msg_id, "ok", {"text": text, "language": language})
     except ImportError:

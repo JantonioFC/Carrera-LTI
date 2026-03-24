@@ -5,7 +5,7 @@ import { deobfuscate, obfuscate } from "./security";
 export const idbStorage: StateStorage = {
 	getItem: async (name: string): Promise<string | null> => {
 		const rawVal = await get(name);
-		let val = deobfuscate(rawVal);
+		let val = await deobfuscate(rawVal);
 
 		// Auto-migration from legacy synchronous storage for Aether
 		if (!val && name === "aether-storage") {
@@ -36,7 +36,7 @@ export const idbStorage: StateStorage = {
 		return val || null;
 	},
 	setItem: async (name: string, value: string): Promise<void> => {
-		const obfuscatedValue = obfuscate(value);
+		const obfuscatedValue = await obfuscate(value);
 		await set(name, obfuscatedValue);
 	},
 	removeItem: async (name: string): Promise<void> => {

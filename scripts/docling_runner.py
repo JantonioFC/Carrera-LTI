@@ -18,6 +18,22 @@ Ref: RFC-002 §4.4 Fase D — Issue #55
 
 import json
 import sys
+from pathlib import Path
+
+# Directorios permitidos para procesar archivos — Issue #60
+_ALLOWED_ROOTS = [Path.home(), Path("/tmp"), Path("/var/folders")]
+
+
+def _validate_path(raw: str) -> Path:
+    """Valida que el path esté dentro de un directorio permitido (previene path traversal)."""
+    if not raw:
+        raise ValueError("path vacío")
+    resolved = Path(raw).resolve()
+    if not any(
+        str(resolved).startswith(str(root.resolve())) for root in _ALLOWED_ROOTS
+    ):
+        raise ValueError(f"path no permitido: {resolved}")
+    return resolved
 
 
 def _respond(msg_id: str, status: str, data=None, error=None):
@@ -33,9 +49,9 @@ def _process_document(msg_id: str, payload: dict):
     try:
         from docling.document_converter import DocumentConverter
 
-        path = payload.get("path", "")
+        path = _validate_path(payload.get("path", ""))
         converter = DocumentConverter()
-        result = converter.convert(path)
+        result = converter.convert(str(path))
         text = result.document.export_to_text()
         # Dividir en chunks de ~500 palabras para indexación
         words = text.split()
@@ -52,9 +68,9 @@ def _ocr(msg_id: str, payload: dict):
     try:
         from docling.document_converter import DocumentConverter
 
-        path = payload.get("path", "")
+        path = _validate_path(payload.get("path", ""))
         converter = DocumentConverter()
-        result = converter.convert(path)
+        result = converter.convert(str(path))
         text = result.document.export_to_text()
         _respond(msg_id, "ok", {"text": text})
     except ImportError:

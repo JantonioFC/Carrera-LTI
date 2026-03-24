@@ -72,6 +72,17 @@ export class StdioTransport implements SubprocessTransport {
 		}
 	}
 
+	/** Termina el subproceso y rechaza todos los requests pendientes. Issue #61 */
+	kill(signal: NodeJS.Signals = "SIGTERM"): void {
+		for (const [id, handler] of this.pending) {
+			handler.reject(
+				new Error(`StdioTransport: killed (${signal}) — id=${id}`),
+			);
+			this.pending.delete(id);
+		}
+		this.proc.kill(signal);
+	}
+
 	async send(msg: IPCMessage): Promise<IPCMessage> {
 		return new Promise<IPCMessage>((resolve, reject) => {
 			const timer = setTimeout(() => {
