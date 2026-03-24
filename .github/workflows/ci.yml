@@ -14,10 +14,10 @@ jobs:
       matrix:
         node-version: [18.x, 20.x]
         os: [ubuntu-latest, macos-latest]
-      include:
-        - os: ubuntu-latest
-          node-version: 20.x
-          run-gitleaks: true
+        include:
+          - os: ubuntu-latest
+            node-version: 20.x
+            run-gitleaks: true
 
     steps:
     - uses: actions/checkout@v4
