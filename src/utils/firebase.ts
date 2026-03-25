@@ -23,10 +23,18 @@ import type { NexusDocument } from "../store/nexusStore";
 import { logger } from "./logger";
 import type { CalendarEventsMap } from "./schemas";
 
+// Guard: solo inicializar Firebase si la clave API y el proyecto están configurados.
+// Las variables VITE_* se sustituyen en tiempo de compilación por Vite; si no están
+// presentes en .env, el bundle no contendrá credenciales reales. (#174)
+const FIREBASE_API_KEY = import.meta.env.VITE_FIREBASE_API_KEY;
+const FIREBASE_PROJECT_ID = import.meta.env.VITE_FIREBASE_PROJECT_ID;
+
+const hasFirebaseConfig = !!(FIREBASE_API_KEY && FIREBASE_PROJECT_ID);
+
 const firebaseConfig = {
-	apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+	apiKey: FIREBASE_API_KEY,
 	authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-	projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+	projectId: FIREBASE_PROJECT_ID,
 	storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
 	messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
 	appId: import.meta.env.VITE_FIREBASE_APP_ID,
@@ -37,12 +45,19 @@ let app: FirebaseApp | undefined;
 let auth: Auth | undefined;
 let db: Firestore | undefined;
 
-try {
-	app = initializeApp(firebaseConfig);
-	auth = getAuth(app);
-	db = getFirestore(app);
-} catch (error) {
-	logger.warn("Firebase", "initialization failed", error);
+if (hasFirebaseConfig) {
+	try {
+		app = initializeApp(firebaseConfig);
+		auth = getAuth(app);
+		db = getFirestore(app);
+	} catch (error) {
+		logger.warn("Firebase", "initialization failed", error);
+	}
+} else {
+	logger.warn(
+		"Firebase",
+		"VITE_FIREBASE_API_KEY no configurada — Firebase deshabilitado",
+	);
 }
 
 export type AppData = {

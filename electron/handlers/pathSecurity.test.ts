@@ -95,6 +95,15 @@ describe("pathSecurity — assertSafePath", () => {
 				/fuera de directorios permitidos/,
 			);
 		});
+
+		it("should_reject_path_with_homedir_as_prefix_but_different_dir", () => {
+			// Regresión #177: "/home/juan" no debe aceptar "/home/juanmalicioso/archivo"
+			// ya que solo es un prefijo de string, no un prefijo de directorio real.
+			const fakeParent = homedir() + "-malicioso";
+			expect(() => assertSafePath(join(fakeParent, "archivo.pdf"))).toThrow(
+				/fuera de directorios permitidos/,
+			);
+		});
 	});
 
 	describe("error messages", () => {

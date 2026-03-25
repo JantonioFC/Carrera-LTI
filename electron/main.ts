@@ -7,6 +7,7 @@ import {
 	BrowserWindow,
 	ipcMain,
 	safeStorage,
+	session,
 	systemPreferences,
 } from "electron";
 import { logger } from "../src/utils/logger";
@@ -90,7 +91,10 @@ async function getEncryptionKey(): Promise<string> {
 		// Fallback: persistir clave en disco con permisos restrictivos para que
 		// sea la misma entre arranques (evita pérdida de datos cifrados). (#144)
 		const fallbackKeyFile = join(homedir(), ".carrera-lti", "fallback.key");
-		mkdirSync(join(homedir(), ".carrera-lti"), { recursive: true });
+		mkdirSync(join(homedir(), ".carrera-lti"), {
+			recursive: true,
+			mode: 0o700,
+		}); // (#180)
 		if (existsSync(fallbackKeyFile)) {
 			return readFileSync(fallbackKeyFile, "utf-8").trim();
 		}
@@ -109,7 +113,7 @@ async function getEncryptionKey(): Promise<string> {
 	// Primera ejecución: generar clave aleatoria y cifrarla con el keychain del OS.
 	const key = randomBytes(32).toString("hex");
 	const encrypted = safeStorage.encryptString(key);
-	mkdirSync(join(homedir(), ".carrera-lti"), { recursive: true });
+	mkdirSync(join(homedir(), ".carrera-lti"), { recursive: true, mode: 0o700 }); // (#180)
 	writeFileSync(keyFile, encrypted);
 	return key;
 }
@@ -261,6 +265,34 @@ function initObserver(): void {
 	logger.info("Observer", "handlers registrados");
 }
 
+// ── CSP via main process — Issue #175 ─────────────────────────────────────────
+// El meta tag CSP en index.html es ignorado por Electron en rutas file://.
+// La única forma garantizada de aplicar CSP en Electron es vía onHeadersReceived.
+function setupCSP(): void {
+	session.defaultSession.webRequest.onHeadersReceived(
+		{ urls: ["<all_urls>"] },
+		(details, callback) => {
+			callback({
+				responseHeaders: {
+					...details.responseHeaders,
+					"Content-Security-Policy": [
+						[
+							"default-src 'self'",
+							"script-src 'self' 'unsafe-inline'", // unsafe-inline requerido por Vite chunks
+							"style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+							"font-src 'self' data: https://fonts.gstatic.com",
+							"img-src 'self' data: https:",
+							"connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com",
+							"object-src 'none'",
+							"frame-src 'none'",
+						].join("; "),
+					],
+				},
+			});
+		},
+	);
+}
+
 // ── Ventana principal ─────────────────────────────────────────────────────────
 function createWindow(): void {
 	const win = new BrowserWindow({
@@ -293,6 +325,7 @@ app.whenReady().then(async () => {
 	initWhisper();
 	initObserver();
 
+	setupCSP();
 	createWindow();
 
 	app.on("activate", () => {

@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ "main", "cortex/develop" ]
 
+permissions:
+  contents: read  # mínimo global; evita GITHUB_TOKEN con write por defecto (#178)
+
 jobs:
   build-and-test:
     runs-on: ${{ matrix.os }}
