@@ -6,7 +6,7 @@ Versionado semántico: [SemVer](https://semver.org/lang/es/).
 
 ---
 
-## [Unreleased] — v3.6.0
+## [v3.6.0] — 2026-03-25
 
 ### Added
 - `React.memo` en 6 subcomponentes presentacionales: `NexusSidebar`, `NexusTableView`, `NexusKanbanView`, `AetherContextPanel`, `AetherSidebar`, `KanbanColumn` (#151)
@@ -30,7 +30,7 @@ Versionado semántico: [SemVer](https://semver.org/lang/es/).
 
 ---
 
-## [v3.5.0] — 2026-03-xx
+## [v3.5.0] — 2026-03-24
 
 ### Added
 - JSDoc para 4 módulos de `src/cortex/` (#125)
