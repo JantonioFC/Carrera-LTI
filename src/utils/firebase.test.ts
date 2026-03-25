@@ -12,8 +12,10 @@ const mockGetAuth = vi.fn(() => ({}));
 
 vi.mock("firebase/auth", () => ({
 	getAuth: () => mockGetAuth(),
-	onAuthStateChanged: (auth: unknown, cb: (user: { uid: string } | null) => void) =>
-		mockOnAuthStateChanged(auth, cb),
+	onAuthStateChanged: (
+		auth: unknown,
+		cb: (user: { uid: string } | null) => void,
+	) => mockOnAuthStateChanged(auth, cb),
 	signInAnonymously: (auth: unknown) => mockSignInAnonymously(auth),
 }));
 
@@ -53,9 +55,11 @@ describe("authService", () => {
 	});
 
 	it("init — llama al callback con uid cuando hay usuario autenticado", async () => {
-		mockOnAuthStateChanged.mockImplementation((_auth: unknown, cb: (user: { uid: string } | null) => void) => {
-			cb({ uid: "test-uid-123" });
-		});
+		mockOnAuthStateChanged.mockImplementation(
+			(_auth: unknown, cb: (user: { uid: string } | null) => void) => {
+				cb({ uid: "test-uid-123" });
+			},
+		);
 
 		const { authService } = await import("./firebase");
 		const callback = vi.fn();
@@ -65,9 +69,11 @@ describe("authService", () => {
 	});
 
 	it("init — llama al callback con null cuando no hay usuario", async () => {
-		mockOnAuthStateChanged.mockImplementation((_auth: unknown, cb: (user: null) => void) => {
-			cb(null);
-		});
+		mockOnAuthStateChanged.mockImplementation(
+			(_auth: unknown, cb: (user: null) => void) => {
+				cb(null);
+			},
+		);
 
 		const { authService } = await import("./firebase");
 		const callback = vi.fn();
@@ -136,7 +142,10 @@ describe("syncService", () => {
 		// Re-import to get a fresh module instance where db initialization fails
 		vi.resetModules();
 		const { syncService: freshSyncService } = await import("./firebase");
-		const result = await freshSyncService.syncToCloud("user-1", baseData as never);
+		const result = await freshSyncService.syncToCloud(
+			"user-1",
+			baseData as never,
+		);
 
 		expect(result).toBe(false);
 	});

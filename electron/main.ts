@@ -10,10 +10,7 @@ import {
 	systemPreferences,
 } from "electron";
 import { logger } from "../src/utils/logger";
-import {
-	type ConfigStore,
-	initConfig,
-} from "./handlers/configHandlers";
+import { type ConfigStore, initConfig } from "./handlers/configHandlers";
 import { makeDoclingHandlers } from "./handlers/doclingHandlers";
 import { makeObserverHandlers } from "./handlers/observerHandlers";
 import { makeRuVectorHandlers } from "./handlers/ruVectorHandlers";

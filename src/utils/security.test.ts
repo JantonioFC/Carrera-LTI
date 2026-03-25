@@ -153,9 +153,7 @@ describe("security.ts", () => {
 
 	// 4b. deobfuscate(null)
 	it("deobfuscate(null) no lanza excepción", async () => {
-		await expect(
-			deobfuscate(null as unknown as string),
-		).resolves.not.toThrow();
+		await expect(deobfuscate(null as unknown as string)).resolves.not.toThrow();
 	});
 
 	// 4c. deobfuscate("") returns ""

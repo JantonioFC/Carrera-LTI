@@ -142,7 +142,7 @@ describe("idbStorage", () => {
 		});
 
 		it("no migra si el valor ya existe en IDB para aether-storage", async () => {
-			idbStore.set("aether-storage", "obf:{\"state\":{},\"version\":1}");
+			idbStore.set("aether-storage", 'obf:{"state":{},"version":1}');
 			localStorage.setItem("lti_aether_vault", JSON.stringify([{ id: "old" }]));
 
 			const result = await idbStorage.getItem("aether-storage");

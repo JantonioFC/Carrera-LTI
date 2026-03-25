@@ -134,9 +134,7 @@ describe("CURRICULUM — materias específicas", () => {
 	it("s1-3 es 'Fundamentos e Introducción a la Programación' con 10 créditos", () => {
 		const subject = CURRICULUM[0].subjects.find((s) => s.id === "s1-3");
 		expect(subject).toBeDefined();
-		expect(subject!.name).toBe(
-			"Fundamentos e Introducción a la Programación",
-		);
+		expect(subject!.name).toBe("Fundamentos e Introducción a la Programación");
 		expect(subject!.credits).toBe(10);
 	});
 

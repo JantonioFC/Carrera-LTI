@@ -30,8 +30,8 @@ vi.mock("../utils/aiUtils", () => ({
 
 // ---------------------------------------------------------------------------
 
+import { err, ok } from "../utils/result";
 import { AIBackendClient } from "./aiClient";
-import { ok, err } from "../utils/result";
 
 const dummyZodSchema = z.object({ answer: z.string() });
 const dummyGeminiSchema = {
@@ -182,7 +182,9 @@ describe("AIBackendClient", () => {
 
 			expect(result.ok).toBe(false);
 			if (!result.ok) {
-				expect((result.error as Error).message).toContain("Service Unavailable");
+				expect((result.error as Error).message).toContain(
+					"Service Unavailable",
+				);
 			}
 		});
 	});
@@ -242,7 +244,11 @@ describe("AIBackendClient", () => {
 
 	describe("askAetherStream — streaming", () => {
 		it("el callback onChunk recibe todos los chunks del stream", async () => {
-			const chunks = [{ text: "Hola" }, { text: ", " }, { text: "soy Aether." }];
+			const chunks = [
+				{ text: "Hola" },
+				{ text: ", " },
+				{ text: "soy Aether." },
+			];
 
 			async function* fakeStream() {
 				for (const chunk of chunks) {
@@ -253,10 +259,8 @@ describe("AIBackendClient", () => {
 			mockGenerateContentStream.mockResolvedValueOnce(fakeStream());
 
 			const received: string[] = [];
-			await client.askAetherStream(
-				"¿Quién eres?",
-				"Notas de prueba",
-				(text) => received.push(text),
+			await client.askAetherStream("¿Quién eres?", "Notas de prueba", (text) =>
+				received.push(text),
 			);
 
 			expect(received).toEqual(["Hola", ", ", "soy Aether."]);

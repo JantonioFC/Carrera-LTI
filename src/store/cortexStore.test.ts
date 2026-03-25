@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import {
-	useCortexStore,
 	type CortexActivity,
 	type CortexQueryResult,
+	useCortexStore,
 } from "../cortex/ui/cortexStore";
 
 function resetStore() {
@@ -135,9 +135,11 @@ describe("cortexStore — setQueryResults", () => {
 	});
 
 	it("setQueryResults con array vacío limpia los resultados", () => {
-		useCortexStore.getState().setQueryResults([
-			{ chunkId: "c1", docId: "d1", content: "x", score: 0.5 },
-		]);
+		useCortexStore
+			.getState()
+			.setQueryResults([
+				{ chunkId: "c1", docId: "d1", content: "x", score: 0.5 },
+			]);
 		useCortexStore.getState().setQueryResults([]);
 		expect(useCortexStore.getState().queryResults).toEqual([]);
 	});
@@ -184,9 +186,11 @@ describe("cortexStore — reset", () => {
 		useCortexStore.getState().setActivity({ type: "querying", query: "algo" });
 		useCortexStore.getState().setIndexedDocCount(99);
 		useCortexStore.getState().setLastIndexedAt(Date.now());
-		useCortexStore.getState().setQueryResults([
-			{ chunkId: "c1", docId: "d1", content: "x", score: 0.8 },
-		]);
+		useCortexStore
+			.getState()
+			.setQueryResults([
+				{ chunkId: "c1", docId: "d1", content: "x", score: 0.8 },
+			]);
 		useCortexStore.getState().setIsQuerying(true);
 		useCortexStore.getState().setQueryError("fallo");
 

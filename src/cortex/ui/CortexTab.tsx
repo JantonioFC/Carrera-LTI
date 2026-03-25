@@ -1,7 +1,4 @@
-import type {
-	AetherNote,
-	AetherNoteId,
-} from "../../store/aetherStore";
+import type { AetherNote, AetherNoteId } from "../../store/aetherStore";
 import { useAetherStore } from "../../store/aetherStore";
 import { ObserverAIToggle } from "../observer/ObserverAIToggle";
 import { useObserverIPC } from "../observer/useObserverIPC";

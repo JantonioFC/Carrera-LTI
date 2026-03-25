@@ -11,7 +11,8 @@
 			"!!**/dist",
 			"!!**/dist-electron",
 			"!!**/.obsidian",
-			"!!**/*.css"
+			"!!**/*.css",
+			"!!**/testsprite_tests/**"
 		],
 		"ignoreUnknown": true
 	},

@@ -3,14 +3,14 @@ import {
 	DEFAULT_ACADEMIC_DATES,
 	EXAM_END,
 	EXAM_START,
-	SEMESTER_END,
-	SEMESTER_START,
-	TOTAL_CREDITS,
-	WEEKDAY_SHORT,
 	formatDate,
 	formatDateShort,
 	getDaysUntil,
 	isDatePast,
+	SEMESTER_END,
+	SEMESTER_START,
+	TOTAL_CREDITS,
+	WEEKDAY_SHORT,
 } from "./lti.helpers";
 
 // -----------------------------------------------------------------------
