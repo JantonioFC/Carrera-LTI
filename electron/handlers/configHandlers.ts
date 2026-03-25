@@ -36,12 +36,12 @@ export function initConfig(
 	},
 ): void {
 	const handlers = makeConfigHandlers(store);
-	ipcMain.handle("config:set", (_event, key: string, value: string) =>
-		handlers.configSet(key, value),
-	);
-	ipcMain.handle("config:get", (_event, key: string) =>
-		handlers.configGet(key),
-	);
+	ipcMain.handle("config:set", ((...args: unknown[]) =>
+		handlers.configSet(args[1] as string, args[2] as string)) as (
+		...args: unknown[]
+	) => unknown);
+	ipcMain.handle("config:get", ((...args: unknown[]) =>
+		handlers.configGet(args[1] as string)) as (...args: unknown[]) => unknown);
 }
 
 export function makeConfigHandlers(store: ConfigStore): ConfigHandlers {
