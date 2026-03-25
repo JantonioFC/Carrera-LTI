@@ -94,3 +94,77 @@ describe("nexusStore — mutaciones de documentos", () => {
 		expect(parsed[0].title).toBe("Persistido");
 	});
 });
+
+import { IndexeddbPersistence } from "y-indexeddb";
+import * as Y from "yjs";
+
+describe("nexusStore — getYDoc y deleteDocument con YDoc", () => {
+	beforeEach(() => {
+		localStorage.clear();
+		resetStore();
+		// Reemplazar con constructor válido para que `new IndexeddbPersistence()` no lance
+		vi.mocked(IndexeddbPersistence).mockImplementation(function (
+			this: unknown,
+		) {
+			return {};
+		} as any);
+	});
+	afterEach(() => {
+		localStorage.clear();
+		resetStore();
+	});
+
+	it("retorna un Y.Doc para un id existente", () => {
+		const doc = useNexusStore.getState().addDocument("Con YDoc");
+		const ydoc = useNexusStore.getState().getYDoc(doc.id);
+		expect(ydoc).toBeInstanceOf(Y.Doc);
+	});
+
+	it("llamarlo dos veces con el mismo id retorna el mismo objeto", () => {
+		const doc = useNexusStore.getState().addDocument("Cache");
+		const first = useNexusStore.getState().getYDoc(doc.id);
+		const second = useNexusStore.getState().getYDoc(doc.id);
+		expect(first).toBe(second);
+	});
+
+	it("crea la IndexeddbPersistence al crear el YDoc", () => {
+		const doc = useNexusStore.getState().addDocument("IDB");
+		useNexusStore.getState().getYDoc(doc.id);
+		expect(IndexeddbPersistence).toHaveBeenCalledWith(
+			`nexus-doc-${doc.id}`,
+			expect.any(Y.Doc),
+		);
+	});
+
+	it("deleteDocument elimina el doc de documents y de yDocs", () => {
+		const doc = useNexusStore.getState().addDocument("Borrable");
+		useNexusStore.getState().getYDoc(doc.id);
+		useNexusStore.getState().deleteDocument(doc.id);
+
+		expect(useNexusStore.getState().documents).toHaveLength(0);
+		expect(useNexusStore.getState().yDocs[doc.id]).toBeUndefined();
+	});
+
+	it("deleteDocument llama destroy() en el YDoc", () => {
+		const doc = useNexusStore.getState().addDocument("Destroy");
+		const ydoc = useNexusStore.getState().getYDoc(doc.id);
+		const destroySpy = vi.spyOn(ydoc, "destroy");
+
+		useNexusStore.getState().deleteDocument(doc.id);
+
+		expect(destroySpy).toHaveBeenCalledOnce();
+	});
+
+	it("después de deleteDocument, getYDoc crea un nuevo YDoc (no reutiliza el destruido)", () => {
+		const doc = useNexusStore.getState().addDocument("Renew");
+		useNexusStore.getState().addDocument("Keep"); // para que el doc siga existiendo tras resetear
+		const first = useNexusStore.getState().getYDoc(doc.id);
+		useNexusStore.getState().deleteDocument(doc.id);
+
+		// Re-agregar el doc para poder llamar getYDoc de nuevo
+		const newDoc = useNexusStore.getState().addDocument("Renew");
+		const second = useNexusStore.getState().getYDoc(newDoc.id);
+
+		expect(second).not.toBe(first);
+	});
+});

@@ -6,6 +6,36 @@ Versionado semántico: [SemVer](https://semver.org/lang/es/).
 
 ---
 
+## [v3.7.0] — 2026-03-25
+
+### Security
+- `pathSecurity.ts` — `startsWith(root + sep)` previene bypass de prefijo en allowlist (#177)
+- `main.ts` — `mkdirSync` con `mode: 0o700` en `~/.carrera-lti` (#180)
+- `electron/handlers/ruVectorHandlers.ts` — Zod `DocPathSchema` valida `docPath` antes de indexar (#188)
+- CSP aplicada via `session.webRequest.onHeadersReceived` en main process (#175)
+- Guard `hasFirebaseConfig` evita bundlear credenciales en producción (#174)
+- `ci.yml` — `permissions: contents: read` global (#178)
+- `release.yml` — `timeout-minutes` en todos los jobs (#179)
+
+### Performance
+- `MallaCurricular.tsx` — 5 iteraciones sobre `allSubjects` memoizadas con `useMemo` (#186)
+- `Dashboard.tsx` — `CURRICULUM.flatMap().find()` por render reemplazado por Map O(1) (#187)
+
+### Fixed
+- `NexusAI.tsx` — eliminar `setMessages` como canal de efecto secundario para localStorage (#185)
+- `RuVectorAdapter.ts` — `randomUUID` migrado de `node:crypto` a `globalThis.crypto` (#189)
+
+### DX
+- `package.json` — `version` actualizado a `"3.6.0"` (#176)
+
+### Tests
+- Cobertura de `safeStorage.ts`, `result.ts`, `schemas.ts` (#181–#183)
+- Tests para `ingestNote`, `semanticSearch`, `importNotes` en `aetherStore` (#184)
+- Tests para `icsExport.ts`, `logger.ts` (#190–#191)
+- Tests `getYDoc` y `deleteDocument` en `nexusStore` (#192)
+
+---
+
 ## [v3.6.0] — 2026-03-25
 
 ### Added

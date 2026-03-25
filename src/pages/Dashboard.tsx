@@ -33,6 +33,17 @@ export default function Dashboard({
 	const daysToStart = getDaysUntil(SEMESTER_START);
 	const sem1 = CURRICULUM[0].subjects;
 
+	// Map id→subject para O(1) lookup en lugar de flatMap().find() por render (#187)
+	const subjectById = useMemo(() => {
+		const m = new Map<string, (typeof sem1)[0]>();
+		for (const sem of CURRICULUM) {
+			for (const s of sem.subjects) {
+				m.set(s.id, s);
+			}
+		}
+		return m;
+	}, []);
+
 	const { data, getAverage, getApprovedCredits, getApprovedCount } =
 		useSubjectData();
 	const average = getAverage();
@@ -164,9 +175,7 @@ export default function Dashboard({
 									Object.entries(data)
 										.filter(([_, d]) => d.status === "en_curso")
 										.map(([id, _d]) => {
-											const subject = CURRICULUM.flatMap(
-												(s) => s.subjects,
-											).find((s) => s.id === id);
+											const subject = subjectById.get(id);
 											return (
 												<div
 													key={id}

@@ -1,5 +1,3 @@
-import { randomUUID } from "node:crypto";
-
 // Interfaces mínimas para aislar RuVectorAdapter del proceso principal.
 // El tipo completo vive en electron/subprocess/SubprocessAdapter.ts — no
 // accesible desde src/ (ver tsconfig.app.json). (#142)
@@ -59,7 +57,11 @@ export class RuVectorAdapter {
 		opts?: RequestOptions,
 	): Promise<{ chunks: number }> {
 		const response = await this.subprocess.request(
-			{ id: randomUUID(), action: "index_document", payload: { ...req } },
+			{
+				id: globalThis.crypto.randomUUID(),
+				action: "index_document",
+				payload: { ...req },
+			},
 			opts,
 		);
 		return { chunks: (response.data as Record<string, number>).chunks };
@@ -70,7 +72,11 @@ export class RuVectorAdapter {
 		opts?: RequestOptions,
 	): Promise<RuVectorChunk[]> {
 		const response = await this.subprocess.request(
-			{ id: randomUUID(), action: "query", payload: { ...req } },
+			{
+				id: globalThis.crypto.randomUUID(),
+				action: "query",
+				payload: { ...req },
+			},
 			opts,
 		);
 		return ((response.data as Record<string, unknown>).results ??
@@ -83,7 +89,7 @@ export class RuVectorAdapter {
 	): Promise<void> {
 		await this.subprocess.request(
 			{
-				id: randomUUID(),
+				id: globalThis.crypto.randomUUID(),
 				action: "delete_document",
 				payload: { docId: req.docId },
 			},
