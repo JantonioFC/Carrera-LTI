@@ -1,5 +1,5 @@
 import { Search } from "lucide-react";
-import { useState } from "react";
+import { memo, useState } from "react";
 import type { AetherNote, AetherNoteId } from "../../store/aetherStore";
 
 interface AetherSidebarProps {
@@ -8,7 +8,7 @@ interface AetherSidebarProps {
 	onSelectNote: (id: AetherNoteId) => void;
 }
 
-export function AetherSidebar({
+function AetherSidebarInner({
 	notes,
 	activeNoteId,
 	onSelectNote,
@@ -60,3 +60,5 @@ export function AetherSidebar({
 		</div>
 	);
 }
+
+export const AetherSidebar = memo(AetherSidebarInner);

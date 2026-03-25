@@ -1,4 +1,5 @@
 import { LayoutDashboard, Plus } from "lucide-react";
+import { memo } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { db } from "../../hooks/useNexusDB";
 
@@ -23,7 +24,7 @@ interface NexusKanbanViewProps {
 	onUpdateRowData: (rowId: string, fieldId: string, value: unknown) => void;
 }
 
-export function NexusKanbanView({
+function NexusKanbanViewInner({
 	fields,
 	rows,
 	activeDbId,
@@ -128,3 +129,5 @@ export function NexusKanbanView({
 		</div>
 	);
 }
+
+export const NexusKanbanView = memo(NexusKanbanViewInner);

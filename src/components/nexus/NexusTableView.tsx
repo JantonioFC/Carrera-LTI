@@ -6,6 +6,7 @@ import {
 	Plus,
 	Type,
 } from "lucide-react";
+import { memo } from "react";
 
 interface NexusField {
 	id: string;
@@ -46,7 +47,7 @@ function FieldIcon({ type }: { type: string }) {
 	}
 }
 
-export function NexusTableView({
+function NexusTableViewInner({
 	fields,
 	rows,
 	onAddField,
@@ -171,3 +172,5 @@ export function NexusTableView({
 		</div>
 	);
 }
+
+export const NexusTableView = memo(NexusTableViewInner);

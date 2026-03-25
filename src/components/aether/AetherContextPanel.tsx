@@ -1,4 +1,5 @@
 import { Brain, Loader2, Sparkles } from "lucide-react";
+import { memo } from "react";
 import type { AetherNote, AetherNoteId } from "../../store/aetherStore";
 
 interface AetherContextPanelProps {
@@ -11,7 +12,7 @@ interface AetherContextPanelProps {
 	onDeleteNote: (id: AetherNoteId) => void;
 }
 
-export function AetherContextPanel({
+function AetherContextPanelInner({
 	activeNote,
 	similarNotes,
 	backlinks,
@@ -114,3 +115,5 @@ export function AetherContextPanel({
 		</div>
 	);
 }
+
+export const AetherContextPanel = memo(AetherContextPanelInner);

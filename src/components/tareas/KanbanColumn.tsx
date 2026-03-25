@@ -6,6 +6,7 @@ import {
 	GripVertical,
 	X,
 } from "lucide-react";
+import { memo } from "react";
 import { useSubjectData } from "../../hooks/useSubjectData";
 import type {
 	KanbanStatus,
@@ -150,7 +151,7 @@ function TaskCard({
 	);
 }
 
-export function KanbanColumn({
+function KanbanColumnInner({
 	columnId,
 	label,
 	accent,
@@ -184,3 +185,5 @@ export function KanbanColumn({
 		</div>
 	);
 }
+
+export const KanbanColumn = memo(KanbanColumnInner);

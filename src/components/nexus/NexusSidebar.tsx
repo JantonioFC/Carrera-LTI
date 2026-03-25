@@ -1,4 +1,5 @@
 import { Database, Plus } from "lucide-react";
+import { memo } from "react";
 
 interface NexusDB {
 	id: string;
@@ -13,7 +14,7 @@ interface NexusSidebarProps {
 	onCreate: () => void;
 }
 
-export function NexusSidebar({
+function NexusSidebarInner({
 	databases,
 	activeDbId,
 	onSelect,
@@ -53,3 +54,5 @@ export function NexusSidebar({
 		</div>
 	);
 }
+
+export const NexusSidebar = memo(NexusSidebarInner);
