@@ -1,5 +1,5 @@
 import { Bot, Brain, Key, Trash2 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ChatBubble } from "../components/chat/ChatBubble";
 import { ChatInputArea } from "../components/chat/ChatInputArea";
 import { ChatSkeleton } from "../components/chat/ChatSkeleton";
@@ -29,9 +29,9 @@ export default function AetherChat() {
 	const [status, setStatus] = useState<RemoteData<void, string>>(notAsked());
 	const messagesEndRef = useRef<HTMLDivElement>(null);
 
-	const scrollToBottom = () => {
+	const scrollToBottom = useCallback(() => {
 		messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-	};
+	}, []);
 
 	const [isHydrated, setIsHydrated] = useState(false);
 	useEffect(() => {
@@ -47,7 +47,7 @@ export default function AetherChat() {
 
 	useEffect(() => {
 		scrollToBottom();
-	}, [scrollToBottom]);
+	}, [chatHistory, scrollToBottom]);
 
 	const handleSaveKey = (e: React.FormEvent) => {
 		e.preventDefault();

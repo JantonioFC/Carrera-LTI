@@ -79,9 +79,9 @@ export const useAetherStore = create<AetherState & AetherActions>()(
 
 			return {
 				notes: defaultNotes,
-				geminiApiKey: import.meta.env.VITE_GEMINI_API_KEY || "",
-				gmailClientId: import.meta.env.VITE_GMAIL_CLIENT_ID || "",
-				gmailApiKey: import.meta.env.VITE_GMAIL_API_KEY || "",
+				geminiApiKey: "",
+				gmailClientId: "",
+				gmailApiKey: "",
 				chatHistory: [],
 
 				addNote: (title = "Nueva Nota") => {
@@ -156,16 +156,19 @@ export const useAetherStore = create<AetherState & AetherActions>()(
 					set((state) => {
 						state.geminiApiKey = key;
 					});
+					window.cortexAPI?.config.set("gemini_api_key", key);
 				},
 				setGmailClientId: (id) => {
 					set((state) => {
 						state.gmailClientId = id;
 					});
+					window.cortexAPI?.config.set("gmail_client_id", id);
 				},
 				setGmailApiKey: (key) => {
 					set((state) => {
 						state.gmailApiKey = key;
 					});
+					window.cortexAPI?.config.set("gmail_api_key", key);
 				},
 
 				ingestNote: async (id) => {
@@ -254,6 +257,25 @@ export const useAetherStore = create<AetherState & AetherActions>()(
 		{
 			name: "aether-storage",
 			storage: createJSONStorage(() => idbStorage),
+			// API keys no se persisten en IDB — van al OS Keychain vía cortexAPI (#109)
+			partialize: (state) => ({
+				notes: state.notes,
+				chatHistory: state.chatHistory,
+			}),
+			onRehydrateStorage: () => async () => {
+				const api = window.cortexAPI;
+				if (!api) return;
+				const [geminiKey, gmailId, gmailKey] = await Promise.all([
+					api.config.get("gemini_api_key"),
+					api.config.get("gmail_client_id"),
+					api.config.get("gmail_api_key"),
+				]);
+				useAetherStore.setState({
+					geminiApiKey: geminiKey ?? "",
+					gmailClientId: gmailId ?? "",
+					gmailApiKey: gmailKey ?? "",
+				});
+			},
 		},
 	),
 );
