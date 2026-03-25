@@ -1,7 +1,7 @@
 {
 	"name": "carrera-lti",
 	"private": true,
-	"version": "1.0.0",
+	"version": "3.6.0",
 	"license": "CC-BY-NC-4.0",
 	"type": "module",
 	"main": "dist-electron/main.js",

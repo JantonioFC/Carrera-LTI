@@ -13,7 +13,7 @@
 
 import { realpathSync } from "node:fs";
 import { homedir } from "node:os";
-import { isAbsolute, resolve } from "node:path";
+import { isAbsolute, resolve, sep } from "node:path";
 import { app } from "electron";
 
 /**
@@ -43,7 +43,11 @@ export function assertSafePath(inputPath: string): void {
 		app.getPath("temp"),
 	];
 
-	const isAllowed = allowedRoots.some((root) => resolved.startsWith(root));
+	// Usar sep para evitar bypass de prefijo: "/home/juan" no debe aceptar
+	// "/home/juanmalicious/file.pdf". Se requiere separador o igualdad exacta. (#177)
+	const isAllowed = allowedRoots.some(
+		(root) => resolved === root || resolved.startsWith(root + sep),
+	);
 	if (!isAllowed) {
 		throw new Error(
 			`path traversal: ruta fuera de directorios permitidos — "${resolved}"`,
