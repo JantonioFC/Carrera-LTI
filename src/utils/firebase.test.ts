@@ -19,7 +19,7 @@ vi.mock("firebase/auth", () => ({
 	signInAnonymously: (auth: unknown) => mockSignInAnonymously(auth),
 }));
 
-const mockDoc = vi.fn(() => ({}));
+const mockDoc = vi.fn((..._args: unknown[]) => ({}));
 const mockSetDoc = vi.fn();
 const mockGetDoc = vi.fn();
 const mockGetFirestore = vi.fn(() => ({}));

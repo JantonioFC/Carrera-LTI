@@ -67,11 +67,14 @@ interface AetherActions {
 
 /** Schema Zod para validar notas importadas antes de persistirlas. (#138) */
 const ImportedNoteSchema = z.object({
-	id: z.string().min(1),
+	id: z
+		.string()
+		.min(1)
+		.transform((v) => v as AetherNoteId),
 	title: z.string().min(1),
 	content: z.string().default(""),
-	createdAt: z.number().optional(),
-	updatedAt: z.number().optional(),
+	createdAt: z.number().optional().default(0),
+	updatedAt: z.number().optional().default(0),
 	tags: z.array(z.string()).optional().default([]),
 	embedding: z.array(z.number()).optional(),
 });

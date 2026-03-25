@@ -8,7 +8,7 @@ const mockGenerateContentStream = vi.fn();
 
 // GoogleGenAI must be a proper constructor (class-like), not an arrow function
 vi.mock("@google/genai", () => {
-	function GoogleGenAI(_opts: { apiKey: string }) {
+	function GoogleGenAI(this: { models: unknown }, _opts: { apiKey: string }) {
 		this.models = {
 			generateContent: mockGenerateContent,
 			generateContentStream: mockGenerateContentStream,
@@ -19,7 +19,7 @@ vi.mock("@google/genai", () => {
 
 // Mock aiUtils to isolate AIBackendClient from the real retry/structured logic
 const mockGenerateStructuredContentWithRetry = vi.fn();
-const mockTruncateContext = vi.fn((text: string) => text);
+const mockTruncateContext = vi.fn((text: string, _maxChars?: number) => text);
 
 vi.mock("../utils/aiUtils", () => ({
 	generateStructuredContentWithRetry: (...args: unknown[]) =>
