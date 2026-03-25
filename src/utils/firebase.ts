@@ -21,7 +21,7 @@ import type { IAuthService, ISyncService } from "../services/types";
 import type { AetherNote } from "../store/aetherStore";
 import type { NexusDocument } from "../store/nexusStore";
 import { logger } from "./logger";
-import type { CalendarEventsMap } from "./schemas";
+import { AppDataSchema, type CalendarEventsMap } from "./schemas";
 
 // Guard: solo inicializar Firebase si la clave API y el proyecto están configurados.
 // Las variables VITE_* se sustituyen en tiempo de compilación por Vite; si no están
@@ -131,9 +131,17 @@ class FirebaseSyncService implements ISyncService {
 			const userRef = doc(db, "users", userId);
 			const snap = await getDoc(userRef);
 			if (snap.exists()) {
-				const data = snap.data() as AppData;
-				// Phase 3: Zod validation point here
-				return data;
+				// SC-10 (#211): validar estructura antes de devolver al caller
+				const parsed = AppDataSchema.safeParse(snap.data());
+				if (!parsed.success) {
+					logger.warn(
+						"Firebase",
+						"Cloud data failed schema validation — discarding",
+						parsed.error.issues[0]?.message,
+					);
+					return null;
+				}
+				return parsed.data as AppData;
 			}
 		} catch (error) {
 			logger.error("Firebase", "Failed to get data from cloud", error);

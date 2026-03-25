@@ -1,4 +1,9 @@
-import type { GoogleGenAI } from "@google/genai";
+import type {
+	GenerateContentParameters,
+	GenerateContentResponse,
+	GoogleGenAI,
+	Schema,
+} from "@google/genai";
 import type { ZodType } from "zod";
 import { logger } from "./logger";
 import { err, ok, type Result } from "./result";
@@ -14,9 +19,9 @@ import { err, ok, type Result } from "./result";
  */
 export async function generateContentWithRetry(
 	ai: GoogleGenAI,
-	options: any,
+	options: GenerateContentParameters,
 	maxRetries: number = 3,
-): Promise<any> {
+): Promise<GenerateContentResponse> {
 	let attempt = 0;
 
 	while (attempt < maxRetries) {
@@ -67,9 +72,9 @@ export function truncateContext(
  */
 export async function generateStructuredContentWithRetry<T>(
 	ai: GoogleGenAI,
-	options: any,
+	options: GenerateContentParameters,
 	zodSchema: ZodType<T>,
-	geminiSchema: any,
+	geminiSchema: Schema,
 	maxRetries: number = 3,
 ): Promise<Result<T, Error>> {
 	const structuredOptions = {

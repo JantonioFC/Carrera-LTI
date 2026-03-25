@@ -29,11 +29,23 @@ export function AetherGraphView({
 				});
 			}
 		};
-		window.addEventListener("resize", update);
+
+		// QP-10 (#205): throttle a 100ms para evitar 60 re-renders/s en resize
+		let rafId: ReturnType<typeof requestAnimationFrame> | null = null;
+		const throttled = () => {
+			if (rafId !== null) return;
+			rafId = requestAnimationFrame(() => {
+				update();
+				rafId = null;
+			});
+		};
+
+		window.addEventListener("resize", throttled);
 		const timer = setTimeout(update, 100);
 		return () => {
-			window.removeEventListener("resize", update);
+			window.removeEventListener("resize", throttled);
 			clearTimeout(timer);
+			if (rafId !== null) cancelAnimationFrame(rafId);
 		};
 	}, []);
 

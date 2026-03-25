@@ -13,7 +13,7 @@ import {
 } from "@dnd-kit/core";
 import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import { GripVertical } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { DroppableColumn } from "../components/horarios/DroppableColumn";
 import { SelectSubjectModal } from "../components/horarios/SelectSubjectModal";
 import { useSubjectData } from "../hooks/useSubjectData";
@@ -39,12 +39,23 @@ export default function Horarios({
 	onUpdateSchedule,
 }: HorariosProps) {
 	const { allSubjects, data } = useSubjectData();
-	// Filtrar items del cronograma: Solo los que están "en curso"
-	const items = schedule.filter((item) => {
-		const subject = allSubjects.find((s) => s.id === item.subjectId);
-		const status = data[item.subjectId]?.status || subject?.status;
-		return status === "en_curso";
-	});
+
+	// QP-09 (#204): memoizar para evitar find() en cada render
+	const subjectStatusById = useMemo(() => {
+		const m = new Map<string, string | undefined>();
+		for (const s of allSubjects) m.set(s.id, s.status);
+		return m;
+	}, [allSubjects]);
+
+	const items = useMemo(
+		() =>
+			schedule.filter((item) => {
+				const status =
+					data[item.subjectId]?.status ?? subjectStatusById.get(item.subjectId);
+				return status === "en_curso";
+			}),
+		[schedule, data, subjectStatusById],
+	);
 	const [isSelecting, setIsSelecting] = useState(false);
 
 	const setItems = (

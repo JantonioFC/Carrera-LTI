@@ -59,12 +59,25 @@ npm test
 # Modo watch
 npm run test:watch
 
+# Cobertura de tests
+npm run test:coverage
+
 # Linting y formato (Biome)
 npm run lint
 npm run format
 ```
 
 El linting usa **Biome**. No se usa ESLint ni Prettier. Todos los tests deben pasar y el linter no debe reportar errores antes de abrir una pull request.
+
+El comando `npm run test:coverage` genera un reporte de cobertura con `@vitest/coverage-v8`. La CI aplica los siguientes umbrales mínimos:
+
+| Métrica | Umbral |
+|---|---|
+| Líneas | 60% |
+| Funciones | 60% |
+| Ramas | 55% |
+
+Un PR que baje la cobertura por debajo de estos umbrales fallará en CI.
 
 ---
 

@@ -7,7 +7,7 @@ import { useNexusStore } from "../store/nexusStore";
 import { type AppData, authService, syncService } from "../utils/firebase";
 import { logger } from "../utils/logger";
 import { AppDataSchema, type CalendarEventsMap } from "../utils/schemas";
-import { useSubjectData } from "./useSubjectData";
+import { type SubjectData, useSubjectData } from "./useSubjectData";
 
 export function useCloudSync(
 	presenciales: PresencialEvent[],
@@ -172,7 +172,7 @@ export function useCloudSync(
 				// Restore subjects
 				if (validatedData.subjectData) {
 					Object.entries(validatedData.subjectData).forEach(([id, data]) => {
-						updateSubject(id, data as any);
+						updateSubject(id, data as Partial<SubjectData>); // QP-07 (#203)
 					});
 				}
 

@@ -1,3 +1,5 @@
+// TODO AR-06 (#207): nexusStore usa localStorage manual mientras aetherStore usa
+// Zustand persist middleware. Migrar a persist para consistencia — ver issue #207.
 import { enableMapSet } from "immer";
 import { v4 as uuidv4 } from "uuid";
 import { IndexeddbPersistence } from "y-indexeddb";

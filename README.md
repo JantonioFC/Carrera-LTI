@@ -175,6 +175,28 @@ scripts/
 
 ---
 
+## 📂 Subdirectorios de `src/cortex/`
+
+| Directorio | Contenido |
+|---|---|
+| `bridge/` | Contract tests del `contextBridge` de Electron (`AetherIndexBridge`) |
+| `config/` | `ConfigStore` — acceso tipado a la configuración cifrada desde el renderer |
+| `e2e/` | Tests end-to-end de Cortex con fixtures de documentos reales |
+| `export/` | `IndexExporter` — exporta el índice vectorial a JSON |
+| `feedback/` | `FeedbackStore` — almacena retroalimentación del usuario sobre resultados RAG |
+| `grounding/` | `GroundingValidator` — valida que las respuestas IA citen fuentes del índice |
+| `ipc/` | `IPCProtocol` — parseo y validación de mensajes NDJSON del protocolo stdio |
+| `observer/` | `useObserverIPC`, `ObserverAIToggle`, `ConferencePipeline` — grabación y transcripción |
+| `orchestrator/` | `CortexOrchestrator` — coordina los flujos index → query → grounding |
+| `queue/` | `QueueManager` — cola de tareas de indexación con reintentos |
+| `research/` | `AutoResearchClaw` — búsqueda automática de contexto académico |
+| `ui/` | Componentes React de Cortex (`CortexTab`, `CortexFloatingPanel`, `CortexActivityIndicator`) |
+| `updater/` | `UpdaterConfig` — configuración del canal de actualizaciones de Cortex |
+| `wav/` | `WavManager` — gestión del ciclo de vida de archivos WAV temporales |
+| `__mocks__/` | Mock de `electron` para Vitest (evita importar Electron en tests del renderer) |
+
+---
+
 ## 🔑 Configuración de IA (Opcional)
 
 Nexus AI y Asistente Aether requieren una **API Key de Google AI Studio** (gratuita):
