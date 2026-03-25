@@ -1,6 +1,6 @@
 import { homedir } from "node:os";
 import { join } from "node:path";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 // Mockeamos electron para que app.getPath() devuelva rutas controladas.
 vi.mock("electron", () => ({
@@ -49,9 +49,7 @@ describe("pathSecurity — assertSafePath", () => {
 
 		it("should_accept_path_inside_temp", () => {
 			expect(() =>
-				assertSafePath(
-					join(homedir(), ".carrera-lti", "tmp", "recording.wav"),
-				),
+				assertSafePath(join(homedir(), ".carrera-lti", "tmp", "recording.wav")),
 			).not.toThrow();
 		});
 

@@ -12,7 +12,7 @@
 			"!!**/dist-electron",
 			"!!**/.obsidian",
 			"!!**/*.css",
-			"!!**/testsprite_tests/**"
+			"!!**/testsprite_tests"
 		],
 		"ignoreUnknown": true
 	},

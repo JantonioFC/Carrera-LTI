@@ -66,11 +66,7 @@ async function getEncryptionKey(): Promise<string> {
 		);
 		// Fallback: persistir clave en disco con permisos restrictivos para que
 		// sea la misma entre arranques (evita pérdida de datos cifrados). (#144)
-		const fallbackKeyFile = join(
-			homedir(),
-			".carrera-lti",
-			"fallback.key",
-		);
+		const fallbackKeyFile = join(homedir(), ".carrera-lti", "fallback.key");
 		mkdirSync(join(homedir(), ".carrera-lti"), { recursive: true });
 		if (existsSync(fallbackKeyFile)) {
 			return readFileSync(fallbackKeyFile, "utf-8").trim();

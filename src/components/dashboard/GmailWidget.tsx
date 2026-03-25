@@ -9,9 +9,9 @@ import {
 	Settings,
 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
-import { logger } from "../../utils/logger";
 import { type GmailMessage, gmailService } from "../../services/gmail";
 import { useAetherStore } from "../../store/aetherStore";
+import { logger } from "../../utils/logger";
 import { AssistantGuide } from "../AssistantGuide";
 
 export function GmailWidget() {
