@@ -1,6 +1,12 @@
 import { randomUUID } from "node:crypto";
+import { z } from "zod";
 import type { SubprocessAdapter } from "../subprocess/SubprocessAdapter";
 import { assertSafePath } from "./pathSecurity";
+
+const WHISPER_MODELS = ["tiny", "base", "small", "medium", "large"] as const;
+const TranscribeInputSchema = z.object({
+	model: z.enum(WHISPER_MODELS).optional(),
+});
 
 /**
  * Handlers de Whisper para ipcMain.
@@ -32,10 +38,11 @@ export function makeWhisperHandlers(
 			model = "small",
 		): Promise<{ text: string; language: string }> {
 			assertSafePath(wavPath);
+			const { model: safeModel } = TranscribeInputSchema.parse({ model });
 			const response = await adapter.request({
 				id: randomUUID(),
 				action: "transcribe",
-				payload: { path: wavPath, model },
+				payload: { path: wavPath, model: safeModel ?? "small" },
 			});
 			const data = response.data as Record<string, unknown>;
 			return {

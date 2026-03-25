@@ -6,9 +6,9 @@ import { immer } from "zustand/middleware/immer";
 import { findSimilarNotes, generateEmbedding } from "../utils/embeddings";
 import { idbStorage } from "../utils/idbStorage";
 import { logger } from "../utils/logger";
+import type { AetherNoteId, ChatMessageId } from "../utils/schemas";
 
-export type AetherNoteId = `note_${string}`;
-export type ChatMessageId = `msg_${string}`;
+export type { AetherNoteId, ChatMessageId };
 
 export interface AetherNote {
 	id: AetherNoteId;

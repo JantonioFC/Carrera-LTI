@@ -23,13 +23,16 @@ export class IPCValidationError extends Error {
 	}
 }
 
+/** Límite de tamaño para prevenir DoS por mensajes NDJSON gigantes (#149). */
+const MAX_IPC_MESSAGE_BYTES = 10 * 1024 * 1024; // 10 MB
+
 /**
  * Parsea y valida una línea NDJSON recibida por stdio desde un subproceso.
  *
  * Protocolo (RFC-001):
  *   { "id": "<uuid>", "status": "ok"|"error"|"progress", "data": {...}, "error": null }
  *
- * @throws IPCParseError   — si el string no es JSON válido o está vacío.
+ * @throws IPCParseError   — si el string no es JSON válido, está vacío o supera el límite.
  * @throws IPCValidationError — si faltan campos obligatorios o tienen valores inválidos.
  */
 export function parseIPCMessage(rawLine: string): IPCMessage {
@@ -37,6 +40,12 @@ export function parseIPCMessage(rawLine: string): IPCMessage {
 
 	if (!trimmed) {
 		throw new IPCParseError("empty input");
+	}
+
+	if (trimmed.length > MAX_IPC_MESSAGE_BYTES) {
+		throw new IPCParseError(
+			`message too large: ${trimmed.length} bytes (max ${MAX_IPC_MESSAGE_BYTES})`,
+		);
 	}
 
 	let parsed: unknown;

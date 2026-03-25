@@ -5,10 +5,11 @@ import * as Y from "yjs";
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
 import { safeParseJSON } from "../utils/safeStorage";
+import type { NexusDocumentId } from "../utils/schemas";
+
+export type { NexusDocumentId };
 
 enableMapSet();
-
-export type NexusDocumentId = `doc_${string}`;
 
 export interface NexusDocument {
 	id: NexusDocumentId;

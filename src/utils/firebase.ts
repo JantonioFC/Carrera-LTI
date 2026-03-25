@@ -21,6 +21,7 @@ import type { IAuthService, ISyncService } from "../services/types";
 import type { AetherNote } from "../store/aetherStore";
 import type { NexusDocument } from "../store/nexusStore";
 import { logger } from "./logger";
+import type { CalendarEventsMap } from "./schemas";
 
 const firebaseConfig = {
 	apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -47,7 +48,7 @@ try {
 export type AppData = {
 	subjectData: SubjectDataMap;
 	presenciales: PresencialEvent[];
-	calendarEvents?: Record<string, any[]>;
+	calendarEvents?: CalendarEventsMap;
 	tasks?: Task[];
 	schedule?: ScheduleItem[];
 	nexusDocs?: NexusDocument[];

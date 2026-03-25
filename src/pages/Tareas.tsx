@@ -9,12 +9,11 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useSubjectData } from "../hooks/useSubjectData";
+import type { SubtaskId, TaskId } from "../utils/schemas";
 
+export type { SubtaskId, TaskId };
 export type KanbanStatus = "todo" | "inProgress" | "done";
 export type Priority = "alta" | "media" | "baja";
-
-export type TaskId = `t${string}`;
-export type SubtaskId = `st${string}`;
 
 export interface Subtask {
 	id: SubtaskId;

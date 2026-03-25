@@ -18,6 +18,7 @@ import { useSubjectData } from "./hooks/useSubjectData";
 import type { ScheduleItem } from "./pages/Horarios";
 import type { Task } from "./pages/Tareas";
 import { STORAGE_KEYS, safeParseJSON, setJSON } from "./utils/safeStorage";
+import type { CalendarEventsMap } from "./utils/schemas";
 
 // ─── Lazy-loaded pages (code splitting) ───────────────────────
 const Dashboard = lazy(() => import("./pages/Dashboard"));
@@ -46,9 +47,9 @@ function App() {
 		);
 	});
 
-	const [calendarEvents, setCalendarEvents] = useState<Record<string, any[]>>(
+	const [calendarEvents, setCalendarEvents] = useState<CalendarEventsMap>(
 		() => {
-			return safeParseJSON<Record<string, any[]>>("cal2026_events", {});
+			return safeParseJSON<CalendarEventsMap>("cal2026_events", {});
 		},
 	);
 
@@ -78,7 +79,7 @@ function App() {
 		setJSON(STORAGE_KEYS.PRESENCIALES, updated);
 	};
 
-	const updateCalendarEvents = (updated: Record<string, any[]>) => {
+	const updateCalendarEvents = (updated: CalendarEventsMap) => {
 		setCalendarEvents(updated);
 		setJSON(STORAGE_KEYS.CAL_EVENTS, updated);
 	};

@@ -11,6 +11,7 @@
  * Ref: Issue #118
  */
 
+import { realpathSync } from "node:fs";
 import { homedir } from "node:os";
 import { isAbsolute, resolve } from "node:path";
 import { app } from "electron";
@@ -26,7 +27,14 @@ export function assertSafePath(inputPath: string): void {
 		);
 	}
 
-	const resolved = resolve(inputPath);
+	// resolve() normaliza ../.. pero no sigue symlinks; realpathSync los resuelve.
+	// Si el archivo aún no existe usamos resolve() como fallback (#150).
+	let resolved: string;
+	try {
+		resolved = realpathSync(inputPath);
+	} catch {
+		resolved = resolve(inputPath);
+	}
 
 	const allowedRoots = [
 		homedir(),

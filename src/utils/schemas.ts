@@ -1,14 +1,18 @@
 import { z } from "zod";
 
-// ─── Aether ───────────────────────────────────────────────────
-export const AetherNoteIdSchema = z.string().brand<"AetherNoteId">();
-export const ChatMessageIdSchema = z.string().brand<"ChatMessageId">();
+// ─── ID types (source of truth — importar desde aquí, no redefinir) ──────────
+export type AetherNoteId = `note_${string}`;
+export type ChatMessageId = `msg_${string}`;
+export type NexusDocumentId = `doc_${string}`;
+export type SubtaskId = `st${string}`;
+export type TaskId = `t${string}`;
 
+// ─── Aether ───────────────────────────────────────────────────
 export const AetherNoteSchema = z.object({
 	id: z
 		.string()
 		.startsWith("note_")
-		.transform((v) => v as any),
+		.transform((v) => v as AetherNoteId),
 	title: z.string(),
 	content: z.string(),
 	createdAt: z.number(),
@@ -23,7 +27,7 @@ export const ChatMessageSchema = z.object({
 	id: z
 		.string()
 		.startsWith("msg_")
-		.transform((v) => v as any),
+		.transform((v) => v as ChatMessageId),
 	role: z.enum(["user", "model"]),
 	text: z.string(),
 	timestamp: z.number(),
@@ -36,7 +40,7 @@ export const NexusDocumentSchema = z.object({
 	id: z
 		.string()
 		.startsWith("doc_")
-		.transform((v) => v as any),
+		.transform((v) => v as NexusDocumentId),
 	title: z.string(),
 	createdAt: z.number(),
 	updatedAt: z.number(),
@@ -55,7 +59,7 @@ export const SubtaskSchema = z.object({
 	id: z
 		.string()
 		.startsWith("st")
-		.transform((v) => v as any),
+		.transform((v) => v as SubtaskId),
 	text: z.string(),
 	completed: z.boolean(),
 });
@@ -64,7 +68,7 @@ export const TaskSchema = z.object({
 	id: z
 		.string()
 		.startsWith("t")
-		.transform((v) => v as any),
+		.transform((v) => v as TaskId),
 	title: z.string(),
 	subjectId: z.string(),
 	dueDate: z.string(),
@@ -107,6 +111,9 @@ export const CalendarEventsSchema = z.record(
 	z.string(),
 	z.array(CalendarEventSchema),
 );
+
+export type CalendarEvent = z.infer<typeof CalendarEventSchema>;
+export type CalendarEventsMap = z.infer<typeof CalendarEventsSchema>;
 
 // ─── Subject Data ─────────────────────────────────────────────
 export const SubjectResourceSchema = z.object({
