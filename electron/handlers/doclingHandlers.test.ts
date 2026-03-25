@@ -2,6 +2,10 @@ import { describe, expect, it, vi } from "vitest";
 import type { SubprocessAdapter } from "../subprocess/SubprocessAdapter";
 import { makeDoclingHandlers } from "./doclingHandlers";
 
+// assertSafePath llama app.getPath() de Electron que no existe en jsdom.
+// El test valida el handler, no la seguridad de paths.
+vi.mock("./pathSecurity", () => ({ assertSafePath: vi.fn() }));
+
 /**
  * Tests unitarios de makeDoclingHandlers.
  * Se inyecta un mock de SubprocessAdapter para aislar la lógica de mapeo.
