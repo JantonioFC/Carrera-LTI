@@ -1,3 +1,4 @@
+import type { Schema } from "@google/genai";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { z } from "zod";
 
@@ -37,7 +38,7 @@ const dummyZodSchema = z.object({ answer: z.string() });
 const dummyGeminiSchema = {
 	type: "OBJECT",
 	properties: { answer: { type: "STRING" } },
-};
+} as Schema;
 
 // ---------------------------------------------------------------------------
 
