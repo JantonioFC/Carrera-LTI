@@ -5,6 +5,7 @@ import { ChatInputArea } from "../components/chat/ChatInputArea";
 import { ChatSkeleton } from "../components/chat/ChatSkeleton";
 import { apiBackend } from "../services/aiClient";
 import { useAetherStore } from "../store/aetherStore";
+import { logger } from "../utils/logger";
 import {
 	failure,
 	isLoading,
@@ -92,7 +93,7 @@ export default function AetherChat() {
 
 			setStatus(success(undefined));
 		} catch (error: any) {
-			console.error("Gemini API Error:", error);
+			logger.error("AetherChat", "Gemini API Error", error);
 			addChatMessage({
 				role: "model",
 				text: `**Error de Conexión:** ${error.message || "No se pudo contactar con Gemini. Revisa tu API Key o conexión al servicio."}`,
