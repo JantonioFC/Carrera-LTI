@@ -111,16 +111,11 @@ export const useNexusStore = create<NexusState & NexusActions>()(
 				const ydoc = new Y.Doc();
 				void new IndexeddbPersistence(`nexus-doc-${idStr}`, ydoc);
 
+				// Marcar, registrar y limpiar el flag en un solo bloque atómico
+				// para evitar fugas si un render intermedio re-entra (#163).
 				set((state) => {
+					state.yDocsCreating.add(idStr);
 					state.yDocs[idStr] = ydoc as any;
-					state.yDocsCreating.add(idStr); // Now done inside set
-					// Note: we don't delete it immediately because we want to track it
-					// but actually getYDoc is synchronous here.
-					// Let's optimize the flow.
-				});
-
-				// We need to remove it from creating set after it's in yDocs
-				set((state) => {
 					state.yDocsCreating.delete(idStr);
 				});
 

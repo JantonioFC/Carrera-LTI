@@ -130,9 +130,10 @@ export class GmailService {
 
 			// 2. Initialize GSI
 			if (!this.gisInitialized) {
-				this.tokenClient = (
-					window as any
-				).google.accounts.oauth2.initTokenClient({
+				if (!window.google?.accounts?.oauth2) {
+					throw new Error("Google Identity Services (GSI) not loaded");
+				}
+				this.tokenClient = window.google.accounts.oauth2.initTokenClient({
 					client_id: clientId,
 					scope: "https://www.googleapis.com/auth/gmail.readonly",
 					callback: "", // defined at request time
