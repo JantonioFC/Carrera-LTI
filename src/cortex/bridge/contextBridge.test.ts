@@ -1,4 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+// Importamos el tipo del preload para que TypeScript detecte divergencias
+// en compilación si el contrato de cortexAPI cambia. (#124)
+import type { CortexAPI } from "../../../electron/types.d.ts";
 
 /**
  * Tests de contrato del contextBridge.
@@ -10,9 +13,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
  * acceso a electron. Solo usamos el mock que simula lo que el preload expone.
  */
 
-// Replica exacta de lo que electron/preload.ts expone via contextBridge.
-// Si la forma del preload cambia, actualizar aquí también.
-function buildMockCortexAPI() {
+// Tipado contra CortexAPI garantiza que el mock siempre coincide con el preload.
+function buildMockCortexAPI(): CortexAPI {
 	return {
 		config: {
 			set: vi

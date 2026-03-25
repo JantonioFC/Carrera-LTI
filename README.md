@@ -80,7 +80,7 @@ Combina gestión académica, un Segundo Cerebro (Aether), un Espacio de Trabajo 
 
 Carrera LTI utiliza un **Setup Wizard** interactivo para automatizar la configuración del entorno, las APIs de Google, Firebase y las dependencias Python para Cortex.
 
-Requiere [Node.js](https://nodejs.org/) v18+ y Python 3.10+.
+Requiere [Node.js](https://nodejs.org/) v20 LTS+ y Python 3.10+.
 
 ```bash
 # 1. Clonar el repositorio

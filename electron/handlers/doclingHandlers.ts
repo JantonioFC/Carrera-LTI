@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import type { SubprocessAdapter } from "../subprocess/SubprocessAdapter";
+import { assertSafePath } from "./pathSecurity";
 
 /**
  * Handlers de Docling para ipcMain.
@@ -25,6 +26,7 @@ export function makeDoclingHandlers(
 		async processDocument(
 			docPath: string,
 		): Promise<{ chunks: number; text: string }> {
+			assertSafePath(docPath);
 			const response = await adapter.request({
 				id: randomUUID(),
 				action: "process_document",
@@ -38,6 +40,7 @@ export function makeDoclingHandlers(
 		},
 
 		async ocr(imagePath: string): Promise<{ text: string }> {
+			assertSafePath(imagePath);
 			const response = await adapter.request({
 				id: randomUUID(),
 				action: "ocr",

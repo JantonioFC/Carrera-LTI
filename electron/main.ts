@@ -12,7 +12,7 @@ import {
 import { logger } from "../src/utils/logger";
 import {
 	type ConfigStore,
-	makeConfigHandlers,
+	initConfig,
 } from "./handlers/configHandlers";
 import { makeDoclingHandlers } from "./handlers/doclingHandlers";
 import { makeObserverHandlers } from "./handlers/observerHandlers";
@@ -252,12 +252,7 @@ function createWindow(): void {
 // ── Arranque ──────────────────────────────────────────────────────────────────
 app.whenReady().then(async () => {
 	const store = await initStore();
-	const config = makeConfigHandlers(store);
-
-	ipcMain.handle("config:set", (_event, key: string, value: string) =>
-		config.configSet(key, value),
-	);
-	ipcMain.handle("config:get", (_event, key: string) => config.configGet(key));
+	initConfig(store, ipcMain);
 
 	initRuVector();
 	initDocling();

@@ -24,6 +24,7 @@ import { Clock, GripVertical, Plus, Search, Trash2, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import { type Subject, WEEKDAY_SHORT } from "../data/lti";
 import { useSubjectData } from "../hooks/useSubjectData";
+import { logger } from "../utils/logger";
 
 const DAYS = [1, 2, 3, 4, 5, 6]; // Lun a Sáb
 
@@ -348,7 +349,7 @@ export default function Horarios({
 		const activeId = active.id.toString();
 
 		if (!over) {
-			console.log("[DND] DragEnd: No drop target found");
+			logger.debug("Horarios", "[DND] DragEnd: No drop target found");
 			// If it's a bank item, move it back to the bank if it was left in a day during DragOver
 			if (activeId.startsWith("bank-")) {
 				setItems((prev) =>
@@ -359,7 +360,10 @@ export default function Horarios({
 		}
 
 		const overId = over.id.toString();
-		console.log(`[DND] DragEnd: active=${activeId} over=${overId}`);
+		logger.debug(
+			"Horarios",
+			`[DND] DragEnd: active=${activeId} over=${overId}`,
+		);
 
 		setItems((prev) => {
 			const activeIndex = prev.findIndex((i) => i.id === activeId);
@@ -382,7 +386,7 @@ export default function Horarios({
 			// Case 1: Dropped on bank -> Delete if it's an instance
 			if (overDay === null) {
 				if (!activeId.startsWith("bank-")) {
-					console.log(`[DND] Removing instance ${activeId}`);
+					logger.debug("Horarios", `[DND] Removing instance ${activeId}`);
 					return prev.filter((i) => i.id !== activeId);
 				}
 				// If it's the master bank item, just ensure it stays in bank
@@ -398,7 +402,10 @@ export default function Horarios({
 
 				// If it's a bank master, clone it by giving it a new instance ID
 				if (activeId.startsWith("bank-")) {
-					console.log(`[DND] Cloning master ${activeId} to day ${overDay}`);
+					logger.debug(
+						"Horarios",
+						`[DND] Cloning master ${activeId} to day ${overDay}`,
+					);
 					const instanceId = `inst-${newItem.subjectId}-${Math.random().toString(36).substring(2, 9)}`;
 
 					// IMPORTANT: The master stays in the bank (day null)

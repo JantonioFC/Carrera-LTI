@@ -33,16 +33,16 @@ export default function AetherChat() {
 		messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
 	}, []);
 
-	const [isHydrated, setIsHydrated] = useState(false);
+	const [isHydrated, setIsHydrated] = useState(() =>
+		useAetherStore.persist.hasHydrated(),
+	);
 	useEffect(() => {
-		// Wait for Zustand to load the key from IndexedDB before showing the Auth form to prevent flashes
-		const checkHydration = setInterval(() => {
-			if (useAetherStore.persist.hasHydrated()) {
-				setIsHydrated(true);
-				clearInterval(checkHydration);
-			}
-		}, 50);
-		return () => clearInterval(checkHydration);
+		// Suscribirse a onFinishHydration evita el polling con setInterval (#114)
+		if (useAetherStore.persist.hasHydrated()) {
+			setIsHydrated(true);
+			return;
+		}
+		return useAetherStore.persist.onFinishHydration(() => setIsHydrated(true));
 	}, []);
 
 	useEffect(() => {
