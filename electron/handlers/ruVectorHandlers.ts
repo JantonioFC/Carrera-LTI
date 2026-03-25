@@ -1,6 +1,12 @@
 import { createHash, randomUUID } from "node:crypto";
+import { z } from "zod";
 import type { SubprocessAdapter } from "../subprocess/SubprocessAdapter";
 import { assertSafePath } from "./pathSecurity";
+
+const QueryInputSchema = z.object({
+	text: z.string().min(1).max(4096),
+	topK: z.number().int().min(1).max(50).optional(),
+});
 
 /** Deriva un docId determinista del path del documento (SHA-256). */
 function docIdFromPath(docPath: string): string {
@@ -61,10 +67,11 @@ export function makeRuVectorHandlers(
 		},
 
 		async cortexQuery(text: string, topK = 5): Promise<unknown[]> {
+			const input = QueryInputSchema.parse({ text, topK });
 			const response = await adapter.request({
 				id: randomUUID(),
 				action: "query",
-				payload: { text, topK },
+				payload: { text: input.text, topK: input.topK ?? 5 },
 			});
 			const data = response.data as Record<string, unknown>;
 			return (data.results as unknown[]) ?? [];

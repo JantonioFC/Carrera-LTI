@@ -6,6 +6,80 @@ Versionado semántico: [SemVer](https://semver.org/lang/es/).
 
 ---
 
+## [Unreleased] — v3.6.0
+
+### Added
+- `React.memo` en 6 subcomponentes presentacionales: `NexusSidebar`, `NexusTableView`, `NexusKanbanView`, `AetherContextPanel`, `AetherSidebar`, `KanbanColumn` (#151)
+- Tests unitarios para `ErrorBoundary` — 10 tests cubriendo estado normal, fallback, reset y `console.error` (#156)
+- `vi.useFakeTimers()` / `vi.setSystemTime(FIXED_NOW)` en tests de `HealthMetrics` y `CortexOrchestrator` para aserciones de tiempo determinísticas (#157)
+- Step de coverage en CI con validación de umbrales (`lines: 60%, functions: 60%, branches: 55%`) (#158)
+- Validación Zod en IPC: `cortexQuery` (text/topK) y Whisper `transcribe` (model) (#148)
+- Guard `MAX_IPC_MESSAGE_BYTES = 10 MB` antes de `JSON.parse` en `IPCProtocol.ts` (#149)
+- Tipos ID template-literal (`AetherNoteId`, `TaskId`, `SubtaskId`, `ChatMessageId`, `NexusDocumentId`) como fuente única de verdad en `schemas.ts` (#152)
+- `CalendarEventsMap` tipado reemplaza `Record<string, any[]>` (#153)
+
+### Changed
+- `AetherVault.tsx` dividido: 545 → ~170 LOC. Extrae 4 subcomponentes a `src/components/aether/` (#154)
+- `NexusDatabase.tsx` dividido: 430 → ~90 LOC. Extrae 3 subcomponentes a `src/components/nexus/` (#155)
+- `Tareas.tsx` dividido: 423 → ~140 LOC. Extrae `AddTaskModal` y `KanbanColumn` a `src/components/tareas/` (#155)
+
+### Security
+- `assertSafePath` usa `realpathSync` para prevenir traversal por symlinks (#150)
+- Tests de allowlist: 6 tests de rechazo para `configSet`/`configGet` con claves fuera de `ALLOWED_CONFIG_KEYS` (#147)
+- Validación Zod en handlers IPC vectoriales y Whisper (#148)
+
+---
+
+## [v3.5.0] — 2026-03-xx
+
+### Added
+- JSDoc para 4 módulos de `src/cortex/` (#125)
+- `Materias` y `Horarios` divididos en subcomponentes (#130, #131)
+
+### Changed
+- Issues P0/P1/P2 resueltos (#107–#141)
+- Correcciones TypeScript strict en toda la capa Cortex
+
+### Fixed
+- Formato Biome en pipeline CI
+- Separador de ruta en Windows en `pathSecurity.test.ts`
+
+---
+
+## [v3.4.0] — 2026-03-xx
+
+### Added
+- `SubprocessAdapter` desacoplado de `CortexOrchestrator` (#89)
+- `CircuitBreaker` con umbrales configurables (#90)
+- Logger estructurado reemplaza `console.*` (#91)
+- `CONTRIBUTING.md` y `docs/API_IPC.md` (#93, #94)
+- ADR-001/002/003 actualizados (#98), `TROUBLESHOOTING.md` (#99)
+- Matrix CI: Node 18+20, macOS, SHA-256 en release (#95–#97)
+
+---
+
+## [v3.3.0] — 2026-02-xx
+
+### Added
+- Job E2E en CI: pipeline Observer → Transcribe → Aether (#87, #88)
+- Tests unitarios para `GmailService`, `ruVectorHandlers`, AI utils, crypto, embeddings (#80–#86)
+
+---
+
+## [v3.2.0] — 2026-02-xx
+
+### Changed
+- Performance hardening y mejoras de calidad (#67–#79)
+
+---
+
+## [v3.1.0] — 2026-01-xx
+
+### Security
+- Hardening: sanitización de inputs, allowlist de configuración, guard de path traversal, validación IPC (#59–#66)
+
+---
+
 ## [3.0.0] — 2026-03-23
 
 ### 🚀 Migración Electron — Cortex IPC nativo (RFC-002)

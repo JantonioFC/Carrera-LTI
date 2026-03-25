@@ -1,4 +1,16 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+const FIXED_NOW = 1_700_000_000_000; // 2023-11-14 22:13:20 UTC (determinístico)
+
+beforeEach(() => {
+	vi.useFakeTimers();
+	vi.setSystemTime(FIXED_NOW);
+});
+
+afterEach(() => {
+	vi.useRealTimers();
+});
+
 import { shouldRestart } from "./CortexOrchestrator";
 
 describe("CortexOrchestrator.shouldRestart", () => {
@@ -19,13 +31,13 @@ describe("CortexOrchestrator.shouldRestart", () => {
 
 	// Reset tras 60s de estabilidad — incluso con crashCount en el límite
 	it("should_reset_counter_when_stable_for_60_seconds", () => {
-		const lastStableAt = Date.now() - 61_000;
+		const lastStableAt = FIXED_NOW - 61_000;
 		expect(shouldRestart({ crashCount: 3, lastStableAt })).toBe(true);
 	});
 
 	// Estabilidad reciente (55s) — NO alcanza el umbral
 	it("should_not_reset_counter_when_stable_for_less_than_60_seconds", () => {
-		const lastStableAt = Date.now() - 55_000;
+		const lastStableAt = FIXED_NOW - 55_000;
 		expect(shouldRestart({ crashCount: 3, lastStableAt })).toBe(false);
 	});
 

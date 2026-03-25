@@ -1,5 +1,7 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { HealthMetrics, type HealthSnapshot } from "./HealthMetrics";
+
+const FIXED_NOW = 1_700_000_000_000; // 2023-11-14 22:13:20 UTC (determinístico)
 
 function makeSnapshot(overrides: Partial<HealthSnapshot> = {}): HealthSnapshot {
 	return {
@@ -7,10 +9,19 @@ function makeSnapshot(overrides: Partial<HealthSnapshot> = {}): HealthSnapshot {
 		successRate: 0.98,
 		indexedDocCount: 200,
 		indexSizeBytes: 500 * 1024 * 1024, // 500 MB
-		sampledAt: Date.now(),
+		sampledAt: FIXED_NOW,
 		...overrides,
 	};
 }
+
+beforeEach(() => {
+	vi.useFakeTimers();
+	vi.setSystemTime(FIXED_NOW);
+});
+
+afterEach(() => {
+	vi.useRealTimers();
+});
 
 describe("HealthMetrics — computeStatus", () => {
 	it("should_return_healthy_when_all_metrics_are_nominal", () => {
@@ -92,9 +103,9 @@ describe("HealthMetrics — record y avgLatency", () => {
 
 	it("should_only_keep_last_24h_of_samples", () => {
 		const m = new HealthMetrics();
-		// Simular muestra antigua (>24h)
-		m.recordLatency(9999, Date.now() - 25 * 3_600_000);
-		m.recordLatency(100); // reciente
+		// Muestra antigua (>24h respecto a FIXED_NOW)
+		m.recordLatency(9999, FIXED_NOW - 25 * 3_600_000);
+		m.recordLatency(100, FIXED_NOW); // reciente
 		expect(m.getAvgLatencyMs()).toBe(100);
 	});
 });

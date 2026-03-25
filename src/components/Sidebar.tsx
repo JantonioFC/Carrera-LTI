@@ -21,12 +21,13 @@ import type { PresencialEvent } from "../data/lti";
 import { useCloudSync } from "../hooks/useCloudSync";
 import type { ScheduleItem } from "../pages/Horarios";
 import type { Task } from "../pages/Tareas";
+import type { CalendarEventsMap } from "../utils/schemas";
 
 interface SidebarProps {
 	presenciales: PresencialEvent[];
 	onUpdatePresenciales: (events: PresencialEvent[]) => void;
-	calendarEvents: Record<string, any[]>;
-	onUpdateCalendarEvents: (events: Record<string, any[]>) => void;
+	calendarEvents: CalendarEventsMap;
+	onUpdateCalendarEvents: (events: CalendarEventsMap) => void;
 	tasks: Task[];
 	onUpdateTasks: (tasks: Task[]) => void;
 	schedule: ScheduleItem[];

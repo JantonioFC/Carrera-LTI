@@ -1,12 +1,13 @@
 import type React from "react";
 import ResponsiveCalendar from "../components/calendar/ResponsiveCalendar";
 import type { PresencialEvent } from "../data/lti";
+import type { CalendarEventsMap } from "../utils/schemas";
 
 interface CalendarioProps {
 	presenciales: PresencialEvent[];
 	onUpdatePresenciales: (p: PresencialEvent[]) => void;
-	calendarEvents: Record<string, any[]>;
-	onUpdateCalendarEvents: (e: Record<string, any[]>) => void;
+	calendarEvents: CalendarEventsMap;
+	onUpdateCalendarEvents: (e: CalendarEventsMap) => void;
 }
 
 const Calendario: React.FC<CalendarioProps> = ({

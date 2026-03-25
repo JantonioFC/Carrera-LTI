@@ -6,14 +6,14 @@ import { useAetherStore } from "../store/aetherStore";
 import { useNexusStore } from "../store/nexusStore";
 import { type AppData, authService, syncService } from "../utils/firebase";
 import { logger } from "../utils/logger";
-import { AppDataSchema } from "../utils/schemas";
+import { AppDataSchema, type CalendarEventsMap } from "../utils/schemas";
 import { useSubjectData } from "./useSubjectData";
 
 export function useCloudSync(
 	presenciales: PresencialEvent[],
 	setPresenciales: (events: PresencialEvent[]) => void,
-	calendarEvents: Record<string, any[]>,
-	setCalendarEvents: (events: Record<string, any[]>) => void,
+	calendarEvents: CalendarEventsMap,
+	setCalendarEvents: (events: CalendarEventsMap) => void,
 	tasks: Task[],
 	setTasks: (tasks: Task[]) => void,
 	schedule: ScheduleItem[],
