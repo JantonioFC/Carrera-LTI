@@ -3,6 +3,7 @@ import { z } from "zod";
 import type { SubprocessAdapter } from "../subprocess/SubprocessAdapter";
 import { assertSafePath } from "./pathSecurity";
 
+const DocPathSchema = z.string().min(1).max(4096); // (#188)
 const QueryInputSchema = z.object({
 	text: z.string().min(1).max(4096),
 	topK: z.number().int().min(1).max(50).optional(),
@@ -52,14 +53,15 @@ export function makeRuVectorHandlers(
 ): RuVectorHandlers {
 	return {
 		async cortexIndex(docPath: string): Promise<{ chunks: number }> {
-			assertSafePath(docPath);
+			const validPath = DocPathSchema.parse(docPath);
+			assertSafePath(validPath);
 			const response = await adapter.request({
 				id: randomUUID(),
 				action: "index_document",
 				payload: {
-					docId: docIdFromPath(docPath),
-					path: docPath,
-					mimeType: mimeTypeFromPath(docPath),
+					docId: docIdFromPath(validPath),
+					path: validPath,
+					mimeType: mimeTypeFromPath(validPath),
 				},
 			});
 			const data = response.data as Record<string, number>;

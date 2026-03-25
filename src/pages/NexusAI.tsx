@@ -131,11 +131,17 @@ Sé conciso pero completo. Usa formato Markdown cuando sea útil.\n\n`;
 				},
 			);
 
-			// Save to localStorage after stream completes
-			setMessages((prev) => {
-				localStorage.setItem("lti_nexus_ai_history", JSON.stringify(prev));
-				return prev;
-			});
+			// Save to localStorage after stream completes.
+			// Usar estado final derivado en lugar de setMessages como canal de
+			// efecto secundario — anti-patrón en React Concurrent Mode (#185).
+			const finalHistory = [
+				...updatedMessages,
+				{ role: "model" as const, content: currentText },
+			];
+			localStorage.setItem(
+				"lti_nexus_ai_history",
+				JSON.stringify(finalHistory),
+			);
 
 			setStatus(success(undefined));
 		} catch (err: any) {

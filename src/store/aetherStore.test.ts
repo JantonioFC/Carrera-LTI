@@ -1,5 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+// Mock embeddings para ingestNote y semanticSearch
+vi.mock("../utils/embeddings", () => ({
+	generateEmbedding: vi.fn(),
+	findSimilarNotes: vi.fn(),
+}));
+
 // Mock idb-keyval para que persist no intente usar IndexedDB en tests
 vi.mock("idb-keyval", () => ({
 	get: vi.fn().mockResolvedValue(undefined),
@@ -158,5 +164,155 @@ describe("aetherStore — findBacklinks", () => {
 		expect(
 			useAetherStore.getState().findBacklinks("note_ghost" as any),
 		).toEqual([]);
+	});
+});
+
+import { findSimilarNotes, generateEmbedding } from "../utils/embeddings";
+
+describe("aetherStore — ingestNote", () => {
+	beforeEach(() => {
+		resetStore();
+		vi.mocked(generateEmbedding).mockReset();
+		vi.mocked(findSimilarNotes).mockReset();
+	});
+	afterEach(resetStore);
+
+	it("si la nota no existe, retorna sin hacer nada", async () => {
+		useAetherStore.setState({ geminiApiKey: "test-key" });
+		await useAetherStore.getState().ingestNote("note_noexiste" as any);
+		expect(generateEmbedding).not.toHaveBeenCalled();
+	});
+
+	it("si no hay geminiApiKey, retorna sin hacer nada", async () => {
+		const note = useAetherStore.getState().addNote("Test");
+		await useAetherStore.getState().ingestNote(note.id);
+		expect(generateEmbedding).not.toHaveBeenCalled();
+	});
+
+	it("si generateEmbedding retorna un vector, actualiza el embedding de la nota", async () => {
+		useAetherStore.setState({ geminiApiKey: "test-key" });
+		const note = useAetherStore.getState().addNote("Test");
+		const vector = [0.1, 0.2, 0.3];
+		vi.mocked(generateEmbedding).mockResolvedValueOnce(vector);
+
+		await useAetherStore.getState().ingestNote(note.id);
+
+		const updated = useAetherStore.getState().getNote(note.id);
+		expect(updated?.embedding).toEqual(vector);
+	});
+
+	it("si generateEmbedding retorna null, no actualiza la nota", async () => {
+		useAetherStore.setState({ geminiApiKey: "test-key" });
+		const note = useAetherStore.getState().addNote("Test");
+		vi.mocked(generateEmbedding).mockResolvedValueOnce(null);
+
+		await useAetherStore.getState().ingestNote(note.id);
+
+		const updated = useAetherStore.getState().getNote(note.id);
+		expect(updated?.embedding).toBeUndefined();
+	});
+});
+
+describe("aetherStore — semanticSearch", () => {
+	beforeEach(() => {
+		resetStore();
+		vi.mocked(generateEmbedding).mockReset();
+		vi.mocked(findSimilarNotes).mockReset();
+	});
+	afterEach(resetStore);
+
+	it("si no hay geminiApiKey, retorna []", async () => {
+		const result = await useAetherStore.getState().semanticSearch("query");
+		expect(result).toEqual([]);
+	});
+
+	it("si query está vacío, retorna []", async () => {
+		useAetherStore.setState({ geminiApiKey: "test-key" });
+		const result = await useAetherStore.getState().semanticSearch("");
+		expect(result).toEqual([]);
+	});
+
+	it("si generateEmbedding retorna vector, llama findSimilarNotes y retorna el resultado", async () => {
+		useAetherStore.setState({ geminiApiKey: "test-key" });
+		const note = useAetherStore.getState().addNote("Nota");
+		const vector = [0.1, 0.2];
+		vi.mocked(generateEmbedding).mockResolvedValueOnce(vector);
+		vi.mocked(findSimilarNotes).mockReturnValueOnce([note]);
+
+		const result = await useAetherStore.getState().semanticSearch("query");
+		expect(findSimilarNotes).toHaveBeenCalled();
+		expect(result).toEqual([note]);
+	});
+
+	it("si generateEmbedding retorna null, retorna []", async () => {
+		useAetherStore.setState({ geminiApiKey: "test-key" });
+		vi.mocked(generateEmbedding).mockResolvedValueOnce(null);
+
+		const result = await useAetherStore.getState().semanticSearch("query");
+		expect(result).toEqual([]);
+	});
+});
+
+describe("aetherStore — importNotes", () => {
+	beforeEach(resetStore);
+	afterEach(resetStore);
+
+	it("importa notas desde array JSON con id/title/content/tags/createdAt/updatedAt", () => {
+		const notes = [
+			{
+				id: "note_1",
+				title: "Importada",
+				content: "texto",
+				tags: ["t"],
+				createdAt: 1000,
+				updatedAt: 2000,
+			},
+		];
+		useAetherStore.getState().importNotes(JSON.stringify(notes));
+		expect(useAetherStore.getState().notes).toHaveLength(1);
+		expect(useAetherStore.getState().notes[0].title).toBe("Importada");
+	});
+
+	it("ignora notas con formato inválido (falla Zod)", () => {
+		const notes = [{ id: "note_1", title: "" }]; // title vacío falla min(1)
+		useAetherStore.getState().importNotes(JSON.stringify(notes));
+		expect(useAetherStore.getState().notes).toHaveLength(0);
+	});
+
+	it("no duplica notas con mismo id", () => {
+		const note = {
+			id: "note_dup",
+			title: "Dup",
+			content: "",
+			tags: [],
+			createdAt: 1,
+			updatedAt: 1,
+		};
+		useAetherStore.getState().importNotes(JSON.stringify([note]));
+		useAetherStore.getState().importNotes(JSON.stringify([note]));
+		expect(useAetherStore.getState().notes).toHaveLength(1);
+	});
+
+	it("JSON malformado no lanza", () => {
+		expect(() =>
+			useAetherStore.getState().importNotes("{malformado"),
+		).not.toThrow();
+	});
+
+	it("formato { notes: [...] } también funciona", () => {
+		const data = {
+			notes: [
+				{
+					id: "note_wrap",
+					title: "Envuelta",
+					content: "",
+					tags: [],
+					createdAt: 1,
+					updatedAt: 1,
+				},
+			],
+		};
+		useAetherStore.getState().importNotes(JSON.stringify(data));
+		expect(useAetherStore.getState().notes[0].title).toBe("Envuelta");
 	});
 });

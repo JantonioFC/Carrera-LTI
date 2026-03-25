@@ -30,21 +30,39 @@ export default function MallaCurricular() {
 		return Math.min(...active.map((s) => s.semester));
 	}, [allSubjects, data]);
 
-	const subjectsWithStatus = allSubjects.map((s) => ({
-		...s,
-		status: data[s.id]?.status || s.status,
-		grade: data[s.id]?.grade,
-	}));
+	// Evitar 5 iteraciones redundantes en cada render (#186)
+	const subjectsWithStatus = useMemo(
+		() =>
+			allSubjects.map((s) => ({
+				...s,
+				status: data[s.id]?.status || s.status,
+				grade: data[s.id]?.grade,
+			})),
+		[allSubjects, data],
+	);
 
-	const creditsDone = subjectsWithStatus
-		.filter((s) => s.status === "aprobada")
-		.reduce((a, s) => a + s.credits, 0);
-	const creditsActive = subjectsWithStatus
-		.filter((s) => s.status === "en_curso")
-		.reduce((a, s) => a + s.credits, 0);
-	const creditsPending = subjectsWithStatus
-		.filter((s) => s.status === "pendiente")
-		.reduce((a, s) => a + s.credits, 0);
+	const { creditsDone, creditsActive, creditsPending, tcDone } = useMemo(() => {
+		let done = 0;
+		let active = 0;
+		let pending = 0;
+		let tcDoneAcc = 0;
+		for (const s of subjectsWithStatus) {
+			if (s.status === "aprobada") {
+				done += s.credits;
+				if (s.semester <= 4) tcDoneAcc += s.credits;
+			} else if (s.status === "en_curso") {
+				active += s.credits;
+			} else if (s.status === "pendiente") {
+				pending += s.credits;
+			}
+		}
+		return {
+			creditsDone: done,
+			creditsActive: active,
+			creditsPending: pending,
+			tcDone: tcDoneAcc,
+		};
+	}, [subjectsWithStatus]);
 
 	// Progressive total credits includes custom ones
 	const totalRequired = Math.max(
@@ -53,13 +71,14 @@ export default function MallaCurricular() {
 	);
 	const pct = Math.round((creditsDone / totalRequired) * 100);
 
-	// Tecnicatura = first 4 semesters (static)
-	const tcTotal = CURRICULUM.slice(0, 4)
-		.flatMap((s) => s.subjects)
-		.reduce((a, s) => a + s.credits, 0);
-	const tcDone = subjectsWithStatus
-		.filter((s) => s.semester <= 4 && s.status === "aprobada")
-		.reduce((a, s) => a + s.credits, 0);
+	// Tecnicatura = first 4 semesters (static — no depende de estado)
+	const tcTotal = useMemo(
+		() =>
+			CURRICULUM.slice(0, 4)
+				.flatMap((s) => s.subjects)
+				.reduce((a, s) => a + s.credits, 0),
+		[],
+	);
 
 	return (
 		<div className="p-6 space-y-5 animate-fade-in">
