@@ -10,10 +10,7 @@ import {
 	systemPreferences,
 } from "electron";
 import { logger } from "../src/utils/logger";
-import {
-	type ConfigStore,
-	makeConfigHandlers,
-} from "./handlers/configHandlers";
+import { type ConfigStore, initConfig } from "./handlers/configHandlers";
 import { makeDoclingHandlers } from "./handlers/doclingHandlers";
 import { makeObserverHandlers } from "./handlers/observerHandlers";
 import { makeRuVectorHandlers } from "./handlers/ruVectorHandlers";
@@ -252,12 +249,7 @@ function createWindow(): void {
 // ── Arranque ──────────────────────────────────────────────────────────────────
 app.whenReady().then(async () => {
 	const store = await initStore();
-	const config = makeConfigHandlers(store);
-
-	ipcMain.handle("config:set", (_event, key: string, value: string) =>
-		config.configSet(key, value),
-	);
-	ipcMain.handle("config:get", (_event, key: string) => config.configGet(key));
+	initConfig(store, ipcMain);
 
 	initRuVector();
 	initDocling();

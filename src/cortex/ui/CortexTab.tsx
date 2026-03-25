@@ -1,7 +1,23 @@
+import type { AetherNote, AetherNoteId } from "../../store/aetherStore";
 import { useAetherStore } from "../../store/aetherStore";
 import { ObserverAIToggle } from "../observer/ObserverAIToggle";
 import { useObserverIPC } from "../observer/useObserverIPC";
 import { type CortexActivity, useCortexStore } from "./cortexStore";
+
+interface CortexTabProps {
+	/** Inyectables para testing o desacoplamiento. Por defecto usa useAetherStore. */
+	addNote?: (title?: string) => AetherNote;
+	updateNote?: (id: AetherNoteId, updates: Partial<AetherNote>) => void;
+	ingestNote?: (id: AetherNoteId) => Promise<void>;
+}
+
+/** Hook interno que provee callbacks de Aether al Observer. */
+function useAetherObserverCallbacks() {
+	const addNote = useAetherStore((s) => s.addNote);
+	const updateNote = useAetherStore((s) => s.updateNote);
+	const ingestNote = useAetherStore((s) => s.ingestNote);
+	return { addNote, updateNote, ingestNote };
+}
 
 function activityLabel(activity: CortexActivity): string {
 	switch (activity.type) {
@@ -30,13 +46,14 @@ function formatTs(ts: number | null): string {
  * Tab dedicado de Cortex: muestra estado del índice, actividad actual,
  * toggle de Observer AI y banner informativo.
  */
-export function CortexTab() {
+export function CortexTab(props: CortexTabProps = {}) {
 	const indexedDocCount = useCortexStore((s) => s.indexedDocCount);
 	const lastIndexedAt = useCortexStore((s) => s.lastIndexedAt);
 	const activity = useCortexStore((s) => s.activity);
-	const addNote = useAetherStore((s) => s.addNote);
-	const updateNote = useAetherStore((s) => s.updateNote);
-	const ingestNote = useAetherStore((s) => s.ingestNote);
+	const storeCallbacks = useAetherObserverCallbacks();
+	const addNote = props.addNote ?? storeCallbacks.addNote;
+	const updateNote = props.updateNote ?? storeCallbacks.updateNote;
+	const ingestNote = props.ingestNote ?? storeCallbacks.ingestNote;
 	const { onStart, onStop } = useObserverIPC({
 		addNote,
 		updateNote,

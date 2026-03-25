@@ -1,11 +1,18 @@
-import { initializeApp } from "firebase/app";
+import { type FirebaseApp, initializeApp } from "firebase/app";
 import {
+	type Auth,
 	signInAnonymously as firebaseSignInAnonymously,
 	getAuth,
 	onAuthStateChanged,
 	type User,
 } from "firebase/auth";
-import { doc, getDoc, getFirestore, setDoc } from "firebase/firestore";
+import {
+	doc,
+	type Firestore,
+	getDoc,
+	getFirestore,
+	setDoc,
+} from "firebase/firestore";
 import type { PresencialEvent } from "../data/lti";
 import type { SubjectDataMap } from "../hooks/useSubjectData";
 import type { ScheduleItem } from "../pages/Horarios";
@@ -25,9 +32,9 @@ const firebaseConfig = {
 	measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
-let app: any;
-let auth: any;
-let db: any;
+let app: FirebaseApp | undefined;
+let auth: Auth | undefined;
+let db: Firestore | undefined;
 
 try {
 	app = initializeApp(firebaseConfig);

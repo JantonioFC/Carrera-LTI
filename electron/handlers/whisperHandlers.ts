@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import type { SubprocessAdapter } from "../subprocess/SubprocessAdapter";
+import { assertSafePath } from "./pathSecurity";
 
 /**
  * Handlers de Whisper para ipcMain.
@@ -30,6 +31,7 @@ export function makeWhisperHandlers(
 			wavPath: string,
 			model = "small",
 		): Promise<{ text: string; language: string }> {
+			assertSafePath(wavPath);
 			const response = await adapter.request({
 				id: randomUUID(),
 				action: "transcribe",

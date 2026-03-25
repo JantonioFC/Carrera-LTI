@@ -262,13 +262,13 @@ E2E=true npx vitest run src/cortex/e2e/
 
 **Causa más común**: Vite dev server no está corriendo.
 
-```bash
-# Terminal 1
-npm run dev   # inicia Vite en http://localhost:5173
+Usa el comando unificado que arranca ambos en un solo proceso:
 
-# Terminal 2
-npm run electron:dev   # inicia Electron (apunta a localhost:5173)
+```bash
+npm run dev:electron
 ```
+
+Este comando usa `vite-plugin-electron` para iniciar Vite y Electron juntos. No es necesario abrir dos terminales.
 
 ---
 

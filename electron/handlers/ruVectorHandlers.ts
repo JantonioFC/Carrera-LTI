@@ -1,5 +1,28 @@
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import type { SubprocessAdapter } from "../subprocess/SubprocessAdapter";
+import { assertSafePath } from "./pathSecurity";
+
+/** Deriva un docId determinista del path del documento (SHA-256). */
+function docIdFromPath(docPath: string): string {
+	return createHash("sha256").update(docPath).digest("hex");
+}
+
+/** Detecta el mimeType a partir de la extensión del archivo. (#126) */
+function mimeTypeFromPath(docPath: string): string {
+	const ext = docPath.split(".").pop()?.toLowerCase();
+	switch (ext) {
+		case "pdf":
+			return "application/pdf";
+		case "docx":
+			return "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+		case "txt":
+			return "text/plain";
+		case "md":
+			return "text/markdown";
+		default:
+			return "application/octet-stream";
+	}
+}
 
 /**
  * Handlers de RuVector para ipcMain.
@@ -23,13 +46,14 @@ export function makeRuVectorHandlers(
 ): RuVectorHandlers {
 	return {
 		async cortexIndex(docPath: string): Promise<{ chunks: number }> {
+			assertSafePath(docPath);
 			const response = await adapter.request({
 				id: randomUUID(),
 				action: "index_document",
 				payload: {
-					docId: randomUUID(),
+					docId: docIdFromPath(docPath),
 					path: docPath,
-					mimeType: "application/pdf",
+					mimeType: mimeTypeFromPath(docPath),
 				},
 			});
 			const data = response.data as Record<string, number>;

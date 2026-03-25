@@ -1,8 +1,22 @@
 import { randomUUID } from "node:crypto";
-import type {
-	RequestOptions,
-	SubprocessAdapter,
-} from "../subprocess/SubprocessAdapter";
+
+// Interfaces mínimas para aislar RuVectorAdapter del proceso principal.
+// El tipo completo vive en electron/subprocess/SubprocessAdapter.ts — no
+// accesible desde src/ (ver tsconfig.app.json). (#142)
+interface AdapterResponse {
+	data: unknown;
+}
+
+interface RequestOptions {
+	timeoutMs?: number;
+}
+
+interface SubprocessAdapter {
+	request(
+		req: { id: string; action: string; payload: Record<string, unknown> },
+		opts?: RequestOptions,
+	): Promise<AdapterResponse>;
+}
 
 export interface RuVectorChunk {
 	chunkId: string;

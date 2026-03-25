@@ -8,22 +8,16 @@ import {
 	KeyboardSensor,
 	PointerSensor,
 	rectIntersection,
-	useDroppable,
 	useSensor,
 	useSensors,
 } from "@dnd-kit/core";
-import {
-	arrayMove,
-	SortableContext,
-	sortableKeyboardCoordinates,
-	useSortable,
-	verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
-import { Clock, GripVertical, Plus, Search, Trash2, X } from "lucide-react";
-import { useMemo, useState } from "react";
-import { type Subject, WEEKDAY_SHORT } from "../data/lti";
+import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
+import { GripVertical } from "lucide-react";
+import { useState } from "react";
+import { DroppableColumn } from "../components/horarios/DroppableColumn";
+import { SelectSubjectModal } from "../components/horarios/SelectSubjectModal";
 import { useSubjectData } from "../hooks/useSubjectData";
+import { logger } from "../utils/logger";
 
 const DAYS = [1, 2, 3, 4, 5, 6]; // Lun a Sáb
 
@@ -33,197 +27,6 @@ export interface ScheduleItem {
 	day: number | null; // null means in the "bank"
 	startTime?: string;
 	endTime?: string;
-}
-
-function SortableItem({
-	id,
-	item,
-	subject,
-	onUpdateTime,
-	onRemove,
-}: {
-	id: string;
-	item: ScheduleItem;
-	subject: Subject | undefined;
-	onUpdateTime: (id: string, start: string, end: string) => void;
-	onRemove: (id: string) => void;
-}) {
-	const [isEditing, setIsEditing] = useState(false);
-	const [tempStart, setTempStart] = useState(item.startTime || "18:00");
-	const [tempEnd, setTempEnd] = useState(item.endTime || "22:00");
-
-	const {
-		attributes,
-		listeners,
-		setNodeRef,
-		transform,
-		transition,
-		isDragging,
-	} = useSortable({
-		id,
-		data: {
-			type: "Task",
-			item,
-		},
-	});
-
-	const style = {
-		transform: CSS.Translate.toString(transform),
-		transition,
-		opacity: isDragging ? 0.3 : 1,
-	};
-
-	return (
-		<div
-			ref={setNodeRef}
-			style={style}
-			className="bg-navy-900/80 border border-navy-700/50 rounded-lg p-2.5 mb-2 group touch-none hover:border-lti-blue/30 transition-all shadow-lg"
-		>
-			<div className="flex items-start gap-2">
-				<div
-					{...attributes}
-					{...listeners}
-					className="cursor-grab p-1 mt-0.5 text-slate-500 hover:text-white transition-colors"
-				>
-					<GripVertical size={14} />
-				</div>
-				<div className="flex-1 min-w-0">
-					<p className="text-xs text-white font-bold truncate mb-1">
-						{subject?.name}
-					</p>
-
-					{isEditing ? (
-						<div className="space-y-2 mt-2">
-							<div className="flex items-center gap-1">
-								<input
-									type="time"
-									value={tempStart}
-									onChange={(e) => setTempStart(e.target.value)}
-									className="bg-navy-950 border border-navy-700 rounded px-1.5 py-0.5 text-[10px] text-white w-full outline-none focus:border-lti-blue"
-								/>
-								<span className="text-slate-600">-</span>
-								<input
-									type="time"
-									value={tempEnd}
-									onChange={(e) => setTempEnd(e.target.value)}
-									className="bg-navy-950 border border-navy-700 rounded px-1.5 py-0.5 text-[10px] text-white w-full outline-none focus:border-lti-blue"
-								/>
-							</div>
-							<div className="flex gap-1">
-								<button
-									onClick={() => {
-										onUpdateTime(id, tempStart, tempEnd);
-										setIsEditing(false);
-									}}
-									className="flex-1 bg-lti-blue text-white text-[10px] py-1 rounded font-bold hover:bg-lti-blue/80"
-								>
-									OK
-								</button>
-								<button
-									onClick={() => setIsEditing(false)}
-									className="bg-navy-700 text-slate-400 text-[10px] px-2 py-1 rounded hover:text-white"
-								>
-									X
-								</button>
-							</div>
-						</div>
-					) : (
-						<div className="flex items-center justify-between">
-							<div
-								onClick={() => setIsEditing(true)}
-								className="flex items-center gap-1 text-[10px] text-slate-400 font-medium hover:text-lti-blue transition-colors cursor-pointer"
-							>
-								<Clock size={10} />
-								<span>
-									{item.startTime || "00:00"} - {item.endTime || "00:00"}
-								</span>
-							</div>
-							<button
-								onClick={() => onRemove(id)}
-								className="opacity-0 group-hover:opacity-100 text-slate-600 hover:text-lti-coral p-1 transition-all"
-							>
-								<Trash2 size={12} />
-							</button>
-						</div>
-					)}
-				</div>
-			</div>
-		</div>
-	);
-}
-
-function DroppableColumn({
-	day,
-	items,
-	allSubjects,
-	onAdd,
-	onUpdateTime,
-	onRemove,
-}: {
-	day: number | null;
-	items: ScheduleItem[];
-	allSubjects: Subject[];
-	onAdd?: () => void;
-	onUpdateTime: (id: string, start: string, end: string) => void;
-	onRemove: (id: string) => void;
-}) {
-	const { setNodeRef, isOver } = useDroppable({
-		id: day === null ? "bank" : `day-${day}`,
-		data: {
-			type: "Column",
-			day,
-		},
-	});
-
-	return (
-		<div
-			ref={setNodeRef}
-			className={`flex flex-col flex-1 min-w-[200px] bg-navy-800/50 rounded-xl p-3 border h-full transition-all duration-200 z-10 ${
-				isOver
-					? "border-lti-coral bg-navy-800 shadow-lg shadow-lti-coral/10"
-					: day === null
-						? "border-lti-coral/30"
-						: "border-navy-700/50 shadow-sm"
-			}`}
-		>
-			<div className="flex items-center justify-between mb-3 px-1">
-				<h3
-					className={`text-xs font-bold uppercase tracking-wider ${day === null ? "text-lti-coral" : "text-slate-400"}`}
-				>
-					{day === null ? "Banco de U.C." : WEEKDAY_SHORT[day]}
-				</h3>
-				{day === null && onAdd && (
-					<button
-						onClick={onAdd}
-						title="Gestionar materias activas"
-						className="p-1 hover:bg-lti-blue/20 text-lti-blue rounded-md transition-colors border border-transparent hover:border-lti-blue/30"
-					>
-						<Plus size={14} />
-					</button>
-				)}
-			</div>
-			<div className="flex-1 min-h-[500px]">
-				<SortableContext
-					items={items.map((i) => i.id)}
-					strategy={verticalListSortingStrategy}
-				>
-					{items.map((item) => {
-						const subject = allSubjects.find((s) => s.id === item.subjectId);
-						return (
-							<SortableItem
-								key={item.id}
-								id={item.id}
-								item={item}
-								subject={subject}
-								onUpdateTime={onUpdateTime}
-								onRemove={onRemove}
-							/>
-						);
-					})}
-				</SortableContext>
-			</div>
-		</div>
-	);
 }
 
 interface HorariosProps {
@@ -348,7 +151,7 @@ export default function Horarios({
 		const activeId = active.id.toString();
 
 		if (!over) {
-			console.log("[DND] DragEnd: No drop target found");
+			logger.debug("Horarios", "[DND] DragEnd: No drop target found");
 			// If it's a bank item, move it back to the bank if it was left in a day during DragOver
 			if (activeId.startsWith("bank-")) {
 				setItems((prev) =>
@@ -359,7 +162,10 @@ export default function Horarios({
 		}
 
 		const overId = over.id.toString();
-		console.log(`[DND] DragEnd: active=${activeId} over=${overId}`);
+		logger.debug(
+			"Horarios",
+			`[DND] DragEnd: active=${activeId} over=${overId}`,
+		);
 
 		setItems((prev) => {
 			const activeIndex = prev.findIndex((i) => i.id === activeId);
@@ -382,7 +188,7 @@ export default function Horarios({
 			// Case 1: Dropped on bank -> Delete if it's an instance
 			if (overDay === null) {
 				if (!activeId.startsWith("bank-")) {
-					console.log(`[DND] Removing instance ${activeId}`);
+					logger.debug("Horarios", `[DND] Removing instance ${activeId}`);
 					return prev.filter((i) => i.id !== activeId);
 				}
 				// If it's the master bank item, just ensure it stays in bank
@@ -398,7 +204,10 @@ export default function Horarios({
 
 				// If it's a bank master, clone it by giving it a new instance ID
 				if (activeId.startsWith("bank-")) {
-					console.log(`[DND] Cloning master ${activeId} to day ${overDay}`);
+					logger.debug(
+						"Horarios",
+						`[DND] Cloning master ${activeId} to day ${overDay}`,
+					);
 					const instanceId = `inst-${newItem.subjectId}-${Math.random().toString(36).substring(2, 9)}`;
 
 					// IMPORTANT: The master stays in the bank (day null)
@@ -466,7 +275,7 @@ export default function Horarios({
 					onDragOver={handleDragOver}
 					onDragEnd={handleDragEnd}
 				>
-					{/* Subjet Bank */}
+					{/* Subject Bank */}
 					<div className="w-64 flex-shrink-0 flex flex-col">
 						<DroppableColumn
 							day={null}
@@ -515,122 +324,6 @@ export default function Horarios({
 			{isSelecting && (
 				<SelectSubjectModal onClose={() => setIsSelecting(false)} />
 			)}
-		</div>
-	);
-}
-
-function SelectSubjectModal({ onClose }: { onClose: () => void }) {
-	const { allSubjects, data, updateSubject } = useSubjectData();
-	const [search, setSearch] = useState("");
-
-	const available = useMemo(() => {
-		return allSubjects.filter((s) => {
-			const status = data[s.id]?.status || s.status;
-			const isAlreadyActive = status === "en_curso";
-			const isApproved = status === "aprobada";
-			const matchesSearch = s.name.toLowerCase().includes(search.toLowerCase());
-			return !isAlreadyActive && !isApproved && matchesSearch;
-		});
-	}, [allSubjects, data, search]);
-
-	const groupedBySemester = useMemo(() => {
-		const groups: Record<number, Subject[]> = {};
-		available.forEach((s) => {
-			const sem = s.semester || 1;
-			if (!groups[sem]) groups[sem] = [];
-			groups[sem].push(s);
-		});
-		return groups;
-	}, [available]);
-
-	const semesters = Object.keys(groupedBySemester)
-		.map(Number)
-		.sort((a, b) => a - b);
-
-	const handleAdd = (id: string) => {
-		updateSubject(id, { status: "en_curso" });
-	};
-
-	return (
-		<div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
-			<div className="bg-navy-800 rounded-2xl border border-navy-600/50 shadow-2xl w-full max-w-sm flex flex-col max-h-[80vh]">
-				<div className="p-4 border-b border-navy-700/50 flex justify-between items-center bg-navy-800 rounded-t-2xl">
-					<h3 className="text-white font-semibold flex items-center gap-2">
-						<Plus size={18} className="text-lti-blue" />
-						Activar Materias
-					</h3>
-					<button
-						onClick={onClose}
-						className="text-slate-400 hover:text-white transition-colors"
-					>
-						<X size={20} />
-					</button>
-				</div>
-				<div className="p-4 bg-navy-900/50 border-b border-navy-700/50">
-					<div className="relative">
-						<Search
-							className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"
-							size={16}
-						/>
-						<input
-							type="text"
-							value={search}
-							onChange={(e) => setSearch(e.target.value)}
-							placeholder="Buscar materia..."
-							className="w-full bg-navy-900 border border-navy-700 rounded-lg pl-10 pr-4 py-2 text-sm text-white focus:outline-none focus:border-lti-blue transition-colors outline-none"
-						/>
-					</div>
-				</div>
-				<div className="flex-1 overflow-y-auto p-2 custom-scrollbar">
-					{semesters.length === 0 ? (
-						<p className="text-xs text-slate-500 italic text-center py-8">
-							No hay más materias para activar
-						</p>
-					) : (
-						semesters.map((sem) => (
-							<div key={sem} className="mb-4">
-								<div className="px-3 py-1 flex items-center gap-2 mb-1 sticky top-0 bg-navy-800/90 backdrop-blur-sm z-10 rounded-md">
-									<div className="h-px flex-1 bg-navy-700"></div>
-									<span className="text-[10px] font-bold text-lti-blue uppercase tracking-widest whitespace-nowrap">
-										Semestre {sem}
-									</span>
-									<div className="h-px flex-1 bg-navy-700"></div>
-								</div>
-								<div className="space-y-0.5">
-									{groupedBySemester[sem].map((s) => (
-										<button
-											key={s.id}
-											onClick={() => handleAdd(s.id)}
-											className="w-full text-left p-2.5 rounded-lg hover:bg-navy-700 transition-colors group flex items-center justify-between"
-										>
-											<div>
-												<p className="text-sm font-medium text-white group-hover:text-lti-blue">
-													{s.name}
-												</p>
-												<p className="text-[10px] text-slate-400">{s.area}</p>
-											</div>
-											<div className="flex items-center gap-2">
-												<span className="text-[10px] font-bold text-slate-500">
-													{s.credits} CR
-												</span>
-												<Plus
-													size={14}
-													className="text-lti-blue opacity-0 group-hover:opacity-100"
-												/>
-											</div>
-										</button>
-									))}
-								</div>
-							</div>
-						))
-					)}
-				</div>
-				<div className="p-4 border-t border-navy-700/50 bg-navy-800 rounded-b-2xl text-center">
-					<p className="text-[10px] text-slate-500">
-						Las materias seleccionadas se añadirán al banco de horarios.
-					</p>
-				</div>
-			</div>
 		</div>
 	);
 }

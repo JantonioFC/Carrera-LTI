@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
+import { z } from "zod";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
@@ -64,6 +65,20 @@ interface AetherActions {
 	importNotes: (json: string) => void;
 }
 
+/** Schema Zod para validar notas importadas antes de persistirlas. (#138) */
+const ImportedNoteSchema = z.object({
+	id: z
+		.string()
+		.min(1)
+		.transform((v) => v as AetherNoteId),
+	title: z.string().min(1),
+	content: z.string().default(""),
+	createdAt: z.number().optional().default(0),
+	updatedAt: z.number().optional().default(0),
+	tags: z.array(z.string()).optional().default([]),
+	embedding: z.array(z.number()).optional(),
+});
+
 const extractLinks = (text: string): string[] => {
 	const links = Array.from(text.matchAll(/\[\[(.*?)\]\]/g), (match) =>
 		match[1]?.trim(),
@@ -79,9 +94,9 @@ export const useAetherStore = create<AetherState & AetherActions>()(
 
 			return {
 				notes: defaultNotes,
-				geminiApiKey: import.meta.env.VITE_GEMINI_API_KEY || "",
-				gmailClientId: import.meta.env.VITE_GMAIL_CLIENT_ID || "",
-				gmailApiKey: import.meta.env.VITE_GMAIL_API_KEY || "",
+				geminiApiKey: "",
+				gmailClientId: "",
+				gmailApiKey: "",
 				chatHistory: [],
 
 				addNote: (title = "Nueva Nota") => {
@@ -156,16 +171,19 @@ export const useAetherStore = create<AetherState & AetherActions>()(
 					set((state) => {
 						state.geminiApiKey = key;
 					});
+					window.cortexAPI?.config.set("gemini_api_key", key);
 				},
 				setGmailClientId: (id) => {
 					set((state) => {
 						state.gmailClientId = id;
 					});
+					window.cortexAPI?.config.set("gmail_client_id", id);
 				},
 				setGmailApiKey: (key) => {
 					set((state) => {
 						state.gmailApiKey = key;
 					});
+					window.cortexAPI?.config.set("gmail_api_key", key);
 				},
 
 				ingestNote: async (id) => {
@@ -230,13 +248,18 @@ export const useAetherStore = create<AetherState & AetherActions>()(
 				importNotes: (json: string) => {
 					try {
 						const data = JSON.parse(json);
-						const importedNotes = Array.isArray(data) ? data : data.notes;
+						const rawNotes = Array.isArray(data) ? data : data.notes;
 
-						if (!Array.isArray(importedNotes)) return;
+						if (!Array.isArray(rawNotes)) return;
+
+						// Validar cada nota con Zod antes de persistir (#138)
+						const importedNotes = rawNotes
+							.map((n) => ImportedNoteSchema.safeParse(n))
+							.filter((r) => r.success)
+							.map((r) => r.data);
 
 						set((state) => {
-							importedNotes.forEach((newNote: any) => {
-								if (!newNote.id || !newNote.title) return;
+							importedNotes.forEach((newNote) => {
 								const exists = state.notes.find((n) => n.id === newNote.id);
 								if (!exists) {
 									state.notes.push(newNote);
@@ -254,6 +277,25 @@ export const useAetherStore = create<AetherState & AetherActions>()(
 		{
 			name: "aether-storage",
 			storage: createJSONStorage(() => idbStorage),
+			// API keys no se persisten en IDB — van al OS Keychain vía cortexAPI (#109)
+			partialize: (state) => ({
+				notes: state.notes,
+				chatHistory: state.chatHistory,
+			}),
+			onRehydrateStorage: () => async () => {
+				const api = window.cortexAPI;
+				if (!api) return;
+				const [geminiKey, gmailId, gmailKey] = await Promise.all([
+					api.config.get("gemini_api_key"),
+					api.config.get("gmail_client_id"),
+					api.config.get("gmail_api_key"),
+				]);
+				useAetherStore.setState({
+					geminiApiKey: geminiKey ?? "",
+					gmailClientId: gmailId ?? "",
+					gmailApiKey: gmailKey ?? "",
+				});
+			},
 		},
 	),
 );

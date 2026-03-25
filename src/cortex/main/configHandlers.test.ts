@@ -60,12 +60,14 @@ describe("configHandlers — config:get", () => {
 	});
 
 	it("should_return_null_for_missing_key", () => {
-		const result = handlers.configGet("nonexistent");
+		// gemini_api_key está en la allowlist pero no en el store mock
+		const result = handlers.configGet("gemini_api_key");
 		expect(result).toBeNull();
 	});
 
 	it("should_return_null_not_undefined_for_missing_key", () => {
-		const result = handlers.configGet("missing");
+		// gmail_client_id está en la allowlist pero no en el store mock
+		const result = handlers.configGet("gmail_client_id");
 		expect(result).not.toBeUndefined();
 		expect(result).toBeNull();
 	});

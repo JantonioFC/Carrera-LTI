@@ -17,7 +17,7 @@ import {
 import { useSubjectData } from "./hooks/useSubjectData";
 import type { ScheduleItem } from "./pages/Horarios";
 import type { Task } from "./pages/Tareas";
-import { safeParseJSON } from "./utils/safeStorage";
+import { STORAGE_KEYS, safeParseJSON, setJSON } from "./utils/safeStorage";
 
 // ─── Lazy-loaded pages (code splitting) ───────────────────────
 const Dashboard = lazy(() => import("./pages/Dashboard"));
@@ -75,22 +75,22 @@ function App() {
 
 	const updatePresenciales = (updated: PresencialEvent[]) => {
 		setPresenciales(updated);
-		localStorage.setItem("lti_eventos_presenciales", JSON.stringify(updated));
+		setJSON(STORAGE_KEYS.PRESENCIALES, updated);
 	};
 
 	const updateCalendarEvents = (updated: Record<string, any[]>) => {
 		setCalendarEvents(updated);
-		localStorage.setItem("cal2026_events", JSON.stringify(updated));
+		setJSON(STORAGE_KEYS.CAL_EVENTS, updated);
 	};
 
 	const updateTasks = (updated: Task[]) => {
 		setTasks(updated);
-		localStorage.setItem("lti_tasks", JSON.stringify(updated));
+		setJSON(STORAGE_KEYS.TASKS, updated);
 	};
 
 	const updateSchedule = (updated: ScheduleItem[]) => {
 		setSchedule(updated);
-		localStorage.setItem("lti_schedule", JSON.stringify(updated));
+		setJSON(STORAGE_KEYS.SCHEDULE, updated);
 	};
 
 	// Sincronizar banco de materias de horarios con materias activas

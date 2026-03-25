@@ -1,4 +1,5 @@
 import { EventEmitter } from "node:events";
+import { normalize } from "node:path";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
 	makeObserverHandlers,
@@ -73,7 +74,7 @@ describe("observerHandlers", () => {
 		const args = spawnFn.mock.calls[0][1] as string[];
 		expect(args[0]).toBe("/scripts/observer_runner.py");
 		expect(args[1]).toMatch(/recording_\d+\.wav$/);
-		expect(args[1]).toContain(TEST_RECORDINGS_DIR);
+		expect(normalize(args[1])).toContain(normalize(TEST_RECORDINGS_DIR));
 	});
 
 	it("should_toggle_on_twice_does_not_spawn_second_process", async () => {

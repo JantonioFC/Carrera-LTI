@@ -9,23 +9,24 @@ on:
 jobs:
   build-and-test:
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
 
     strategy:
       matrix:
         node-version: [20.x, 22.x]
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
         include:
           - os: ubuntu-latest
             node-version: 20.x
             run-gitleaks: true
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
       with:
         fetch-depth: 0  # Requerido por gitleaks para escanear el historial completo
 
     - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
@@ -35,18 +36,18 @@ jobs:
 
     - name: Secret scanning (gitleaks)
       if: matrix.run-gitleaks == true
-      uses: gitleaks/gitleaks-action@v2
+      uses: gitleaks/gitleaks-action@dcedce43c6f43de0b836d1fe38946645c9c638dc # v2
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Check Formatting & Lint (Biome)
       run: npm run lint
-      
+
     - name: Run tests
       run: npm run test
 
     - name: Cache Python venv
-      uses: actions/cache@v4
+      uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
       with:
         path: ~/.carrera-lti/venv
         key: python-venv-${{ runner.os }}-${{ hashFiles('scripts/requirements*.txt', 'scripts/setup.py', 'scripts/*.py') }}
@@ -62,12 +63,13 @@ jobs:
   e2e:
     name: E2E Tests (grounding + fixtures)
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     needs: build-and-test
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
-    - uses: actions/setup-node@v4
+    - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
       with:
         node-version: 20.x
         cache: npm

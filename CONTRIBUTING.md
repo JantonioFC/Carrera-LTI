@@ -38,13 +38,15 @@ Si el setup falla, verifica que Python 3.10+ este instalado y que tengas conexio
 
 ## Desarrollo
 
-Para arrancar el servidor Vite y Electron en modo desarrollo:
+Para arrancar Vite + Electron juntos en modo desarrollo:
 
 ```bash
-npm run dev
+npm run dev:electron
 ```
 
-Esto levanta Vite en `http://localhost:5173` y abre la ventana de Electron apuntando a esa URL. Los cambios en el renderer se aplican en caliente (HMR). Los cambios en el proceso principal de Electron requieren reiniciar el comando.
+Este comando usa `vite-plugin-electron` para levantar Vite y compilar/lanzar Electron en un solo proceso. Los cambios en el renderer se aplican en caliente (HMR). Los cambios en el proceso principal de Electron requieren reiniciar el comando.
+
+> Si solo quieres el modo web (PWA, sin Electron), usa `npm run dev`.
 
 ---
 

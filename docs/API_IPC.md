@@ -61,7 +61,7 @@ Motor de busqueda vectorial semantica implementado como binario Rust (`~/.carrer
 
 | Canal | Metodo JS | Parametros | Retorno | Descripcion |
 |---|---|---|---|---|
-| `cortex:index` | `cortexAPI.cortex.index` | `docPath: string` | `Promise<{ chunks: number }>` | Indexa un documento en el motor vectorial |
+| `cortex:index` | `cortexAPI.cortex.index` | `docPath: string` | `Promise<{ chunks: number }>` | Indexa un documento (PDF, DOCX, TXT, MD) en el motor vectorial. El mimeType se detecta automáticamente por extensión. |
 | `cortex:query` | `cortexAPI.cortex.query` | `text: string, topK?: number` | `Promise<unknown[]>` | Ejecuta una consulta semantica; `topK` por defecto es 5 |
 
 ### Ejemplos

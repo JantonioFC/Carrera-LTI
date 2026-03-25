@@ -1,4 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+// Importamos el tipo del preload para que TypeScript detecte divergencias
+// en compilación si el contrato de cortexAPI cambia. (#124)
+import type { CortexAPI, CortexChunk } from "../../../electron/types.d.ts";
 
 /**
  * Tests de contrato del contextBridge.
@@ -10,8 +13,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
  * acceso a electron. Solo usamos el mock que simula lo que el preload expone.
  */
 
-// Replica exacta de lo que electron/preload.ts expone via contextBridge.
-// Si la forma del preload cambia, actualizar aquí también.
+// Tipado contra CortexAPI garantiza que el mock siempre coincide con el preload.
+// satisfies (en vez de : CortexAPI) preserva los tipos Mock para mockResolvedValueOnce.
 function buildMockCortexAPI() {
 	return {
 		config: {
@@ -27,7 +30,7 @@ function buildMockCortexAPI() {
 				.fn<(docPath: string) => Promise<{ chunks: number }>>()
 				.mockResolvedValue({ chunks: 0 }),
 			query: vi
-				.fn<(text: string, topK?: number) => Promise<unknown[]>>()
+				.fn<(text: string, topK?: number) => Promise<CortexChunk[]>>()
 				.mockResolvedValue([]),
 			processDocument: vi
 				.fn<(docPath: string) => Promise<{ chunks: number; text: string }>>()
@@ -54,7 +57,7 @@ function buildMockCortexAPI() {
 				.fn<() => Promise<{ active: boolean }>>()
 				.mockResolvedValue({ active: false }),
 		},
-	};
+	} satisfies CortexAPI;
 }
 
 describe("contextBridge — contrato cortexAPI.config (Fase B)", () => {
