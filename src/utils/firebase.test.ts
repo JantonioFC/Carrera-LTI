@@ -1,5 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+// Garantiza que hasFirebaseConfig sea true durante los tests (#174).
+// En CI no existe .env, por lo que sin este stub firebase.ts no inicializa
+// app/auth/db y los tests que dependen de ellos fallan.
+(import.meta.env as Record<string, unknown>).VITE_FIREBASE_API_KEY =
+	"test-api-key";
+(import.meta.env as Record<string, unknown>).VITE_FIREBASE_PROJECT_ID =
+	"test-project-id";
+
 // --- Mocks ---
 
 vi.mock("firebase/app", () => ({
