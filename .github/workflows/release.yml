@@ -127,7 +127,7 @@ jobs:
         run: |
           cd installers
           find . -type f \( -name "*.exe" -o -name "*.dmg" -o -name "*.AppImage" \) \
-            | sort | xargs sha256sum > SHA256SUMS.txt
+            -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS.txt
           cat SHA256SUMS.txt
 
       - name: Create GitHub Release
