@@ -1,14 +1,7 @@
-import {
-	Calendar,
-	CheckCircle2,
-	Circle,
-	Flag,
-	GripVertical,
-	Plus,
-	X,
-} from "lucide-react";
+import { Plus } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useSubjectData } from "../hooks/useSubjectData";
+import { AddTaskModal } from "../components/tareas/AddTaskModal";
+import { KanbanColumn } from "../components/tareas/KanbanColumn";
 import type { SubtaskId, TaskId } from "../utils/schemas";
 
 export type { SubtaskId, TaskId };
@@ -31,144 +24,11 @@ export interface Task {
 	subtasks: Subtask[];
 }
 
-const PRIORITY_STYLES: Record<Priority, string> = {
-	alta: "text-red-400 bg-red-500/10 border-red-500/20",
-	media: "text-yellow-400 bg-yellow-500/10 border-yellow-500/20",
-	baja: "text-green-400 bg-green-500/10 border-green-500/20",
-};
-
 const COLUMNS: { id: KanbanStatus; label: string; accent: string }[] = [
 	{ id: "todo", label: "Por hacer", accent: "border-slate-600" },
 	{ id: "inProgress", label: "En proceso", accent: "border-lti-blue" },
 	{ id: "done", label: "Hecho", accent: "border-green-500" },
 ];
-
-function AddTaskModal({
-	onAdd,
-	onClose,
-}: {
-	onAdd: (t: Omit<Task, "id">) => void;
-	onClose: () => void;
-}) {
-	const [form, setForm] = useState<Omit<Task, "id">>({
-		title: "",
-		subjectId: "",
-		dueDate: "",
-		priority: "media",
-		status: "todo",
-		subtasks: [],
-	});
-
-	return (
-		<div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
-			<div className="bg-navy-800 rounded-2xl border border-navy-600/50 shadow-2xl w-full max-w-md">
-				<div className="p-5 border-b border-navy-700/50 flex justify-between items-center">
-					<h3 className="text-white font-semibold">Nueva Tarea</h3>
-					<button
-						onClick={onClose}
-						className="text-slate-400 hover:text-white text-xl"
-					>
-						×
-					</button>
-				</div>
-				<div className="p-5 space-y-4">
-					<p className="text-[10px] text-slate-500 mb-2 uppercase tracking-widest px-1">
-						Detalles de la tarea
-					</p>
-					<div>
-						<label className="block text-xs font-medium text-slate-400 mb-1.5">
-							Título
-						</label>
-						<input
-							type="text"
-							value={form.title}
-							onChange={(e) => setForm({ ...form, title: e.target.value })}
-							className="w-full bg-navy-900 border border-navy-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-lti-blue"
-							placeholder="Descripción de la tarea"
-						/>
-					</div>
-					<div>
-						<label className="block text-xs font-medium text-slate-400 mb-1.5">
-							U.C.
-						</label>
-						<select
-							value={form.subjectId}
-							onChange={(e) => setForm({ ...form, subjectId: e.target.value })}
-							className="w-full bg-navy-900 border border-navy-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-lti-blue"
-						>
-							<option value="">Seleccionar U.C.</option>
-							{useSubjectData().allSubjects.map((s) => (
-								<option key={s.id} value={s.id}>
-									{s.name}
-								</option>
-							))}
-						</select>
-					</div>
-					<div className="grid grid-cols-2 gap-3">
-						<div>
-							<label className="block text-xs font-medium text-slate-400 mb-1.5">
-								Fecha límite
-							</label>
-							<input
-								type="date"
-								value={form.dueDate}
-								onChange={(e) => setForm({ ...form, dueDate: e.target.value })}
-								className="w-full bg-navy-900 border border-navy-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-lti-blue"
-							/>
-						</div>
-						<div>
-							<label className="block text-xs font-medium text-slate-400 mb-1.5">
-								Prioridad
-							</label>
-							<select
-								value={form.priority}
-								onChange={(e) =>
-									setForm({ ...form, priority: e.target.value as Priority })
-								}
-								className="w-full bg-navy-900 border border-navy-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-lti-blue"
-							>
-								<option value="alta">Alta</option>
-								<option value="media">Media</option>
-								<option value="baja">Baja</option>
-							</select>
-						</div>
-					</div>
-					<div>
-						<label className="block text-xs font-medium text-slate-400 mb-1.5">
-							Columna
-						</label>
-						<select
-							value={form.status}
-							onChange={(e) =>
-								setForm({ ...form, status: e.target.value as KanbanStatus })
-							}
-							className="w-full bg-navy-900 border border-navy-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-lti-blue"
-						>
-							<option value="todo">Por hacer</option>
-							<option value="inProgress">En proceso</option>
-							<option value="done">Hecho</option>
-						</select>
-					</div>
-				</div>
-				<div className="p-5 border-t border-navy-700/50 flex gap-3 justify-end">
-					<button
-						onClick={onClose}
-						className="px-4 py-2 text-sm text-slate-400 hover:text-white"
-					>
-						Cancelar
-					</button>
-					<button
-						onClick={() => form.title && onAdd(form)}
-						disabled={!form.title}
-						className="px-4 py-2 text-sm gradient-blue text-white rounded-lg font-medium disabled:opacity-40"
-					>
-						Crear tarea
-					</button>
-				</div>
-			</div>
-		</div>
-	);
-}
 
 interface TareasProps {
 	tasks: Task[];
@@ -176,11 +36,9 @@ interface TareasProps {
 }
 
 export default function Tareas({ tasks, onUpdateTasks }: TareasProps) {
-	const { allSubjects } = useSubjectData();
 	const [showAdd, setShowAdd] = useState(false);
 
 	useEffect(() => {
-		// Check and request for notification permission
 		if (
 			"Notification" in window &&
 			Notification.permission !== "granted" &&
@@ -189,7 +47,6 @@ export default function Tareas({ tasks, onUpdateTasks }: TareasProps) {
 			Notification.requestPermission();
 		}
 
-		// Check for due tasks and notify
 		if ("Notification" in window && Notification.permission === "granted") {
 			const tomorrow = new Date();
 			tomorrow.setDate(tomorrow.getDate() + 1);
@@ -213,23 +70,19 @@ export default function Tareas({ tasks, onUpdateTasks }: TareasProps) {
 		}
 	}, [tasks]);
 
-	const saveTasks = (t: Task[]) => {
-		onUpdateTasks(t);
-	};
-
 	const addTask = (task: Omit<Task, "id">) => {
-		saveTasks([...tasks, { ...task, id: `t${Date.now()}` as TaskId }]);
+		onUpdateTasks([...tasks, { ...task, id: `t${Date.now()}` as TaskId }]);
 		setShowAdd(false);
 	};
 
 	const deleteTask = (id: TaskId) =>
-		saveTasks(tasks.filter((t) => t.id !== id));
+		onUpdateTasks(tasks.filter((t) => t.id !== id));
 
 	const moveTask = (id: TaskId, status: KanbanStatus) =>
-		saveTasks(tasks.map((t) => (t.id === id ? { ...t, status } : t)));
+		onUpdateTasks(tasks.map((t) => (t.id === id ? { ...t, status } : t)));
 
 	const toggleSubtask = (taskId: TaskId, subtaskId: SubtaskId) => {
-		saveTasks(
+		onUpdateTasks(
 			tasks.map((t) => {
 				if (t.id !== taskId) return t;
 				return {
@@ -244,7 +97,7 @@ export default function Tareas({ tasks, onUpdateTasks }: TareasProps) {
 
 	const addSubtask = (taskId: TaskId, text: string) => {
 		if (!text.trim()) return;
-		saveTasks(
+		onUpdateTasks(
 			tasks.map((t) => {
 				if (t.id !== taskId) return t;
 				return {
@@ -280,138 +133,19 @@ export default function Tareas({ tasks, onUpdateTasks }: TareasProps) {
 			</div>
 
 			<div className="grid grid-cols-3 gap-5 h-full">
-				{COLUMNS.map((col) => {
-					const colTasks = tasks.filter((t) => t.status === col.id);
-					return (
-						<div
-							key={col.id}
-							className={`card border-t-2 ${col.accent} p-4 space-y-3 min-h-[400px]`}
-						>
-							<div className="flex items-center justify-between">
-								<h3 className="text-white font-semibold text-sm">
-									{col.label}
-								</h3>
-								<span className="px-2 py-0.5 bg-navy-700 text-slate-300 text-xs rounded-full font-bold">
-									{colTasks.length}
-								</span>
-							</div>
-							<div className="space-y-2">
-								{colTasks.map((task) => {
-									const subject = allSubjects.find(
-										(s) => s.id === task.subjectId,
-									);
-									return (
-										<div
-											key={task.id}
-											className="bg-navy-900/60 border border-navy-700/50 rounded-xl p-3 space-y-2 hover:border-navy-600/70 transition-all group"
-										>
-											<div className="flex items-start gap-2">
-												<GripVertical
-													size={14}
-													className="text-navy-600 mt-0.5 flex-shrink-0 cursor-grab"
-												/>
-												<p className="text-sm text-white font-medium flex-1 leading-snug">
-													{task.title}
-												</p>
-												<button
-													onClick={() => deleteTask(task.id)}
-													className="opacity-0 group-hover:opacity-100 text-slate-600 hover:text-red-400 transition-all flex-shrink-0"
-												>
-													<X size={13} />
-												</button>
-											</div>
-											<div className="flex items-center gap-2 ml-5 flex-wrap">
-												{subject && (
-													<span
-														className="text-xs px-2 py-0.5 rounded-full font-medium"
-														style={{
-															backgroundColor: `${subject.color}20`,
-															color: subject.color,
-														}}
-													>
-														{subject.name.split(" ").slice(0, 3).join(" ")}
-													</span>
-												)}
-												<span
-													className={`text-xs px-2 py-0.5 rounded-full font-medium border ${PRIORITY_STYLES[task.priority]}`}
-												>
-													<Flag size={9} className="inline mr-1" />
-													{task.priority}
-												</span>
-											</div>
-											{task.dueDate && (
-												<p
-													className={`text-xs ml-5 flex items-center gap-1 ${new Date(task.dueDate).getTime() < Date.now() && task.status !== "done" ? "text-red-400 font-bold" : "text-slate-400"}`}
-												>
-													<Calendar size={10} />
-													{new Date(
-														`${task.dueDate}T12:00:00`,
-													).toLocaleDateString("es-UY", {
-														day: "numeric",
-														month: "short",
-													})}
-												</p>
-											)}
-
-											{/* Subtasks */}
-											<div className="ml-5 space-y-1.5 pt-1">
-												{task.subtasks.map((st) => (
-													<div
-														key={st.id}
-														className="flex items-start gap-2 group/st"
-													>
-														<button
-															onClick={() => toggleSubtask(task.id, st.id)}
-															className="mt-0.5 text-slate-400 hover:text-lti-blue transition-colors"
-														>
-															{st.completed ? (
-																<CheckCircle2
-																	size={12}
-																	className="text-lti-blue"
-																/>
-															) : (
-																<Circle size={12} />
-															)}
-														</button>
-														<span
-															className={`text-xs flex-1 ${st.completed ? "text-slate-600 line-through" : "text-slate-300"}`}
-														>
-															{st.text}
-														</span>
-													</div>
-												))}
-												<input
-													type="text"
-													placeholder="+ Agregar subtarea"
-													className="w-full bg-transparent border-none text-xs text-slate-400 focus:outline-none focus:text-white placeholder-slate-600"
-													onKeyDown={(e) => {
-														if (e.key === "Enter") {
-															addSubtask(task.id, e.currentTarget.value);
-															e.currentTarget.value = "";
-														}
-													}}
-												/>
-											</div>
-
-											{/* Move buttons */}
-											<div className="flex gap-1 ml-5">
-												{COLUMNS.filter((c) => c.id !== col.id).map((c) => (
-													<button
-														key={c.id}
-														onClick={() => moveTask(task.id, c.id)}
-														className="text-[10px] text-slate-400 hover:text-white px-2 py-0.5 rounded bg-navy-800 hover:bg-navy-700 transition-colors"
-													>
-														→ {c.label}
-													</button>
-												))}
-											</div>
-										</div>
-									);
-								})}
-							</div>
-						</div>
-					);
-				})}
+				{COLUMNS.map((col) => (
+					<KanbanColumn
+						key={col.id}
+						columnId={col.id}
+						label={col.label}
+						accent={col.accent}
+						tasks={tasks.filter((t) => t.status === col.id)}
+						onDelete={deleteTask}
+						onMove={moveTask}
+						onToggleSubtask={toggleSubtask}
+						onAddSubtask={addSubtask}
+					/>
+				))}
 			</div>
 
 			{showAdd && (
