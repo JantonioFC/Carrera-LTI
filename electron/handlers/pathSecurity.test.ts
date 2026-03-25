@@ -99,7 +99,9 @@ describe("pathSecurity — assertSafePath", () => {
 
 	describe("error messages", () => {
 		it("should_include_resolved_path_in_error_message", () => {
-			expect(() => assertSafePath("/etc/shadow")).toThrow(/\/etc\/shadow/);
+			// Usamos join para que el separador sea correcto en cada plataforma
+			const expected = join("etc", "shadow");
+			expect(() => assertSafePath("/etc/shadow")).toThrow(expected);
 		});
 
 		it("should_include_input_path_in_relative_error_message", () => {
