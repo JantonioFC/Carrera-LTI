@@ -18,6 +18,29 @@ import { makeWhisperHandlers } from "./handlers/whisperHandlers";
 import { SubprocessAdapter } from "./subprocess/SubprocessAdapter";
 import { StdioTransport } from "./transports/StdioTransport";
 
+// ── Rate limiter ──────────────────────────────────────────────────────────────
+function createRateLimiter(max: number, windowMs: number): () => void {
+	const calls: number[] = [];
+	return () => {
+		const now = Date.now();
+		const recent = calls.filter((t) => now - t < windowMs);
+		calls.length = 0;
+		calls.push(...recent, now);
+		if (calls.length > max) {
+			throw new Error(`Rate limit exceeded: ${max} calls per ${windowMs}ms`);
+		}
+	};
+}
+
+const rateLimiters = {
+	cortexIndex: createRateLimiter(10, 60_000), // 10/min
+	cortexQuery: createRateLimiter(30, 60_000), // 30/min
+	cortexProcessDocument: createRateLimiter(5, 60_000), // 5/min
+	cortexOcr: createRateLimiter(5, 60_000), // 5/min
+	cortexTranscribe: createRateLimiter(5, 60_000), // 5/min
+	observerToggle: createRateLimiter(10, 60_000), // 10/min
+};
+
 const DEV_URL = "http://localhost:5173";
 const PROD_HTML = join(__dirname, "../dist/index.html");
 const isDev = !app.isPackaged;
@@ -138,12 +161,14 @@ function initRuVector(): void {
 	});
 	const ruVector = makeRuVectorHandlers(adapter);
 
-	ipcMain.handle("cortex:index", (_event, docPath: string) =>
-		ruVector.cortexIndex(docPath),
-	);
-	ipcMain.handle("cortex:query", (_event, text: string, topK?: number) =>
-		ruVector.cortexQuery(text, topK),
-	);
+	ipcMain.handle("cortex:index", (_event, docPath: string) => {
+		rateLimiters.cortexIndex();
+		return ruVector.cortexIndex(docPath);
+	});
+	ipcMain.handle("cortex:query", (_event, text: string, topK?: number) => {
+		rateLimiters.cortexQuery();
+		return ruVector.cortexQuery(text, topK);
+	});
 
 	logger.info("RuVector", "handlers registrados");
 }
@@ -165,12 +190,14 @@ function initDocling(): void {
 	});
 	const docling = makeDoclingHandlers(adapter);
 
-	ipcMain.handle("cortex:process-document", (_event, docPath: string) =>
-		docling.processDocument(docPath),
-	);
-	ipcMain.handle("cortex:ocr", (_event, imagePath: string) =>
-		docling.ocr(imagePath),
-	);
+	ipcMain.handle("cortex:process-document", (_event, docPath: string) => {
+		rateLimiters.cortexProcessDocument();
+		return docling.processDocument(docPath);
+	});
+	ipcMain.handle("cortex:ocr", (_event, imagePath: string) => {
+		rateLimiters.cortexOcr();
+		return docling.ocr(imagePath);
+	});
 
 	logger.info("Docling", "handlers registrados");
 }
@@ -194,8 +221,10 @@ function initWhisper(): void {
 
 	ipcMain.handle(
 		"cortex:transcribe",
-		(_event, wavPath: string, model?: string) =>
-			whisper.transcribe(wavPath, model),
+		(_event, wavPath: string, model?: string) => {
+			rateLimiters.cortexTranscribe();
+			return whisper.transcribe(wavPath, model);
+		},
 	);
 
 	logger.info("Whisper", "handlers registrados");
@@ -216,6 +245,7 @@ function initObserver(): void {
 	});
 
 	ipcMain.handle("observer:toggle", async (_event, active: boolean) => {
+		rateLimiters.observerToggle();
 		// En macOS solicitar permiso de micrófono antes de capturar.
 		if (active && process.platform === "darwin") {
 			const granted = await systemPreferences.askForMediaAccess("microphone");

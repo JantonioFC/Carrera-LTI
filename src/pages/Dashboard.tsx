@@ -1,5 +1,5 @@
 import { ExternalLink, FolderRoot, History, Layers } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { AnalyticsCharts } from "../components/dashboard/AnalyticsCharts";
 import { DashboardSummary } from "../components/dashboard/DashboardSummary";
 import { EditPresencialModal } from "../components/dashboard/EditPresencialModal";
@@ -45,18 +45,24 @@ export default function Dashboard({
 			.sort((a, b) => a.date.localeCompare(b.date));
 	}, [presenciales]);
 
-	const handleSaveEvent = (updated: PresencialEvent) => {
-		const newList = presenciales.map((p) =>
-			p.id === updated.id ? updated : p,
-		);
-		onUpdatePresenciales(newList);
-		setEditingEvent(null);
-	};
+	const handleSaveEvent = useCallback(
+		(updated: PresencialEvent) => {
+			const newList = presenciales.map((p) =>
+				p.id === updated.id ? updated : p,
+			);
+			onUpdatePresenciales(newList);
+			setEditingEvent(null);
+		},
+		[presenciales, onUpdatePresenciales],
+	);
 
-	const handleDeleteEvent = (id: string) => {
-		onUpdatePresenciales(presenciales.filter((p) => p.id !== id));
-		setEditingEvent(null);
-	};
+	const handleDeleteEvent = useCallback(
+		(id: string) => {
+			onUpdatePresenciales(presenciales.filter((p) => p.id !== id));
+			setEditingEvent(null);
+		},
+		[presenciales, onUpdatePresenciales],
+	);
 
 	// Charts Data
 	const { totalApproved, totalInProgress, totalMissing } = useMemo(

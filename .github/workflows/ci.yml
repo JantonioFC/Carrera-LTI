@@ -13,11 +13,11 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [20.x, 22.x]
+        node-version: [22.x, 24.x]
         os: [ubuntu-latest, macos-latest, windows-latest]
         include:
           - os: ubuntu-latest
-            node-version: 20.x
+            node-version: 22.x
             run-gitleaks: true
 
     steps:
@@ -47,7 +47,7 @@ jobs:
       run: npm run test
 
     - name: Coverage with threshold validation
-      if: matrix.os == 'ubuntu-latest' && matrix.node-version == '20.x'
+      if: matrix.os == 'ubuntu-latest' && matrix.node-version == '22.x'
       run: npm run test:coverage
       # Falla si lines/functions/branches/statements < thresholds en vite.config.ts
 

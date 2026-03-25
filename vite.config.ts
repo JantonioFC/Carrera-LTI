@@ -33,6 +33,7 @@ export default defineConfig({
 				theme_color: "#0A192F",
 				background_color: "#0A192F",
 				display: "standalone",
+				display_override: ["standalone"],
 				icons: [
 					{
 						src: "pwa-192x192.png",
