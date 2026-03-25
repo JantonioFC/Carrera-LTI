@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { CURRICULUM, type Subject, type SubjectStatus } from "../data/lti";
+import { logger } from "../utils/logger";
 import { safeParseJSON } from "../utils/safeStorage";
 
 export interface SubjectResource {
@@ -70,7 +71,7 @@ export function SubjectDataProvider({
 
 			// --- Event-Driven Trigger (Eje 2.2) ---
 			if (partialData.status === "en_curso" && existing.status !== "en_curso") {
-				console.log(`[ORCHESTRATOR] Activating subject: ${subject.name}`);
+				logger.info("Orchestrator", `Activating subject: ${subject.name}`);
 				// Side-effect: Ensure resources directory exists (simulated)
 				if (newData.resources.length === 0) {
 					newData.resources = [
@@ -113,8 +114,9 @@ export function SubjectDataProvider({
 		// Instead of deleting data, we move it to an 'archived' state if it has content
 		setData((prev) => {
 			if (!prev[id]) return prev;
-			console.log(
-				`[ORCHESTRATOR] Soft Delete: Archiving data for subject ${id}`,
+			logger.info(
+				"Orchestrator",
+				`Soft Delete: Archiving data for subject ${id}`,
 			);
 			const archivedData = {
 				...prev[id],

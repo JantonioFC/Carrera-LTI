@@ -9,6 +9,17 @@
  *   initConfig(store);   // registra config:set y config:get en ipcMain
  */
 
+import { z } from "zod";
+
+const ConfigSetSchema = z.object({
+	key: z.string().min(1),
+	value: z.string(),
+});
+
+const ConfigGetSchema = z.object({
+	key: z.string().min(1),
+});
+
 export interface ConfigStore {
 	set(key: string, value: string): void;
 	get(key: string): string | undefined;
@@ -36,12 +47,17 @@ export function initConfig(
 	},
 ): void {
 	const handlers = makeConfigHandlers(store);
-	ipcMain.handle("config:set", ((...args: unknown[]) =>
-		handlers.configSet(args[1] as string, args[2] as string)) as (
-		...args: unknown[]
-	) => unknown);
-	ipcMain.handle("config:get", ((...args: unknown[]) =>
-		handlers.configGet(args[1] as string)) as (...args: unknown[]) => unknown);
+	ipcMain.handle("config:set", ((...args: unknown[]) => {
+		const { key, value } = ConfigSetSchema.parse({
+			key: args[1],
+			value: args[2],
+		});
+		return handlers.configSet(key, value);
+	}) as (...args: unknown[]) => unknown);
+	ipcMain.handle("config:get", ((...args: unknown[]) => {
+		const { key } = ConfigGetSchema.parse({ key: args[1] });
+		return handlers.configGet(key);
+	}) as (...args: unknown[]) => unknown);
 }
 
 export function makeConfigHandlers(store: ConfigStore): ConfigHandlers {

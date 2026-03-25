@@ -1,5 +1,6 @@
 import { AlertTriangle, RefreshCw } from "lucide-react";
 import React from "react";
+import { logger } from "../utils/logger";
 
 interface ErrorBoundaryProps {
 	children: React.ReactNode;
@@ -28,11 +29,8 @@ export class ErrorBoundary extends React.Component<
 	}
 
 	componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-		console.error(
-			`[ErrorBoundary${this.props.section ? ` — ${this.props.section}` : ""}]`,
-			error,
-			errorInfo,
-		);
+		const section = this.props.section ? ` — ${this.props.section}` : "";
+		logger.error("ErrorBoundary" + section, error.message, error, errorInfo);
 	}
 
 	handleReset = () => {

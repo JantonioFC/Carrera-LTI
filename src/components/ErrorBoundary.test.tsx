@@ -119,7 +119,7 @@ describe("ErrorBoundary", () => {
 				</ErrorBoundary>,
 			);
 			expect(consoleError).toHaveBeenCalledWith(
-				"[ErrorBoundary]",
+				expect.stringContaining("ErrorBoundary"),
 				expect.any(Error),
 				expect.anything(),
 			);
