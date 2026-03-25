@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
+import { z } from "zod";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
@@ -63,6 +64,17 @@ interface AetherActions {
 	clearChatHistory: () => void;
 	importNotes: (json: string) => void;
 }
+
+/** Schema Zod para validar notas importadas antes de persistirlas. (#138) */
+const ImportedNoteSchema = z.object({
+	id: z.string().min(1),
+	title: z.string().min(1),
+	content: z.string().default(""),
+	createdAt: z.number().optional(),
+	updatedAt: z.number().optional(),
+	tags: z.array(z.string()).optional().default([]),
+	embedding: z.array(z.number()).optional(),
+});
 
 const extractLinks = (text: string): string[] => {
 	const links = Array.from(text.matchAll(/\[\[(.*?)\]\]/g), (match) =>
@@ -233,13 +245,18 @@ export const useAetherStore = create<AetherState & AetherActions>()(
 				importNotes: (json: string) => {
 					try {
 						const data = JSON.parse(json);
-						const importedNotes = Array.isArray(data) ? data : data.notes;
+						const rawNotes = Array.isArray(data) ? data : data.notes;
 
-						if (!Array.isArray(importedNotes)) return;
+						if (!Array.isArray(rawNotes)) return;
+
+						// Validar cada nota con Zod antes de persistir (#138)
+						const importedNotes = rawNotes
+							.map((n) => ImportedNoteSchema.safeParse(n))
+							.filter((r) => r.success)
+							.map((r) => r.data);
 
 						set((state) => {
-							importedNotes.forEach((newNote: any) => {
-								if (!newNote.id || !newNote.title) return;
+							importedNotes.forEach((newNote) => {
 								const exists = state.notes.find((n) => n.id === newNote.id);
 								if (!exists) {
 									state.notes.push(newNote);

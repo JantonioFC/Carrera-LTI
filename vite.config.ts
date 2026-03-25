@@ -90,5 +90,22 @@ export default defineConfig({
 		globals: true,
 		include: ["src/**/*.test.{ts,tsx}", "electron/**/*.test.ts"],
 		setupFiles: ["./src/test/setup.tsx"],
+		coverage: {
+			provider: "v8",
+			include: ["src/**/*.{ts,tsx}", "electron/**/*.ts"],
+			exclude: [
+				"src/**/*.test.{ts,tsx}",
+				"electron/**/*.test.ts",
+				"src/test/**",
+				"src/main.tsx",
+				"src/vite-env.d.ts",
+			],
+			thresholds: {
+				lines: 60,
+				functions: 60,
+				branches: 55,
+				statements: 60,
+			},
+		},
 	},
 });
