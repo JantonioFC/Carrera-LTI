@@ -94,9 +94,12 @@ jobs:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           # Windows firma (opcional)
           WIN_CSC_KEY_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PWD }}
-          # Canal de auto-updater
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npm run build:electron
+          # Sin GH_TOKEN aquí: evita que electron-builder intente publicar.
+          # La publicación la maneja el job 3 (contents:write). (#173-fix)
+        run: |
+          cross-env VITE_ELECTRON=true npx tsc -b
+          cross-env VITE_ELECTRON=true npx vite build
+          npx electron-builder --publish never
 
       - name: Upload installer artifacts
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
