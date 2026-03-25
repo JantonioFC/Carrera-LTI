@@ -2,6 +2,21 @@ import { describe, expect, it, vi } from "vitest";
 import type { SubprocessAdapter } from "../subprocess/SubprocessAdapter";
 import { makeRuVectorHandlers } from "./ruVectorHandlers";
 
+// pathSecurity usa app.getPath() de Electron, que no existe en jsdom.
+// Mockeamos electron para que los handlers pasen la validación de paths.
+vi.mock("electron", () => ({
+	app: {
+		getPath: (name: string) => {
+			const paths: Record<string, string> = {
+				userData: "/tmp/userData",
+				documents: "/docs",
+				temp: "/tmp",
+			};
+			return paths[name] ?? "/tmp";
+		},
+	},
+}));
+
 /**
  * Tests unitarios de makeRuVectorHandlers.
  * Se inyecta un mock de SubprocessAdapter para aislar la lógica de mapeo.
