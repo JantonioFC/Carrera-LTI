@@ -11,6 +11,7 @@ import {
 import { useCallback, useEffect, useState } from "react";
 import { type GmailMessage, gmailService } from "../../services/gmail";
 import { useAetherStore } from "../../store/aetherStore";
+import { logger } from "../../utils/logger";
 import { AssistantGuide } from "../AssistantGuide";
 
 export function GmailWidget() {
@@ -37,7 +38,7 @@ export function GmailWidget() {
 			setMessages(unread);
 			setIsAuthenticated(true);
 		} catch (err) {
-			console.error("Failed to fetch emails:", err);
+			logger.error("GmailWidget", "Failed to fetch emails", err);
 			setError("Error al obtener correos.");
 		} finally {
 			setLoading(false);
@@ -55,7 +56,7 @@ export function GmailWidget() {
 					}
 				})
 				.catch((err) => {
-					console.error("Service init failed:", err);
+					logger.error("GmailWidget", "Service init failed", err);
 					setError("Error al inicializar Google.");
 				});
 		}
@@ -68,7 +69,7 @@ export function GmailWidget() {
 			setIsAuthenticated(true);
 			fetchEmails();
 		} catch (err) {
-			console.error("Auth failed:", err);
+			logger.error("GmailWidget", "Auth failed", err);
 			setError("Autenticación fallida.");
 		} finally {
 			setLoading(false);

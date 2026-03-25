@@ -43,6 +43,27 @@ describe("configHandlers — config:set", () => {
 		expect(calls).not.toContain("sk-secret");
 		consoleSpy.mockRestore();
 	});
+
+	it("should_reject_key_not_in_allowlist", () => {
+		expect(() => handlers.configSet("__proto__", "evil")).toThrow(
+			/clave no permitida/,
+		);
+	});
+
+	it("should_reject_another_unknown_key", () => {
+		expect(() => handlers.configSet("admin_password", "hunter2")).toThrow(
+			/clave no permitida/,
+		);
+	});
+
+	it("should_not_call_store_set_for_disallowed_key", () => {
+		try {
+			handlers.configSet("unknown_key", "value");
+		} catch {
+			// expected
+		}
+		expect(store.set).not.toHaveBeenCalled();
+	});
 });
 
 describe("configHandlers — config:get", () => {
@@ -70,5 +91,26 @@ describe("configHandlers — config:get", () => {
 		const result = handlers.configGet("gmail_client_id");
 		expect(result).not.toBeUndefined();
 		expect(result).toBeNull();
+	});
+
+	it("should_reject_key_not_in_allowlist", () => {
+		expect(() => handlers.configGet("../../etc/passwd")).toThrow(
+			/clave no permitida/,
+		);
+	});
+
+	it("should_reject_another_unknown_key", () => {
+		expect(() => handlers.configGet("secret_token")).toThrow(
+			/clave no permitida/,
+		);
+	});
+
+	it("should_not_call_store_get_for_disallowed_key", () => {
+		try {
+			handlers.configGet("injected_key");
+		} catch {
+			// expected
+		}
+		expect(store.get).not.toHaveBeenCalled();
 	});
 });

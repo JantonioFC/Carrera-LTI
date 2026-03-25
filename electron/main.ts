@@ -64,9 +64,16 @@ async function getEncryptionKey(): Promise<string> {
 			"Config",
 			"safeStorage no disponible. Configura CORTEX_MASTER_SECRET.",
 		);
-		// En CI o entornos sin keychain usamos una clave derivada del nombre del host
-		// (no ideal, pero evita el fallback a literal "dev-only-key").
-		return randomBytes(32).toString("hex");
+		// Fallback: persistir clave en disco con permisos restrictivos para que
+		// sea la misma entre arranques (evita pérdida de datos cifrados). (#144)
+		const fallbackKeyFile = join(homedir(), ".carrera-lti", "fallback.key");
+		mkdirSync(join(homedir(), ".carrera-lti"), { recursive: true });
+		if (existsSync(fallbackKeyFile)) {
+			return readFileSync(fallbackKeyFile, "utf-8").trim();
+		}
+		const fallbackKey = randomBytes(32).toString("hex");
+		writeFileSync(fallbackKeyFile, fallbackKey, { mode: 0o600 });
+		return fallbackKey;
 	}
 
 	const keyFile = join(homedir(), ".carrera-lti", "cortex.enc");
