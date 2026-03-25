@@ -1,3 +1,10 @@
+/**
+ * Store global de estado de la UI de Cortex.
+ *
+ * Centraliza la actividad en curso (indexado, transcripción, OCR, consulta),
+ * el conteo de documentos indexados y los resultados de la última consulta.
+ * No persiste en localStorage — se reconstruye desde el backend al arrancar.
+ */
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
 

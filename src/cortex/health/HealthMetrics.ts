@@ -47,26 +47,31 @@ export class HealthMetrics {
 	private latencies: LatencySample[] = [];
 	private operations: OpSample[] = [];
 
+	/** Registra una muestra de latencia en ms con timestamp opcional. */
 	recordLatency(ms: number, ts = Date.now()): void {
 		this.latencies.push({ value: ms, ts });
 	}
 
+	/** Registra el resultado (éxito/fallo) de una operación con timestamp opcional. */
 	recordOperation(op: { success: boolean }, ts = Date.now()): void {
 		this.operations.push({ success: op.success, ts });
 	}
 
+	/** Latencia promedio de las muestras de las últimas 24h. Retorna 0 si no hay muestras. */
 	getAvgLatencyMs(): number {
 		const recent = this.recentLatencies();
 		if (recent.length === 0) return 0;
 		return recent.reduce((sum, s) => sum + s.value, 0) / recent.length;
 	}
 
+	/** Tasa de éxito de las últimas 24h. Retorna 1 si no hay operaciones registradas. */
 	getSuccessRate(): number {
 		const recent = this.recentOps();
 		if (recent.length === 0) return 1;
 		return recent.filter((o) => o.success).length / recent.length;
 	}
 
+	/** Evalúa un snapshot de métricas contra los umbrales y retorna el estado general con alertas. */
 	computeStatus(snapshot: HealthSnapshot): HealthStatus {
 		const alerts: HealthAlert[] = [];
 

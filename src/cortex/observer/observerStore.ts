@@ -1,3 +1,11 @@
+/**
+ * Store de estado del Observer de audio (grabación de clase).
+ *
+ * Solo persiste `isRunning` en localStorage; los flags de transición
+ * y notificación son efímeros y se resetean en cada sesión.
+ *
+ * Issue #58
+ */
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
