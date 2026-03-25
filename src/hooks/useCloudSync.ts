@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { logger } from "../utils/logger";
 import type { PresencialEvent } from "../data/lti";
 import type { ScheduleItem } from "../pages/Horarios";
 import type { Task } from "../pages/Tareas";
@@ -61,7 +62,7 @@ export function useCloudSync(
 					// Validación con Zod antes de subir a la nube (ADR-002)
 					const validation = AppDataSchema.safeParse(rawData);
 					if (!validation.success) {
-						console.error("Invalid queued data schema:", validation.error);
+						logger.error("useCloudSync", "Invalid queued data schema", validation.error);
 						return;
 					}
 
@@ -78,7 +79,7 @@ export function useCloudSync(
 						setSyncStatus("error");
 					}
 				} catch (e) {
-					console.error("Online sync handler failed:", e);
+					logger.error("useCloudSync", "Online sync handler failed", e);
 				}
 			}
 		};
@@ -108,7 +109,7 @@ export function useCloudSync(
 		// Validación antes de encolar o enviar
 		const validation = AppDataSchema.safeParse(appData);
 		if (!validation.success) {
-			console.error("Failed to validate AppData for sync:", validation.error);
+			logger.error("useCloudSync", "Failed to validate AppData for sync", validation.error);
 			setSyncStatus("error");
 			return;
 		}
@@ -132,7 +133,7 @@ export function useCloudSync(
 				setSyncStatus("error");
 			}
 		} catch (error) {
-			console.error("Error syncing to cloud:", error);
+			logger.error("useCloudSync", "Error syncing to cloud", error);
 			localStorage.setItem("lti_sync_queue", JSON.stringify(validation.data));
 			setSyncStatus("error");
 		}
@@ -149,7 +150,7 @@ export function useCloudSync(
 				// Validación de datos remotos (ADR-002)
 				const validation = AppDataSchema.safeParse(remoteData);
 				if (!validation.success) {
-					console.error("Remote data failed validation:", validation.error);
+					logger.error("useCloudSync", "Remote data failed validation", validation.error);
 					setSyncStatus("error");
 					return;
 				}
@@ -210,7 +211,7 @@ export function useCloudSync(
 				setSyncStatus("error");
 			}
 		} catch (error) {
-			console.error("Error restoring from cloud:", error);
+			logger.error("useCloudSync", "Error restoring from cloud", error);
 			setSyncStatus("error");
 		}
 	};
