@@ -7,8 +7,10 @@ afterEach(() => {
 	cleanup();
 });
 
-// Simplified mock for lucide-react that supports props (specifically className)
-vi.mock("lucide-react", () => {
+// Dynamic mock for lucide-react — imports all actual exports and replaces each
+// with a lightweight span so tests don't break when new icons are used.
+vi.mock("lucide-react", async (importOriginal) => {
+	const actual = await importOriginal<Record<string, unknown>>();
 	const mockIcon = (name: string) => {
 		const component = ({ className, ...props }: { className?: string }) => (
 			<span data-testid={`icon-${name}`} className={className} {...props} />
@@ -16,15 +18,9 @@ vi.mock("lucide-react", () => {
 		component.displayName = name;
 		return component;
 	};
-
-	return {
-		AlertCircle: mockIcon("AlertCircle"),
-		ExternalLink: mockIcon("ExternalLink"),
-		History: mockIcon("History"),
-		Layers: mockIcon("Layers"),
-		FolderRoot: mockIcon("FolderRoot"),
-		Loader2: mockIcon("Loader2"),
-	};
+	return Object.fromEntries(
+		Object.keys(actual).map((key) => [key, mockIcon(key)]),
+	);
 });
 
 // Mock Recharts globally

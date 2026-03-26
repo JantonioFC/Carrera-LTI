@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ConfigStore } from "./ConfigStore";
+import { ConfigStore } from "../../../electron/utils/configStore";
 
 describe("ConfigStore — encryptKey / decryptKey", () => {
 	const store = new ConfigStore({
