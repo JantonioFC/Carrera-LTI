@@ -6,9 +6,9 @@ Versionado semántico: [SemVer](https://semver.org/lang/es/).
 
 ---
 
-## [v3.7.0] — 2026-03-25
+## [v3.7.0] — 2026-03-26
 
-### Security
+### Security (p0 — #174–#180)
 - `pathSecurity.ts` — `startsWith(root + sep)` previene bypass de prefijo en allowlist (#177)
 - `main.ts` — `mkdirSync` con `mode: 0o700` en `~/.carrera-lti` (#180)
 - `electron/handlers/ruVectorHandlers.ts` — Zod `DocPathSchema` valida `docPath` antes de indexar (#188)
@@ -16,23 +16,43 @@ Versionado semántico: [SemVer](https://semver.org/lang/es/).
 - Guard `hasFirebaseConfig` evita bundlear credenciales en producción (#174)
 - `ci.yml` — `permissions: contents: read` global (#178)
 - `release.yml` — `timeout-minutes` en todos los jobs (#179)
+- `electron/main.ts` — CSP `connect-src` acotado a dominios explícitos (Firebase + Gemini) (#210)
+- `firebase.ts` — `AppDataSchema.safeParse()` valida datos Firestore antes de usarlos (#211)
 
-### Performance
+### Architecture (p1/p2 — #193–#207)
+- `electron/utils/logger.ts` (nuevo) — elimina inversión de capas: `main.ts` ya no importa desde `src/` (#193)
+- `aiUtils.ts` / `aiClient.ts` — tipos `any` reemplazados por `GenerateContentParameters`, `GenerateContentResponse`, `Schema` de `@google/genai` (#201)
+- `AETHER_SYSTEM_INSTRUCTION` extraída como constante — elimina duplicación entre `askAether` y `askAetherStream` (#202)
+- `useCloudSync.ts` — `data as any` reemplazado por `data as Partial<SubjectData>` (#203)
+
+### Performance (p1/p2 — #186, #187, #204, #205)
 - `MallaCurricular.tsx` — 5 iteraciones sobre `allSubjects` memoizadas con `useMemo` (#186)
 - `Dashboard.tsx` — `CURRICULUM.flatMap().find()` por render reemplazado por Map O(1) (#187)
+- `Horarios.tsx` — `filter()` sobre schedule memoizado con `useMemo` — O(n×m) → O(1) (#204)
+- `AetherGraphView.tsx` — resize listener con `requestAnimationFrame` throttle (#205)
 
-### Fixed
+### Fixed (p1)
 - `NexusAI.tsx` — eliminar `setMessages` como canal de efecto secundario para localStorage (#185)
 - `RuVectorAdapter.ts` — `randomUUID` migrado de `node:crypto` a `globalThis.crypto` (#189)
 
-### DX
-- `package.json` — `version` actualizado a `"3.6.0"` (#176)
+### Docs & DX (p2 — #195–#199)
+- `docs/adr/ADR-004-path-security.md` — decisión de arquitectura para path security (#197)
+- `docs/adr/ADR-005-rate-limiting.md` — estrategia de rate limiting IPC (#197)
+- `docs/adr/ADR-006-ipc-message-size-guard.md` — guard de 10 MB en mensajes IPC (#197)
+- `docs/API_IPC.md` — corregidas claves de config documentadas incorrectamente (#196)
+- `README.md` — tabla completa de subdirectorios `src/cortex/` (#198)
+- `CONTRIBUTING.md` — sección `test:coverage` y umbrales de CI (#199)
 
-### Tests
+### Tests (p1/p2 — #181–#184, #190–#192, #208–#209)
 - Cobertura de `safeStorage.ts`, `result.ts`, `schemas.ts` (#181–#183)
 - Tests para `ingestNote`, `semanticSearch`, `importNotes` en `aetherStore` (#184)
 - Tests para `icsExport.ts`, `logger.ts` (#190–#191)
 - Tests `getYDoc` y `deleteDocument` en `nexusStore` (#192)
+- `useCalendarEvents.test.ts` — 8 tests para `saveEvent` y `deleteEvent` (#208)
+- `useAcademicCalendar.test.tsx` — 8 tests para hooks de calendario académico (#209)
+
+### Dependencies
+- `picomatch` 2.3.1 → 2.3.2 / 4.0.3 → 4.0.4 — security fix CVE-2026-33671, CVE-2026-33672
 
 ---
 

@@ -159,6 +159,8 @@ electron/
 ├── main.ts                   # Proceso principal Electron (IPC handlers init)
 ├── preload.ts                # contextBridge — expone APIs a renderer
 ├── types.d.ts                # Tipos globales window.cortexAPI
+├── utils/
+│   └── logger.ts             # Logger del proceso principal (no importa desde src/)
 ├── handlers/
 │   ├── configHandlers.ts     # Config IPC (electron-store cifrado)
 │   ├── doclingHandlers.ts    # processDocument + ocr
