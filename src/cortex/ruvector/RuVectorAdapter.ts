@@ -16,12 +16,10 @@ interface SubprocessAdapter {
 	): Promise<AdapterResponse>;
 }
 
-export interface RuVectorChunk {
-	chunkId: string;
-	score: number;
-	content: string;
-	docId: string;
-}
+// AR-11 (#236): tipo canónico movido a src/types/cortex.ts — re-exportado aquí por compatibilidad
+import type { CortexChunk } from "../../types/cortex";
+
+export type { CortexChunk as RuVectorChunk } from "../../types/cortex";
 
 export interface IndexDocumentRequest {
 	docId: string;
@@ -70,7 +68,7 @@ export class RuVectorAdapter {
 	async query(
 		req: QueryRequest,
 		opts?: RequestOptions,
-	): Promise<RuVectorChunk[]> {
+	): Promise<CortexChunk[]> {
 		const response = await this.subprocess.request(
 			{
 				id: globalThis.crypto.randomUUID(),
@@ -80,7 +78,7 @@ export class RuVectorAdapter {
 			opts,
 		);
 		return ((response.data as Record<string, unknown>).results ??
-			[]) as RuVectorChunk[];
+			[]) as CortexChunk[];
 	}
 
 	async deleteDocument(

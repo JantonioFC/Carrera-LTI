@@ -4,8 +4,8 @@ import {
 	spawn,
 } from "node:child_process";
 import { createInterface } from "node:readline";
-import type { IPCMessage } from "../../src/cortex/ipc/IPCProtocol";
-import { parseIPCMessage } from "../../src/cortex/ipc/IPCProtocol";
+import type { IPCMessage } from "../ipc/IPCProtocol";
+import { parseIPCMessage } from "../ipc/IPCProtocol";
 import type { SubprocessTransport } from "../subprocess/SubprocessAdapter";
 
 const DEFAULT_TIMEOUT_MS = 30_000;

@@ -1,7 +1,4 @@
-// AR-02 (#233): La copia canónica de este módulo fue movida a electron/ipc/IPCProtocol.ts.
-// Este archivo permanece en src/ solo para ser importado por electron/ vía paths relativos
-// mientras tsconfig.app.json no incluya electron/.
-// Los importadores en electron/ deben apuntar a electron/ipc/IPCProtocol (ya actualizado).
+// AR-02 (#233): módulo movido de src/cortex/ipc/ a electron/ipc/ — pertenece al Main Process.
 
 /** Valores válidos para el campo status según el RFC-001 */
 const VALID_STATUSES = ["ok", "error", "progress"] as const;

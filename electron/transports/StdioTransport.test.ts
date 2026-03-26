@@ -1,7 +1,7 @@
 import type { ChildProcess } from "node:child_process";
 import { PassThrough } from "node:stream";
 import { describe, expect, it, vi } from "vitest";
-import type { IPCMessage } from "../../src/cortex/ipc/IPCProtocol";
+import type { IPCMessage } from "../ipc/IPCProtocol";
 import { StdioTransport } from "./StdioTransport";
 
 /**

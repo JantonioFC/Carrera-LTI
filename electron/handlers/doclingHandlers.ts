@@ -1,6 +1,10 @@
 import { randomUUID } from "node:crypto";
+import { z } from "zod";
 import type { SubprocessAdapter } from "../subprocess/SubprocessAdapter";
 import { assertSafePath } from "./pathSecurity";
+
+// SC-02 (#237): validación Zod de inputs IPC antes de assertSafePath
+const PathInputSchema = z.string().min(1, "path must not be empty");
 
 /**
  * Handlers de Docling para ipcMain.
@@ -26,11 +30,12 @@ export function makeDoclingHandlers(
 		async processDocument(
 			docPath: string,
 		): Promise<{ chunks: number; text: string }> {
-			assertSafePath(docPath);
+			const validatedPath = PathInputSchema.parse(docPath);
+			assertSafePath(validatedPath);
 			const response = await adapter.request({
 				id: randomUUID(),
 				action: "process_document",
-				payload: { path: docPath },
+				payload: { path: validatedPath },
 			});
 			const data = response.data as Record<string, unknown>;
 			return {
@@ -40,11 +45,12 @@ export function makeDoclingHandlers(
 		},
 
 		async ocr(imagePath: string): Promise<{ text: string }> {
-			assertSafePath(imagePath);
+			const validatedPath = PathInputSchema.parse(imagePath);
+			assertSafePath(validatedPath);
 			const response = await adapter.request({
 				id: randomUUID(),
 				action: "ocr",
-				payload: { path: imagePath },
+				payload: { path: validatedPath },
 			});
 			const data = response.data as Record<string, unknown>;
 			return { text: (data.text as string) ?? "" };
