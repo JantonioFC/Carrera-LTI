@@ -11,8 +11,8 @@ vi.mock("../hooks/useSubjectData", () => ({
 
 import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
-import type { EventsState } from "../hooks/useCalendarEvents";
 import { useAcademicCalendar } from "../hooks/useAcademicCalendar";
+import type { EventsState } from "../hooks/useCalendarEvents";
 import { useSubjectData } from "../hooks/useSubjectData";
 import Examenes from "./Examenes";
 
@@ -66,12 +66,8 @@ describe("Examenes", () => {
 				onUpdateCalendarEvents={onUpdateCalendarEvents}
 			/>,
 		);
-		expect(
-			screen.getByText("Gestión de Exámenes"),
-		).toBeInTheDocument();
-		expect(
-			screen.getByText("No hay exámenes registrados"),
-		).toBeInTheDocument();
+		expect(screen.getByText("Gestión de Exámenes")).toBeInTheDocument();
+		expect(screen.getByText("No hay exámenes registrados")).toBeInTheDocument();
 	});
 
 	// 2. handleAddExam: no agrega si falta date o subject
@@ -183,8 +179,7 @@ describe("Examenes", () => {
 		);
 
 		// Deben renderizarse los dos exámenes (buscar en la sección de lista)
-		const examList = document
-			.querySelectorAll("section")[2] as HTMLElement;
+		const examList = document.querySelectorAll("section")[2] as HTMLElement;
 		expect(examList.querySelector("p.text-white")).toBeInTheDocument();
 
 		// Hacer click en el primer botón de borrar (Matemáticas, primer examen)

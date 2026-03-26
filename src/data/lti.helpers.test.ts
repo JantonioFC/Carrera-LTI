@@ -4,15 +4,15 @@ import {
 	DEFAULT_ACADEMIC_DATES,
 	EXAM_END,
 	EXAM_START,
+	formatDate,
+	formatDateShort,
+	getDaysUntil,
+	isDatePast,
 	SEDE,
 	SEMESTER_END,
 	SEMESTER_START,
 	TOTAL_CREDITS,
 	WEEKDAY_SHORT,
-	formatDate,
-	formatDateShort,
-	getDaysUntil,
-	isDatePast,
 } from "./lti.helpers";
 
 // ---------------------------------------------------------------------------
@@ -175,7 +175,9 @@ describe("formatDate", () => {
 
 	it("el resultado es más largo que formatDateShort para la misma fecha", () => {
 		const date = "2026-03-09";
-		expect(formatDate(date).length).toBeGreaterThan(formatDateShort(date).length);
+		expect(formatDate(date).length).toBeGreaterThan(
+			formatDateShort(date).length,
+		);
 	});
 });
 

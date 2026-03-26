@@ -1,8 +1,8 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { EditSubjectModal } from "./EditSubjectModal";
 import type { Subject } from "../../data/lti";
 import type { SubjectData } from "../../hooks/useSubjectData";
+import { EditSubjectModal } from "./EditSubjectModal";
 
 // --------------- fixtures ---------------
 
@@ -26,7 +26,12 @@ const dataWithResource: SubjectData = {
 	status: "aprobada",
 	grade: 9,
 	resources: [
-		{ id: "res-1", name: "Drive Clases", url: "https://drive.google.com/xyz", type: "link" },
+		{
+			id: "res-1",
+			name: "Drive Clases",
+			url: "https://drive.google.com/xyz",
+			type: "link",
+		},
 	],
 };
 
@@ -65,15 +70,23 @@ describe("EditSubjectModal", () => {
 		expect(screen.getByText("Programación I")).toBeInTheDocument();
 
 		// Los tres botones de estado están presentes
-		expect(screen.getByRole("button", { name: /pendiente/i })).toBeInTheDocument();
-		expect(screen.getByRole("button", { name: /en curso/i })).toBeInTheDocument();
-		expect(screen.getByRole("button", { name: /aprobada/i })).toBeInTheDocument();
+		expect(
+			screen.getByRole("button", { name: /pendiente/i }),
+		).toBeInTheDocument();
+		expect(
+			screen.getByRole("button", { name: /en curso/i }),
+		).toBeInTheDocument();
+		expect(
+			screen.getByRole("button", { name: /aprobada/i }),
+		).toBeInTheDocument();
 
 		// Mensaje de sin recursos
 		expect(screen.getByText(/no hay recursos agregados/i)).toBeInTheDocument();
 
 		// Botón Guardar Cambios
-		expect(screen.getByRole("button", { name: /guardar cambios/i })).toBeInTheDocument();
+		expect(
+			screen.getByRole("button", { name: /guardar cambios/i }),
+		).toBeInTheDocument();
 	});
 
 	it("handleAddResource: NO agrega recurso si falta name o url", () => {
@@ -107,7 +120,9 @@ describe("EditSubjectModal", () => {
 		const addButton = screen.getByRole("button", { name: /añadir/i });
 
 		fireEvent.change(nameInput, { target: { value: "Drive Clases" } });
-		fireEvent.change(urlInput, { target: { value: "https://drive.google.com/test" } });
+		fireEvent.change(urlInput, {
+			target: { value: "https://drive.google.com/test" },
+		});
 
 		expect(addButton).not.toBeDisabled();
 		fireEvent.click(addButton);
@@ -120,7 +135,9 @@ describe("EditSubjectModal", () => {
 		expect(urlInput).toHaveValue("");
 
 		// Ya no muestra el mensaje de sin recursos
-		expect(screen.queryByText(/no hay recursos agregados/i)).not.toBeInTheDocument();
+		expect(
+			screen.queryByText(/no hay recursos agregados/i),
+		).not.toBeInTheDocument();
 	});
 
 	it("handleRemoveResource: elimina un recurso existente", () => {
@@ -155,7 +172,11 @@ describe("EditSubjectModal", () => {
 	it("llama onSave con el status correcto al cambiar el estado", () => {
 		const onSave = vi.fn();
 		const onClose = vi.fn();
-		renderModal({ onSave, onClose, currentData: { ...baseData, status: "pendiente" } });
+		renderModal({
+			onSave,
+			onClose,
+			currentData: { ...baseData, status: "pendiente" },
+		});
 
 		// Cambiar a "aprobada"
 		const aprobadaBtn = screen.getByRole("button", { name: /aprobada/i });

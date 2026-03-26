@@ -113,9 +113,9 @@ describe("GmailService.initialize — error paths", () => {
 		const svc = GmailService.getInstance();
 		await svc.initialize("client-id", "api-key");
 		await svc.initialize("client-id", "api-key");
-		expect(
-			window.google.accounts.oauth2.initTokenClient,
-		).toHaveBeenCalledTimes(1);
+		expect(window.google.accounts.oauth2.initTokenClient).toHaveBeenCalledTimes(
+			1,
+		);
 	});
 });
 
@@ -232,7 +232,12 @@ describe("GmailService.fetchUnreadMessages — error paths HTTP", () => {
 	it("relanza un error 401 de la API (Unauthorized)", async () => {
 		const unauthorizedError = Object.assign(new Error("Unauthorized"), {
 			status: 401,
-			result: { error: { code: 401, message: "Request had invalid authentication credentials." } },
+			result: {
+				error: {
+					code: 401,
+					message: "Request had invalid authentication credentials.",
+				},
+			},
 		});
 		window.gapi.client.gmail.users.messages.list = vi
 			.fn()
@@ -249,7 +254,12 @@ describe("GmailService.fetchUnreadMessages — error paths HTTP", () => {
 	it("relanza un error 403 de la API (Forbidden / permisos insuficientes)", async () => {
 		const forbiddenError = Object.assign(new Error("Forbidden"), {
 			status: 403,
-			result: { error: { code: 403, message: "Request had insufficient authentication scopes." } },
+			result: {
+				error: {
+					code: 403,
+					message: "Request had insufficient authentication scopes.",
+				},
+			},
 		});
 		window.gapi.client.gmail.users.messages.list = vi
 			.fn()

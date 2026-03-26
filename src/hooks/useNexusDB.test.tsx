@@ -43,9 +43,7 @@ const { dbMock } = vi.hoisted(() => {
 					),
 					sortBy: vi.fn(async (sortField: string) =>
 						table._rows
-							.filter(
-								(r) => (r as Record<string, string>)[field] === val,
-							)
+							.filter((r) => (r as Record<string, string>)[field] === val)
 							.sort(
 								(a, b) =>
 									(a as Record<string, number>)[sortField] -
@@ -101,14 +99,14 @@ vi.mock("dexie", () => {
 // ─── Imports (después de los mocks) ──────────────────────────────────────────
 
 import { renderHook } from "@testing-library/react";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { useLiveQuery } from "dexie-react-hooks";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import {
 	db,
-	useNexusDB,
 	type NexusField,
 	type NexusRow,
 	type NexusSchema,
+	useNexusDB,
 } from "./useNexusDB";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -310,7 +308,9 @@ describe("useNexusDB — db.databases", () => {
 
 	it("add agrega una base de datos", async () => {
 		const newDB: NexusSchema = { id: "db-10", name: "Nueva", icon: "🗂️" };
-		await db.databases.add(newDB as unknown as Parameters<typeof db.databases.add>[0]);
+		await db.databases.add(
+			newDB as unknown as Parameters<typeof db.databases.add>[0],
+		);
 		expect(dbMock.databases._rows).toContainEqual(newDB);
 	});
 
