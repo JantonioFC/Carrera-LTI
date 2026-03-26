@@ -62,7 +62,7 @@ Motor de busqueda vectorial semantica implementado como binario Rust (`~/.carrer
 | Canal | Metodo JS | Parametros | Retorno | Descripcion |
 |---|---|---|---|---|
 | `cortex:index` | `cortexAPI.cortex.index` | `docPath: string` | `Promise<{ chunks: number }>` | Indexa un documento (PDF, DOCX, TXT, MD) en el motor vectorial. El mimeType se detecta automáticamente por extensión. |
-| `cortex:query` | `cortexAPI.cortex.query` | `text: string, topK?: number` | `Promise<unknown[]>` | Ejecuta una consulta semantica; `topK` por defecto es 5 |
+| `cortex:query` | `cortexAPI.cortex.query` | `text: string, topK?: number` | `Promise<CortexChunk[]>` | Ejecuta una consulta semantica; `topK` por defecto es 5 |
 
 ### Ejemplos
 
@@ -73,7 +73,19 @@ console.log(`Indexados ${result.chunks} fragmentos`);
 
 // Consultar los 3 fragmentos mas relevantes
 const chunks = await window.cortexAPI.cortex.query("aprendizaje supervisado", 3);
-console.log(chunks);
+// chunks: CortexChunk[] — cada elemento tiene { chunkId, score, content, docId }
+console.log(chunks[0].content);
+```
+
+### Tipo CortexChunk
+
+```typescript
+interface CortexChunk {
+  chunkId: string;  // ID único del fragmento
+  score: number;    // Similitud semántica (0-1, mayor = más relevante)
+  content: string;  // Texto del fragmento
+  docId: string;    // ID del documento de origen
+}
 ```
 
 ---
@@ -184,6 +196,13 @@ try {
 Para usar `window.cortexAPI` con tipos en el renderer, agrega la siguiente declaracion en `src/types/electron.d.ts` o similar:
 
 ```typescript
+interface CortexChunk {
+  chunkId: string;
+  score: number;
+  content: string;
+  docId: string;
+}
+
 interface CortexAPI {
   config: {
     set(key: string, value: string): Promise<void>;
@@ -191,7 +210,7 @@ interface CortexAPI {
   };
   cortex: {
     index(docPath: string): Promise<{ chunks: number }>;
-    query(text: string, topK?: number): Promise<unknown[]>;
+    query(text: string, topK?: number): Promise<CortexChunk[]>;
     processDocument(docPath: string): Promise<{ chunks: number; text: string }>;
     ocr(imagePath: string): Promise<{ text: string }>;
     transcribe(wavPath: string, model?: string): Promise<{ text: string; language: string }>;

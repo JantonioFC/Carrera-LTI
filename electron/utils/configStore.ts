@@ -1,6 +1,6 @@
-// TODO AR-09 (#189): mover este módulo a electron/ — usa APIs Node.js
-// (scrypt, createCipheriv) incompatibles con sandbox:true del renderer.
-// En producción este archivo no se bundlea (no importado desde src/).
+// AR-09 (#218): módulo Node.js-only movido a electron/ — usa node:crypto
+// (scrypt, AES-256-GCM) incompatible con sandbox:true del Renderer.
+// NUNCA importar desde src/.
 import {
 	createCipheriv,
 	createDecipheriv,
