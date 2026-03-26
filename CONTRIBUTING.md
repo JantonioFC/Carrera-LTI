@@ -102,6 +102,26 @@ fix/ruvector-timeout-v1.1.3
 docs/api-ipc
 ```
 
+### Patron cortex/**
+
+Para trabajo especifico del modulo Cortex (motor de IA local, RuVector, Observer, IPC), usa el prefijo `cortex/`:
+
+```
+cortex/feature-name
+cortex/fix-ruvector-timeout
+cortex/refactor-ipc-transport
+```
+
+**Cuando usarlo:** cuando el cambio afecta principalmente a `src/cortex/`, `electron/handlers/`, `electron/ipc/`, `electron/transports/` o `electron/subprocess/`.
+
+**Cuando no usarlo:** si el cambio toca mayoritariamente UI, paginas o hooks genericos, usa `feat/` o `fix/` normales.
+
+El CI esta configurado para correr en ramas `cortex/**` (ver `.github/workflows/ci.yml`).
+
+### Frontera electron/src
+
+Los archivos en `electron/` no deben importar valores en tiempo de ejecucion desde `src/`. Solo se permiten importaciones de tipos puros (`import type { ... }`). Esta restriccion esta documentada en `biome.json` (override `electron/**`) y verificada en CI (#246).
+
 ---
 
 ## Estilo de commits

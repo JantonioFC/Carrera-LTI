@@ -1,47 +1,68 @@
 import { BrainCircuit, Coffee, Pause, Play, RotateCcw } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+
+// #241: constantes nombradas para evitar magic numbers duplicados
+const FOCUS_DURATION_SECONDS = 25 * 60;
+const BREAK_DURATION_SECONDS = 5 * 60;
 
 type TimerMode = "focus" | "break";
 
 export default function Pomodoro() {
 	const [isOpen, setIsOpen] = useState(false);
 	const [mode, setMode] = useState<TimerMode>("focus");
-	const [timeLeft, setTimeLeft] = useState(25 * 60);
+	const [timeLeft, setTimeLeft] = useState(FOCUS_DURATION_SECONDS);
 	const [isActive, setIsActive] = useState(false);
 
+	// #242: ref para leer mode dentro del interval sin incluirlo en las deps
+	const modeRef = useRef(mode);
+	modeRef.current = mode;
+
 	useEffect(() => {
-		let interval: ReturnType<typeof setInterval> | undefined;
+		if (!isActive) return;
 
-		if (isActive && timeLeft > 0) {
-			interval = setInterval(() => setTimeLeft((t) => t - 1), 1000);
-		} else if (timeLeft === 0) {
-			setIsActive(false);
-			// Notify user
-			if ("Notification" in window && Notification.permission === "granted") {
-				new Notification(mode === "focus" ? "¡Descanso!" : "¡A estudiar!", {
-					body:
-						mode === "focus"
-							? "Tu sesión de estudio terminó. Tómate un descanso."
-							: "El descanso terminó. A concentrarse.",
-					icon: "/pwa-192x192.png",
-				});
-			}
-		}
+		// #242: updater funcional — el interval no necesita timeLeft como
+		// dependencia, evitando la recreación 60×/min por cada tick.
+		const interval = setInterval(() => {
+			setTimeLeft((t) => {
+				if (t <= 1) {
+					setIsActive(false);
+					if (
+						"Notification" in window &&
+						Notification.permission === "granted"
+					) {
+						new Notification(
+							modeRef.current === "focus" ? "¡Descanso!" : "¡A estudiar!",
+							{
+								body:
+									modeRef.current === "focus"
+										? "Tu sesión de estudio terminó. Tómate un descanso."
+										: "El descanso terminó. A concentrarse.",
+								icon: "/pwa-192x192.png",
+							},
+						);
+					}
+					return 0;
+				}
+				return t - 1;
+			});
+		}, 1000);
 
-		return () => {
-			if (interval) clearInterval(interval);
-		};
-	}, [isActive, timeLeft, mode]);
+		return () => clearInterval(interval);
+	}, [isActive, mode]);
 
 	const toggleTimer = () => setIsActive(!isActive);
 	const resetTimer = () => {
 		setIsActive(false);
-		setTimeLeft(mode === "focus" ? 25 * 60 : 5 * 60);
+		setTimeLeft(
+			mode === "focus" ? FOCUS_DURATION_SECONDS : BREAK_DURATION_SECONDS,
+		);
 	};
 	const switchMode = (m: TimerMode) => {
 		setMode(m);
 		setIsActive(false);
-		setTimeLeft(m === "focus" ? 25 * 60 : 5 * 60);
+		setTimeLeft(
+			m === "focus" ? FOCUS_DURATION_SECONDS : BREAK_DURATION_SECONDS,
+		);
 	};
 
 	const formatTime = (seconds: number) => {

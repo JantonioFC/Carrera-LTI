@@ -6,7 +6,9 @@
 type LogLevel = "debug" | "info" | "warn" | "error";
 
 class StandardLogger {
-	private level: LogLevel = "debug";
+	// #243: en producción el nivel mínimo es "warn" para no exponer logs
+	// de debug/info en la consola del usuario. En desarrollo se usa "debug".
+	private level: LogLevel = import.meta.env.PROD ? "warn" : "debug";
 
 	setLevel(level: LogLevel) {
 		this.level = level;

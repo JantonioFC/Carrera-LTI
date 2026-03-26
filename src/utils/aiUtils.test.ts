@@ -89,6 +89,21 @@ describe("generateContentWithRetry", () => {
 		expect(result).toEqual({ text: "recovered" });
 		expect(mockAi.models.generateContent).toHaveBeenCalledTimes(2);
 	}, 5000);
+
+	// #244: verificar que se agotan exactamente maxRetries intentos en error de red
+	it("agota todos los reintentos en error de red y lanza", async () => {
+		const networkError = new Error("fetch failed");
+		const mockAi = {
+			models: {
+				generateContent: vi.fn().mockRejectedValue(networkError),
+			},
+		} as any;
+
+		await expect(
+			generateContentWithRetry(mockAi, {} as GenerateContentParameters, 3),
+		).rejects.toThrow("fetch failed");
+		expect(mockAi.models.generateContent).toHaveBeenCalledTimes(3);
+	}, 15000);
 });
 
 // --- generateStructuredContentWithRetry ---
