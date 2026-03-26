@@ -14,6 +14,7 @@ import { useNexusDB } from "../hooks/useNexusDB";
 import { apiBackend } from "../services/aiClient";
 import { useAetherStore } from "../store/aetherStore";
 import { useNexusStore } from "../store/nexusStore";
+import { useUserConfigStore } from "../store/userConfigStore";
 import { truncateContext } from "../utils/aiUtils";
 import {
 	failure,
@@ -31,7 +32,8 @@ interface NexusMessage {
 }
 
 export default function NexusAI() {
-	const { notes, geminiApiKey: apiKey, setGeminiApiKey } = useAetherStore();
+	const { notes } = useAetherStore();
+	const { geminiApiKey: apiKey, setGeminiApiKey } = useUserConfigStore();
 	const { documents } = useNexusStore();
 	const { allDatabases } = useNexusDB();
 

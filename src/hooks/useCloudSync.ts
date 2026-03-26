@@ -4,6 +4,7 @@ import type { ScheduleItem } from "../pages/Horarios";
 import type { Task } from "../pages/Tareas";
 import { useAetherStore } from "../store/aetherStore";
 import { useNexusStore } from "../store/nexusStore";
+import { useUserConfigStore } from "../store/userConfigStore";
 import { type AppData, authService, syncService } from "../utils/firebase";
 import { logger } from "../utils/logger";
 import { AppDataSchema, type CalendarEventsMap } from "../utils/schemas";
@@ -35,15 +36,15 @@ export function useCloudSync(
 		};
 	}, []);
 
+	const { notes: aetherNotes } = useAetherStore();
 	const {
-		notes: aetherNotes,
 		geminiApiKey,
 		setGeminiApiKey,
 		gmailClientId,
 		gmailApiKey,
 		setGmailClientId,
 		setGmailApiKey,
-	} = useAetherStore();
+	} = useUserConfigStore();
 	const { documents: nexusDocs } = useNexusStore();
 
 	// Inicializar auth usando el servicio desacoplado

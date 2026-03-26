@@ -88,10 +88,12 @@ describe("nexusStore — mutaciones de documentos", () => {
 
 	it("persiste documentos en localStorage tras addDocument", () => {
 		useNexusStore.getState().addDocument("Persistido");
-		const raw = localStorage.getItem("lti_nexus_docs");
+		// AR-06 (#235): clave migrada de "lti_nexus_docs" (array crudo) a
+		// "lti_nexus_state" (formato zustand persist: { state, version })
+		const raw = localStorage.getItem("lti_nexus_state");
 		expect(raw).not.toBeNull();
 		const parsed = JSON.parse(raw!);
-		expect(parsed[0].title).toBe("Persistido");
+		expect(parsed.state.documents[0].title).toBe("Persistido");
 	});
 });
 

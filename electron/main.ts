@@ -268,6 +268,26 @@ function initObserver(): void {
 // ── CSP via main process — Issue #175 ─────────────────────────────────────────
 // El meta tag CSP en index.html es ignorado por Electron en rutas file://.
 // La única forma garantizada de aplicar CSP en Electron es vía onHeadersReceived.
+//
+// SC-07 (#239): ¿Por qué unsafe-inline?
+// Vite en producción emite <script type="module"> externos (no inline), pero el
+// build también genera estilos inline para animaciones CSS-in-JS y módulos
+// lazy-loaded (BlockNote, Framer Motion). En Electron con file:// no existe un
+// servidor origin que permita usar hashes ('sha256-...'): el hash del HTML
+// cambia en cada build y el proceso de signing lo hace impredecible.
+// Implementar nonces requeriría generar un token en el proceso principal y
+// pasarlo al renderer ANTES de servir el HTML, lo cual no es posible con el
+// enfoque file:// + BrowserWindow.loadFile() actual.
+//
+// Mitigaciones compensatorias (en lugar de nonces):
+//   1. nodeIntegration: false  — el renderer no tiene acceso a Node.js
+//   2. contextIsolation: true  — preload corre en contexto separado del renderer
+//   3. sandbox: true           — el renderer está en el sandbox de Chromium
+//   4. object-src 'none'       — bloquea plugins Flash / objeto embebido
+//   5. frame-src 'none'        — sin iframes (reduce superficie XSS)
+//   6. connect-src allowlist   — solo dominios de Google API autorizados
+// La combinación de sandbox + contextIsolation elimina el vector de escalada
+// de privilegios incluso si un atacante logra ejecutar JS en el renderer.
 function setupCSP(): void {
 	session.defaultSession.webRequest.onHeadersReceived(
 		{ urls: ["<all_urls>"] },
@@ -278,7 +298,7 @@ function setupCSP(): void {
 					"Content-Security-Policy": [
 						[
 							"default-src 'self'",
-							"script-src 'self' 'unsafe-inline'", // unsafe-inline requerido por Vite chunks
+							"script-src 'self' 'unsafe-inline'", // ver comentario SC-07 (#239) arriba
 							"style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
 							"font-src 'self' data: https://fonts.gstatic.com",
 							"img-src 'self' data: https:",

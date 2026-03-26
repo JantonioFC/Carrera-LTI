@@ -22,11 +22,14 @@ vi.mock("../utils/security", () => ({
 }));
 
 import { useAetherStore } from "./aetherStore";
+import { useUserConfigStore } from "./userConfigStore";
 
 function resetStore() {
 	useAetherStore.setState({
 		notes: [],
 		chatHistory: [],
+	});
+	useUserConfigStore.setState({
 		geminiApiKey: "",
 		gmailClientId: "",
 		gmailApiKey: "",
@@ -178,7 +181,7 @@ describe("aetherStore — ingestNote", () => {
 	afterEach(resetStore);
 
 	it("si la nota no existe, retorna sin hacer nada", async () => {
-		useAetherStore.setState({ geminiApiKey: "test-key" });
+		useUserConfigStore.setState({ geminiApiKey: "test-key" });
 		await useAetherStore.getState().ingestNote("note_noexiste" as any);
 		expect(generateEmbedding).not.toHaveBeenCalled();
 	});
@@ -190,7 +193,7 @@ describe("aetherStore — ingestNote", () => {
 	});
 
 	it("si generateEmbedding retorna un vector, actualiza el embedding de la nota", async () => {
-		useAetherStore.setState({ geminiApiKey: "test-key" });
+		useUserConfigStore.setState({ geminiApiKey: "test-key" });
 		const note = useAetherStore.getState().addNote("Test");
 		const vector = [0.1, 0.2, 0.3];
 		vi.mocked(generateEmbedding).mockResolvedValueOnce(vector);
@@ -202,7 +205,7 @@ describe("aetherStore — ingestNote", () => {
 	});
 
 	it("si generateEmbedding retorna null, no actualiza la nota", async () => {
-		useAetherStore.setState({ geminiApiKey: "test-key" });
+		useUserConfigStore.setState({ geminiApiKey: "test-key" });
 		const note = useAetherStore.getState().addNote("Test");
 		vi.mocked(generateEmbedding).mockResolvedValueOnce(null);
 
@@ -227,13 +230,13 @@ describe("aetherStore — semanticSearch", () => {
 	});
 
 	it("si query está vacío, retorna []", async () => {
-		useAetherStore.setState({ geminiApiKey: "test-key" });
+		useUserConfigStore.setState({ geminiApiKey: "test-key" });
 		const result = await useAetherStore.getState().semanticSearch("");
 		expect(result).toEqual([]);
 	});
 
 	it("si generateEmbedding retorna vector, llama findSimilarNotes y retorna el resultado", async () => {
-		useAetherStore.setState({ geminiApiKey: "test-key" });
+		useUserConfigStore.setState({ geminiApiKey: "test-key" });
 		const note = useAetherStore.getState().addNote("Nota");
 		const vector = [0.1, 0.2];
 		vi.mocked(generateEmbedding).mockResolvedValueOnce(vector);
@@ -245,7 +248,7 @@ describe("aetherStore — semanticSearch", () => {
 	});
 
 	it("si generateEmbedding retorna null, retorna []", async () => {
-		useAetherStore.setState({ geminiApiKey: "test-key" });
+		useUserConfigStore.setState({ geminiApiKey: "test-key" });
 		vi.mocked(generateEmbedding).mockResolvedValueOnce(null);
 
 		const result = await useAetherStore.getState().semanticSearch("query");

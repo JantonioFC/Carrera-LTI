@@ -1,12 +1,12 @@
-// TODO AR-06 (#207): nexusStore usa localStorage manual mientras aetherStore usa
-// Zustand persist middleware. Migrar a persist para consistencia — ver issue #207.
+// AR-06 (#235): migrado de localStorage manual a Zustand persist middleware
+// para consistencia con aetherStore y observerStore.
 import { enableMapSet } from "immer";
 import { v4 as uuidv4 } from "uuid";
 import { IndexeddbPersistence } from "y-indexeddb";
 import * as Y from "yjs";
 import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
-import { safeParseJSON } from "../utils/safeStorage";
 import type { NexusDocumentId } from "../utils/schemas";
 
 export type { NexusDocumentId };
@@ -39,18 +39,9 @@ interface NexusActions {
 }
 
 export const useNexusStore = create<NexusState & NexusActions>()(
-	immer((set, get) => {
-		const initialDocuments = safeParseJSON<NexusDocument[]>(
-			"lti_nexus_docs",
-			[],
-		);
-
-		const syncDocuments = (docs: NexusDocument[]) => {
-			localStorage.setItem("lti_nexus_docs", JSON.stringify(docs));
-		};
-
-		return {
-			documents: initialDocuments,
+	persist(
+		immer((set, get) => ({
+			documents: [],
 			yDocs: {},
 			yDocsCreating: new Set(),
 
@@ -64,7 +55,6 @@ export const useNexusStore = create<NexusState & NexusActions>()(
 				};
 				set((state) => {
 					state.documents.unshift(newDoc);
-					syncDocuments(state.documents);
 				});
 				return newDoc;
 			},
@@ -75,7 +65,6 @@ export const useNexusStore = create<NexusState & NexusActions>()(
 					if (doc) {
 						Object.assign(doc, updates);
 						doc.updatedAt = Date.now();
-						syncDocuments(state.documents);
 					}
 				});
 			},
@@ -88,8 +77,6 @@ export const useNexusStore = create<NexusState & NexusActions>()(
 
 				set((state) => {
 					state.documents = state.documents.filter((doc) => doc.id !== id);
-					syncDocuments(state.documents);
-
 					delete state.yDocs[id];
 				});
 			},
@@ -123,6 +110,29 @@ export const useNexusStore = create<NexusState & NexusActions>()(
 
 				return ydoc;
 			},
-		};
-	}),
+		})),
+		{
+			name: "lti_nexus_state", // nueva clave — evita conflicto de formato con la legacy
+			storage: createJSONStorage(() => localStorage),
+			// Solo persiste los metadatos del documento; yDocs/yDocsCreating son runtime.
+			partialize: (state) => ({ documents: state.documents }),
+			onRehydrateStorage: () => (state) => {
+				if (!state || state.documents.length > 0) return;
+				// Migración one-shot: si no hay documentos y existe la clave legacy,
+				// importar los datos del formato anterior (array JSON crudo).
+				try {
+					const legacy = localStorage.getItem("lti_nexus_docs");
+					if (legacy) {
+						const docs = JSON.parse(legacy) as NexusDocument[];
+						if (Array.isArray(docs) && docs.length > 0) {
+							state.documents = docs;
+							localStorage.removeItem("lti_nexus_docs");
+						}
+					}
+				} catch {
+					// ignorar: si la migración falla el usuario empieza con lista vacía
+				}
+			},
+		},
+	),
 );

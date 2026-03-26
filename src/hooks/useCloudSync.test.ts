@@ -39,17 +39,22 @@ vi.mock("../store/aetherStore", () => ({
 	useAetherStore: Object.assign(
 		() => ({
 			notes: [],
-			geminiApiKey: "",
-			gmailClientId: "",
-			gmailApiKey: "",
-			setGeminiApiKey: mockSetGeminiApiKey,
-			setGmailClientId: mockSetGmailClientId,
-			setGmailApiKey: mockSetGmailApiKey,
 		}),
 		{
 			setState: mockAetherSetState,
 		},
 	),
+}));
+
+vi.mock("../store/userConfigStore", () => ({
+	useUserConfigStore: () => ({
+		geminiApiKey: "",
+		gmailClientId: "",
+		gmailApiKey: "",
+		setGeminiApiKey: mockSetGeminiApiKey,
+		setGmailClientId: mockSetGmailClientId,
+		setGmailApiKey: mockSetGmailApiKey,
+	}),
 }));
 
 vi.mock("../store/nexusStore", () => ({
