@@ -51,11 +51,13 @@ function setupHooks() {
 }
 
 describe("Examenes", () => {
-	let onUpdateCalendarEvents: ReturnType<typeof vi.fn>;
+	let onUpdateCalendarEvents: ReturnType<typeof vi.fn> &
+		((e: EventsState) => void);
 
 	beforeEach(() => {
 		setupHooks();
-		onUpdateCalendarEvents = vi.fn();
+		onUpdateCalendarEvents = vi.fn() as unknown as ReturnType<typeof vi.fn> &
+			((e: EventsState) => void);
 	});
 
 	// 1. Renderiza sin crash con calendarEvents vacío
@@ -125,11 +127,6 @@ describe("Examenes", () => {
 				onUpdateCalendarEvents={onUpdateCalendarEvents}
 			/>,
 		);
-
-		// Llenar fecha
-		const dateInputs = screen
-			.getAllByRole("textbox", { hidden: true })
-			.filter((el) => (el as HTMLInputElement).type === "date");
 
 		// Usamos querySelector directo sobre el form
 		const form = screen

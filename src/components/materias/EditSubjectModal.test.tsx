@@ -52,8 +52,8 @@ function renderModal(
 		<EditSubjectModal
 			subject={subject}
 			currentData={currentData}
-			onSave={onSave}
-			onClose={onClose}
+			onSave={onSave as unknown as (p: Partial<SubjectData>) => void}
+			onClose={onClose as unknown as () => void}
 		/>,
 	);
 
@@ -149,12 +149,6 @@ describe("EditSubjectModal", () => {
 		// Encontrar el botón de eliminar (Trash2 — hay uno para el recurso)
 		// El modal también puede tener el botón "Eliminar Materia" si se pasa onDelete,
 		// pero aquí no se pasa, así que sólo hay un Trash2.
-		const removeButtons = screen.getAllByRole("button").filter((btn) => {
-			// El botón de remove no tiene texto visible, identificarlo por su posición
-			// dentro del contenedor del recurso
-			return btn.querySelector("svg") !== null && btn.closest("a") === null;
-		});
-
 		// El único botón con ícono que está junto al recurso
 		// Buscamos el que está dentro del div del recurso (no el de guardar/cancelar)
 		const resourceRow = screen.getByText("Drive Clases").closest("div");
