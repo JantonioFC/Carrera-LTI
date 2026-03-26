@@ -1,3 +1,4 @@
+import type { Schema } from "@google/genai";
 import { GoogleGenAI } from "@google/genai";
 import type { ZodType } from "zod";
 import {
@@ -49,6 +50,17 @@ class RateLimiter {
 
 const aiRateLimiter = new RateLimiter(15); // max 15 requests per minute
 
+// QP-06 (#202): systemInstruction compartida entre askAether y askAetherStream
+const AETHER_SYSTEM_INSTRUCTION = `Eres Aether, un asistente de IA de "Segundo Cerebro".
+Tu objetivo es ayudar al usuario a recordar, conectar y generar ideas basadas EXCLUSIVAMENTE en sus propias notas.
+
+# Instrucciones (Chain of Thought):
+1. Analiza cuidadosamente la pregunta del usuario.
+2. Revisa el contenido de las notas proporcionadas en busqueda de entidades, fechas, conceptos e ideas clave.
+3. Encuentra conexiones entre diferentes notas si aplican.
+4. Formula una respuesta exhaustiva en formato Markdown.
+5. Referencia los nombres de las notas explícitamente cuando uses su información.`;
+
 export interface AIClientConfig {
 	apiKey: string;
 }
@@ -79,19 +91,11 @@ export class AIBackendClient {
 		prompt: string,
 		contextNotes: string,
 		zodSchema: ZodType<any>,
-		geminiSchema: any,
+		geminiSchema: Schema,
 	) {
 		const ai = await this.ensureClient();
 
-		const systemInstruction = `Eres Aether, un asistente de IA de "Segundo Cerebro". 
-Tu objetivo es ayudar al usuario a recordar, conectar y generar ideas basadas EXCLUSIVAMENTE en sus propias notas.
-
-# Instrucciones (Chain of Thought):
-1. Analiza cuidadosamente la pregunta del usuario.
-2. Revisa el contenido de las notas proporcionadas en busqueda de entidades, fechas, conceptos e ideas clave.
-3. Encuentra conexiones entre diferentes notas si aplican.
-4. Formula una respuesta exhaustiva en formato Markdown.
-5. Referencia los nombres de las notas explícitamente cuando uses su información.
+		const systemInstruction = `${AETHER_SYSTEM_INSTRUCTION}
 
 Aquí están las notas actuales del usuario en su bóveda:
 ${truncateContext(contextNotes, 30000)}`;
@@ -118,7 +122,7 @@ ${truncateContext(contextNotes, 30000)}`;
 		messages: { role: string; parts: { text: string }[] }[],
 		systemContext: string,
 		zodSchema: ZodType<any>,
-		geminiSchema: any,
+		geminiSchema: Schema,
 	) {
 		const ai = await this.ensureClient();
 
@@ -157,15 +161,7 @@ Acción: Retorno la lista estructurada con colores (si aplica).`;
 	) {
 		const ai = await this.ensureClient();
 
-		const systemInstruction = `Eres Aether, un asistente de IA de "Segundo Cerebro". 
-Tu objetivo es ayudar al usuario a recordar, conectar y generar ideas basadas EXCLUSIVAMENTE en sus propias notas.
-
-# Instrucciones (Chain of Thought):
-1. Analiza cuidadosamente la pregunta del usuario.
-2. Revisa el contenido de las notas proporcionadas en busqueda de entidades, fechas, conceptos e ideas clave.
-3. Encuentra conexiones entre diferentes notas si aplican.
-4. Formula una respuesta exhaustiva en formato Markdown.
-5. Referencia los nombres de las notas explícitamente cuando uses su información.
+		const systemInstruction = `${AETHER_SYSTEM_INSTRUCTION}
 
 Aquí están las notas actuales del usuario en su bóveda:
 ${truncateContext(contextNotes, 30000)}`;
@@ -209,7 +205,7 @@ Acción: Retorno la lista estructurada con colores (si aplica).`;
 
 		const response = await ai.models.generateContentStream({
 			model: "gemini-2.5-flash",
-			contents: chatContents as any,
+			contents: chatContents,
 		});
 
 		for await (const chunk of response) {

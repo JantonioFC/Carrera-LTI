@@ -1,3 +1,6 @@
+// TODO AR-02 (#194): Este módulo pertenece al Main Process (electron/).
+// Moverlo requiere actualizar todos los importadores — ver issue #194.
+
 /** Valores válidos para el campo status según el RFC-001 */
 const VALID_STATUSES = ["ok", "error", "progress"] as const;
 type IPCStatus = (typeof VALID_STATUSES)[number];

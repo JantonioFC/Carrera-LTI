@@ -1,3 +1,4 @@
+import type { GenerateContentParameters, Schema } from "@google/genai";
 import { describe, expect, it, vi } from "vitest";
 import { z } from "zod";
 import {
@@ -35,7 +36,11 @@ describe("generateContentWithRetry", () => {
 			models: { generateContent: vi.fn().mockResolvedValue({ text: "ok" }) },
 		} as any;
 
-		const result = await generateContentWithRetry(mockAi, {}, 3);
+		const result = await generateContentWithRetry(
+			mockAi,
+			{} as GenerateContentParameters,
+			3,
+		);
 		expect(result).toEqual({ text: "ok" });
 		expect(mockAi.models.generateContent).toHaveBeenCalledTimes(1);
 	});
@@ -46,9 +51,9 @@ describe("generateContentWithRetry", () => {
 			models: { generateContent: vi.fn().mockRejectedValue(error429) },
 		} as any;
 
-		await expect(generateContentWithRetry(mockAi, {}, 2)).rejects.toThrow(
-			"rate limited",
-		);
+		await expect(
+			generateContentWithRetry(mockAi, {} as GenerateContentParameters, 2),
+		).rejects.toThrow("rate limited");
 		// maxRetries=2: intento 0 falla → reintenta → intento 1 falla → lanza
 		expect(mockAi.models.generateContent).toHaveBeenCalledTimes(2);
 	}, 10000);
@@ -59,9 +64,9 @@ describe("generateContentWithRetry", () => {
 			models: { generateContent: vi.fn().mockRejectedValue(error400) },
 		} as any;
 
-		await expect(generateContentWithRetry(mockAi, {}, 3)).rejects.toThrow(
-			"bad request",
-		);
+		await expect(
+			generateContentWithRetry(mockAi, {} as GenerateContentParameters, 3),
+		).rejects.toThrow("bad request");
 		expect(mockAi.models.generateContent).toHaveBeenCalledTimes(1);
 	});
 
@@ -76,7 +81,11 @@ describe("generateContentWithRetry", () => {
 			},
 		} as any;
 
-		const result = await generateContentWithRetry(mockAi, {}, 3);
+		const result = await generateContentWithRetry(
+			mockAi,
+			{} as GenerateContentParameters,
+			3,
+		);
 		expect(result).toEqual({ text: "recovered" });
 		expect(mockAi.models.generateContent).toHaveBeenCalledTimes(2);
 	}, 5000);
@@ -86,7 +95,7 @@ describe("generateContentWithRetry", () => {
 
 describe("generateStructuredContentWithRetry", () => {
 	const schema = z.object({ answer: z.string() });
-	const geminiSchema = {};
+	const geminiSchema = {} as Schema;
 
 	it("retorna ok con datos válidos", async () => {
 		const mockAi = {
@@ -99,7 +108,7 @@ describe("generateStructuredContentWithRetry", () => {
 
 		const result = await generateStructuredContentWithRetry(
 			mockAi,
-			{},
+			{} as GenerateContentParameters,
 			schema,
 			geminiSchema,
 		);
@@ -114,7 +123,7 @@ describe("generateStructuredContentWithRetry", () => {
 
 		const result = await generateStructuredContentWithRetry(
 			mockAi,
-			{},
+			{} as GenerateContentParameters,
 			schema,
 			geminiSchema,
 		);
@@ -131,7 +140,7 @@ describe("generateStructuredContentWithRetry", () => {
 
 		const result = await generateStructuredContentWithRetry(
 			mockAi,
-			{},
+			{} as GenerateContentParameters,
 			schema,
 			geminiSchema,
 		);
@@ -150,7 +159,7 @@ describe("generateStructuredContentWithRetry", () => {
 
 		const result = await generateStructuredContentWithRetry(
 			mockAi,
-			{},
+			{} as GenerateContentParameters,
 			schema,
 			geminiSchema,
 		);

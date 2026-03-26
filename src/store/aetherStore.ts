@@ -1,3 +1,5 @@
+// TODO AR-03 (#195): aetherStore tiene 3 responsabilidades (notas, embeddings,
+// config global). Separar en noteStore + embeddingStore + userConfigStore — ver #195.
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
 import { create } from "zustand";

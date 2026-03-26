@@ -32,3 +32,6 @@ dist-ssr
 
 # TestSprite generated tests
 testsprite_tests/
+
+# Vitest coverage output
+coverage/

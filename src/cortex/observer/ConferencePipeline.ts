@@ -1,3 +1,5 @@
+// TODO AR-05 (#206): ConferencePipeline está bien diseñado pero no se usa en
+// producción (useObserverIPC llama a Whisper + Aether directamente). Ver issue #206.
 import type { DocumentSavedEvent } from "../bridge/AetherIndexBridge";
 
 // ── Puertos (interfaces inyectables) ────────────────────────────────────────

@@ -33,7 +33,7 @@ La API esta disponible en el renderer como `window.cortexAPI` con los siguientes
 
 ## Config
 
-Gestiona pares clave-valor cifrados mediante `electron-store` con la clave del keychain del SO. Las claves tipicas son `google_ai_api_key` y `firebase_api_key`.
+Gestiona pares clave-valor cifrados mediante `electron-store` con la clave del keychain del SO. Las claves permitidas son: `gemini_api_key`, `gmail_client_id`, `gmail_api_key`, `cortex_update_channel` y `llm_api_key`. Cualquier otra clave es rechazada con un error.
 
 | Canal | Metodo JS | Parametros | Retorno | Descripcion |
 |---|---|---|---|---|
@@ -44,10 +44,10 @@ Gestiona pares clave-valor cifrados mediante `electron-store` con la clave del k
 
 ```typescript
 // Guardar una API key
-await window.cortexAPI.config.set("google_ai_api_key", "AIza...");
+await window.cortexAPI.config.set("gemini_api_key", "AIza...");
 
 // Leer una API key
-const key = await window.cortexAPI.config.get("google_ai_api_key");
+const key = await window.cortexAPI.config.get("gemini_api_key");
 if (key) {
   console.log("API key configurada");
 }

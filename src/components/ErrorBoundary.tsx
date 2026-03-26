@@ -30,7 +30,7 @@ export class ErrorBoundary extends React.Component<
 
 	componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
 		const section = this.props.section ? ` — ${this.props.section}` : "";
-		logger.error("ErrorBoundary" + section, error.message, error, errorInfo);
+		logger.error(`ErrorBoundary${section}`, error.message, error, errorInfo);
 	}
 
 	handleReset = () => {
