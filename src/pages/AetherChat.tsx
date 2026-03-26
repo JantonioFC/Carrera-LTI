@@ -5,6 +5,7 @@ import { ChatInputArea } from "../components/chat/ChatInputArea";
 import { ChatSkeleton } from "../components/chat/ChatSkeleton";
 import { apiBackend } from "../services/aiClient";
 import { useAetherStore } from "../store/aetherStore";
+import { useUserConfigStore } from "../store/userConfigStore";
 import { logger } from "../utils/logger";
 import {
 	failure,
@@ -17,14 +18,13 @@ import {
 
 export default function AetherChat() {
 	const {
-		geminiApiKey,
-		setGeminiApiKey,
 		chatHistory,
 		addChatMessage,
 		appendChatMessage,
 		clearChatHistory,
 		semanticSearch,
 	} = useAetherStore();
+	const { geminiApiKey, setGeminiApiKey } = useUserConfigStore();
 	const [inputKey, setInputKey] = useState("");
 	const [prompt, setPrompt] = useState("");
 	const [status, setStatus] = useState<RemoteData<void, string>>(notAsked());

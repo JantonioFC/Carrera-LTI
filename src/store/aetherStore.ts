@@ -1,5 +1,5 @@
-// TODO AR-03 (#195): aetherStore tiene 3 responsabilidades (notas, embeddings,
-// config global). Separar en noteStore + embeddingStore + userConfigStore — ver #195.
+// AR-03 (#234): API keys extraídas a userConfigStore. aetherStore conserva
+// notas + embeddings. La separación de embeddingStore queda pendiente (gradual).
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
 import { create } from "zustand";
@@ -9,6 +9,7 @@ import { findSimilarNotes, generateEmbedding } from "../utils/embeddings";
 import { idbStorage } from "../utils/idbStorage";
 import { logger } from "../utils/logger";
 import type { AetherNoteId, ChatMessageId } from "../utils/schemas";
+import { useUserConfigStore } from "./userConfigStore";
 
 export type { AetherNoteId, ChatMessageId };
 
@@ -41,9 +42,6 @@ export interface ChatMessage {
 
 interface AetherState {
 	notes: AetherNote[];
-	geminiApiKey: string;
-	gmailClientId: string;
-	gmailApiKey: string;
 	chatHistory: ChatMessage[];
 }
 
@@ -54,9 +52,6 @@ interface AetherActions {
 	getNote: (id: AetherNoteId) => AetherNote | undefined;
 	getGraphData: () => GraphData;
 	findBacklinks: (nodeId: AetherNoteId) => AetherNote[];
-	setGeminiApiKey: (key: string) => void;
-	setGmailClientId: (id: string) => void;
-	setGmailApiKey: (key: string) => void;
 	ingestNote: (id: AetherNoteId) => Promise<void>;
 	semanticSearch: (query: string, limit?: number) => Promise<AetherNote[]>;
 	addChatMessage: (
@@ -96,9 +91,6 @@ export const useAetherStore = create<AetherState & AetherActions>()(
 
 			return {
 				notes: defaultNotes,
-				geminiApiKey: "",
-				gmailClientId: "",
-				gmailApiKey: "",
 				chatHistory: [],
 
 				addNote: (title = "Nueva Nota") => {
@@ -169,27 +161,9 @@ export const useAetherStore = create<AetherState & AetherActions>()(
 					});
 				},
 
-				setGeminiApiKey: (key) => {
-					set((state) => {
-						state.geminiApiKey = key;
-					});
-					window.cortexAPI?.config.set("gemini_api_key", key);
-				},
-				setGmailClientId: (id) => {
-					set((state) => {
-						state.gmailClientId = id;
-					});
-					window.cortexAPI?.config.set("gmail_client_id", id);
-				},
-				setGmailApiKey: (key) => {
-					set((state) => {
-						state.gmailApiKey = key;
-					});
-					window.cortexAPI?.config.set("gmail_api_key", key);
-				},
-
 				ingestNote: async (id) => {
-					const { notes, geminiApiKey } = get();
+					const { notes } = get();
+					const { geminiApiKey } = useUserConfigStore.getState();
 					const note = notes.find((n) => n.id === id);
 					if (!note || !geminiApiKey) return;
 
@@ -208,7 +182,8 @@ export const useAetherStore = create<AetherState & AetherActions>()(
 				},
 
 				semanticSearch: async (query, limit = 3) => {
-					const { notes, geminiApiKey } = get();
+					const { notes } = get();
+					const { geminiApiKey } = useUserConfigStore.getState();
 					if (!geminiApiKey || !query) return [];
 
 					const queryVector = await generateEmbedding(geminiApiKey, query);
@@ -292,7 +267,7 @@ export const useAetherStore = create<AetherState & AetherActions>()(
 					api.config.get("gmail_client_id"),
 					api.config.get("gmail_api_key"),
 				]);
-				useAetherStore.setState({
+				useUserConfigStore.setState({
 					geminiApiKey: geminiKey ?? "",
 					gmailClientId: gmailId ?? "",
 					gmailApiKey: gmailKey ?? "",

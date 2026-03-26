@@ -12,8 +12,8 @@ vi.mock("../../services/gmail", () => ({
 	},
 }));
 
-vi.mock("../../store/aetherStore", () => ({
-	useAetherStore: vi.fn(),
+vi.mock("../../store/userConfigStore", () => ({
+	useUserConfigStore: vi.fn(),
 }));
 
 // framer-motion puede necesitar stub mínimo en jsdom
@@ -31,7 +31,7 @@ vi.mock("framer-motion", () => ({
 
 import { gmailService } from "../../services/gmail";
 // Importar después de los mocks
-import { useAetherStore } from "../../store/aetherStore";
+import { useUserConfigStore } from "../../store/userConfigStore";
 import { GmailWidget } from "./GmailWidget";
 
 function setupStore({
@@ -41,7 +41,7 @@ function setupStore({
 	gmailClientId?: string;
 	gmailApiKey?: string;
 } = {}) {
-	vi.mocked(useAetherStore).mockReturnValue({
+	vi.mocked(useUserConfigStore).mockReturnValue({
 		gmailClientId,
 		gmailApiKey,
 		setGmailClientId: vi.fn(),

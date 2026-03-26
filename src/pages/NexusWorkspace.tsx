@@ -1,4 +1,4 @@
-import { BlockNoteEditor } from "@blocknote/core";
+import { BlockNoteEditor, type Dictionary } from "@blocknote/core";
 import { lazy, Suspense, useMemo, useState } from "react";
 import { useNexusStore } from "../store/nexusStore";
 import "@blocknote/core/fonts/inter.css";
@@ -34,9 +34,12 @@ export default function NexusWorkspace() {
 		const yDoc = getYDoc(activeDocId);
 
 		return BlockNoteEditor.create({
-			dictionary: esDictionary as any,
+			// #226: cast explícito — esDictionary satisface la forma Dictionary
+			// pero TypeScript no puede inferir el tipo sin el cast.
+			dictionary: esDictionary as unknown as Dictionary,
 			collaboration: {
-				provider: undefined as any, // We are syncing directly to IDB down below through yDoc
+				// provider es opcional en CollaborationOptions; undefined es válido.
+				provider: undefined,
 				fragment: yDoc.getXmlFragment("document-store"),
 				user: {
 					name: "User",
@@ -141,8 +144,9 @@ export default function NexusWorkspace() {
 								</div>
 							}
 						>
+							{/* #226: cast explícito — generics no inferibles en lazy-loaded context */}
 							<BlockNoteView
-								editor={editor as any}
+								editor={editor as unknown as BlockNoteEditor<any, any, any>}
 								theme="dark"
 								className="nexus-editor min-h-[500px]"
 							/>
