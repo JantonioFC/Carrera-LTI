@@ -48,6 +48,7 @@ export async function generateContentWithRetry(
 			}
 		}
 	}
+	throw new Error("generateContentWithRetry: maxRetries must be > 0");
 }
 
 /**
