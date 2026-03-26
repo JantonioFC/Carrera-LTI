@@ -70,7 +70,8 @@ jobs:
           MACOS_CERTIFICATE_PWD: ${{ secrets.MACOS_CERTIFICATE_PWD }}
           KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
         run: |
-          echo "$MACOS_CERTIFICATE" | base64 --decode > certificate.p12
+          # SC-03 (#240): usar printf en lugar de echo para evitar que el certificado aparezca en logs
+          printf '%s' "$MACOS_CERTIFICATE" | base64 --decode > certificate.p12
           security create-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
           security default-keychain -s build.keychain
           security unlock-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
@@ -84,8 +85,8 @@ jobs:
           WINDOWS_CERTIFICATE: ${{ secrets.WINDOWS_CERTIFICATE }}
           WINDOWS_CERTIFICATE_PWD: ${{ secrets.WINDOWS_CERTIFICATE_PWD }}
         run: |
-          echo "$env:WINDOWS_CERTIFICATE" | Out-File -FilePath certificate.b64
-          certutil -decode certificate.b64 certificate.p12
+          # SC-03 (#240): decodificar directamente con .NET para evitar que el certificado pase por stdout
+          [Convert]::FromBase64String($env:WINDOWS_CERTIFICATE) | Set-Content -Path certificate.p12 -AsByteStream
         shell: pwsh
 
       - name: Build Electron installers

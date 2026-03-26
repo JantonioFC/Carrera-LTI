@@ -1,4 +1,4 @@
-import type { IPCMessage } from "../../src/cortex/ipc/IPCProtocol";
+import type { IPCMessage } from "../ipc/IPCProtocol";
 
 const DEFAULT_TIMEOUT_MS = 30_000;
 

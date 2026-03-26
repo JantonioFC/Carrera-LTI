@@ -7,6 +7,10 @@
  */
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
+import type { CortexChunk } from "../../types/cortex";
+
+// AR-11 (#236): re-exportar CortexChunk como CortexQueryResult por compatibilidad con importadores existentes
+export type { CortexChunk as CortexQueryResult } from "../../types/cortex";
 
 export type CortexActivity =
 	| { type: "idle" }
@@ -15,18 +19,11 @@ export type CortexActivity =
 	| { type: "querying"; query: string }
 	| { type: "ocr"; filename: string };
 
-export interface CortexQueryResult {
-	chunkId: string;
-	docId: string;
-	content: string;
-	score: number;
-}
-
 export interface CortexState {
 	activity: CortexActivity;
 	indexedDocCount: number;
 	lastIndexedAt: number | null;
-	queryResults: CortexQueryResult[];
+	queryResults: CortexChunk[];
 	isQuerying: boolean;
 	queryError: string | null;
 }
@@ -35,7 +32,7 @@ interface CortexActions {
 	setActivity: (activity: CortexActivity) => void;
 	setIndexedDocCount: (count: number) => void;
 	setLastIndexedAt: (ts: number) => void;
-	setQueryResults: (results: CortexQueryResult[]) => void;
+	setQueryResults: (results: CortexChunk[]) => void;
 	setIsQuerying: (v: boolean) => void;
 	setQueryError: (err: string | null) => void;
 	reset: () => void;

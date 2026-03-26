@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { PresencialEvent } from "../data/lti";
 import type { ScheduleItem } from "../pages/Horarios";
 import type { Task } from "../pages/Tareas";
@@ -24,6 +24,16 @@ export function useCloudSync(
 	const [syncStatus, setSyncStatus] = useState<
 		"idle" | "syncing" | "success" | "error"
 	>("idle");
+	// QP-01 (#225): ref para cancelar el timeout de reset en desmonte del componente
+	const idleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+	useEffect(() => {
+		return () => {
+			if (idleTimerRef.current !== null) {
+				clearTimeout(idleTimerRef.current);
+			}
+		};
+	}, []);
 
 	const {
 		notes: aetherNotes,
@@ -78,7 +88,10 @@ export function useCloudSync(
 					if (success) {
 						localStorage.removeItem("lti_sync_queue");
 						setSyncStatus("success");
-						setTimeout(() => setSyncStatus("idle"), 3000);
+						idleTimerRef.current = setTimeout(
+							() => setSyncStatus("idle"),
+							3000,
+						);
 					} else {
 						setSyncStatus("error");
 					}
@@ -135,7 +148,7 @@ export function useCloudSync(
 			if (success) {
 				localStorage.removeItem("lti_sync_queue");
 				setSyncStatus("success");
-				setTimeout(() => setSyncStatus("idle"), 3000);
+				idleTimerRef.current = setTimeout(() => setSyncStatus("idle"), 3000);
 			} else {
 				localStorage.setItem("lti_sync_queue", JSON.stringify(validation.data));
 				setSyncStatus("error");
@@ -218,7 +231,7 @@ export function useCloudSync(
 				}
 
 				setSyncStatus("success");
-				setTimeout(() => setSyncStatus("idle"), 3000);
+				idleTimerRef.current = setTimeout(() => setSyncStatus("idle"), 3000);
 			} else {
 				setSyncStatus("error");
 			}

@@ -55,6 +55,11 @@ export const useObserverStore = create<ObserverState & ObserverActions>()(
 			storage: createJSONStorage(() => localStorage),
 			// Solo persiste isRunning — las transiciones y notificaciones son efímeras
 			partialize: (state) => ({ isRunning: state.isRunning }),
+			// AR-10 (#238): reset isRunning al rehidratar para evitar estado zombi
+			// si el proceso Python crasheó sin emitir el evento de parada.
+			onRehydrateStorage: () => (state) => {
+				if (state) state.isRunning = false;
+			},
 		},
 	),
 );

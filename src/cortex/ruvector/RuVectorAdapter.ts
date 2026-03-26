@@ -16,12 +16,8 @@ interface SubprocessAdapter {
 	): Promise<AdapterResponse>;
 }
 
-export interface RuVectorChunk {
-	chunkId: string;
-	score: number;
-	content: string;
-	docId: string;
-}
+// AR-11 (#236): tipo canónico movido a src/types/cortex.ts — re-exportado aquí por compatibilidad
+export type { CortexChunk as RuVectorChunk } from "../../types/cortex";
 
 export interface IndexDocumentRequest {
 	docId: string;
