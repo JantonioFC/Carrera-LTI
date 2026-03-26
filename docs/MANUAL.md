@@ -1,6 +1,6 @@
 # 📖 Manual de Usuario — Carrera LTI
 
-**Versión:** 3.0 · Marzo 2026
+**Versión:** 3.8.0 · Marzo 2026
 **Plataforma:** Web (PWA) y App de Escritorio (Electron) — Compatible con Windows, macOS, Linux, Android e iOS
 **Marca:** URU/IA.LABS · UTEC Uruguay
 

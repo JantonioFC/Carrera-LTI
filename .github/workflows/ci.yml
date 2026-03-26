@@ -37,6 +37,9 @@ jobs:
     - name: Install dependencies
       run: npm ci
 
+    - name: Dependency vulnerability audit (#248)
+      run: npm audit --audit-level=moderate
+
     - name: Secret scanning (gitleaks)
       if: matrix.run-gitleaks == true
       uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7 # v2.3.9
@@ -45,6 +48,14 @@ jobs:
 
     - name: Check Formatting & Lint (Biome)
       run: npm run lint
+
+    - name: Enforce electron/src boundary (#246)
+      if: runner.os != 'Windows'
+      run: |
+        if grep -rE --include="*.ts" "from [\"'](\.\./)*src/" electron/; then
+          echo "VIOLATION: electron/ must not import runtime values from src/ (see CONTRIBUTING.md)"
+          exit 1
+        fi
 
     - name: Run tests
       run: npm run test
