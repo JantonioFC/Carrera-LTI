@@ -128,4 +128,25 @@ describe("initConfig", () => {
 		initConfig(store, ipc);
 		expect(() => ipc._call("config:get", null, null)).toThrow();
 	});
+
+	// Error-path: clave válida para Zod (string no vacío) pero no en la allowlist
+	it("config:set lanza error si la clave pasa Zod pero no está en la allowlist", () => {
+		const store = makeStore();
+		const ipc = makeIpcMain();
+		initConfig(store, ipc);
+		expect(() =>
+			ipc._call("config:set", null, "valid_string_not_in_allowlist", "val"),
+		).toThrow(/clave no permitida/);
+		expect(store.set).not.toHaveBeenCalled();
+	});
+
+	it("config:get lanza error si la clave pasa Zod pero no está en la allowlist", () => {
+		const store = makeStore();
+		const ipc = makeIpcMain();
+		initConfig(store, ipc);
+		expect(() =>
+			ipc._call("config:get", null, "valid_string_not_in_allowlist"),
+		).toThrow(/clave no permitida/);
+		expect(store.get).not.toHaveBeenCalled();
+	});
 });

@@ -15,7 +15,7 @@ import { apiBackend } from "../services/aiClient";
 import { useAetherStore } from "../store/aetherStore";
 import { useNexusStore } from "../store/nexusStore";
 import { useUserConfigStore } from "../store/userConfigStore";
-import { truncateContext } from "../utils/aiUtils";
+import { NEXUS_AI_CONTEXT_CHARS, truncateContext } from "../utils/aiUtils";
 import {
 	failure,
 	isLoading,
@@ -88,7 +88,7 @@ Sé conciso pero completo. Usa formato Markdown cuando sea útil.\n\n`;
 			context += "\n";
 		}
 
-		return truncateContext(context, 40000); // 40k chars limit
+		return truncateContext(context, NEXUS_AI_CONTEXT_CHARS);
 	}, [notes, documents, allDatabases]);
 
 	const sendMessage = async () => {

@@ -1,6 +1,9 @@
 import { Calendar as CalendarIcon, Tag, X } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
+/** QP-NEW-3 (#289): delay en ms para hacer foco en el input tras apertura del modal. */
+const MODAL_FOCUS_DELAY_MS = 100;
+
 interface CalendarEventModalProps {
 	isOpen: boolean;
 	onClose: () => void;
@@ -23,7 +26,7 @@ export const CalendarEventModal: React.FC<CalendarEventModalProps> = ({
 	useEffect(() => {
 		if (isOpen) {
 			setTitle(initialTitle);
-			setTimeout(() => inputRef.current?.focus(), 100);
+			setTimeout(() => inputRef.current?.focus(), MODAL_FOCUS_DELAY_MS);
 		}
 	}, [isOpen, initialTitle]);
 
@@ -55,9 +58,9 @@ export const CalendarEventModal: React.FC<CalendarEventModalProps> = ({
 
 				<form onSubmit={handleSubmit} className="p-6 space-y-4">
 					<div>
-						<label className="block text-xs font-medium text-slate-400 uppercase tracking-wider mb-1.5">
+						<span className="block text-xs font-medium text-slate-400 uppercase tracking-wider mb-1.5">
 							Fecha
-						</label>
+						</span>
 						<div className="bg-navy-800/50 border border-navy-700 rounded-lg px-3 py-2 text-slate-300 text-sm">
 							{date.toLocaleDateString("es-ES", {
 								weekday: "long",
