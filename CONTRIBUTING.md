@@ -67,7 +67,9 @@ npm run lint
 npm run format
 ```
 
-El linting usa **Biome**. No se usa ESLint ni Prettier. Todos los tests deben pasar y el linter no debe reportar errores antes de abrir una pull request.
+El linting usa **Biome** (v2.4.7). No se usa ESLint ni Prettier. Todos los tests deben pasar y el linter no debe reportar errores antes de abrir una pull request.
+
+> **Nota sobre auditorías:** Las revisiones de código con skills de auditoría (seguridad, DDD, calidad, testing) se realizan solo cuando hay un motivo concreto (antes de una feature de riesgo, tras un bug de producción, ante un cambio de stack), no como proceso automático en cada release. El objetivo es encontrar deuda real, no manufacturar issues.
 
 El comando `npm run test:coverage` genera un reporte de cobertura con `@vitest/coverage-v8`. La CI aplica los siguientes umbrales mínimos:
 
@@ -94,10 +96,11 @@ Usa el formato `tipo/descripcion-breve-vX.Y.Z`:
 | `test/` | Nuevos tests o mejoras de tests |
 | `docs/` | Solo documentacion |
 
-El sufijo `vX.Y.Z` es opcional pero recomendado cuando el cambio esta asociado a una version especifica. Ejemplos:
+El sufijo `vX.Y.Z` es opcional pero recomendado cuando el cambio esta asociado a una version especifica. Para releases con multiples partes (p1, p2, p3), se usa el formato `feat/vX.Y.Z-pN`. Ejemplos:
 
 ```
-feat/observer-ai-v1.2.0
+feat/v3.10.0-p1
+feat/v3.10.0-p2
 fix/ruvector-timeout-v1.1.3
 docs/api-ipc
 ```
@@ -196,7 +199,7 @@ El proceso principal no tiene acceso a la UI; el renderer no tiene acceso a Node
 | `electron/handlers/` | Handlers IPC agrupados por servicio (config, ruvector, docling, whisper, observer) |
 | `src/cortex/` | Capa de abstraccion del renderer para comunicarse con el proceso principal |
 | `src/store/` | Stores de Zustand (estado global de la UI) |
-| `src/utils/` | Utilidades compartidas (`logger`, helpers) |
+| `src/utils/` | Utilidades compartidas: `schemas.ts` (branded types + Zod IPC), `aiUtils.ts`, `logger`, helpers |
 
 ---
 

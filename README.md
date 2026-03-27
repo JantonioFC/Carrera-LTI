@@ -137,6 +137,8 @@ src/
 │   ├── useNexusDB.tsx        # Motor de BD Relacionales (Dexie)
 │   └── useCloudSync.tsx      # Sincronización Firebase offline-resiliente
 ├── utils/
+│   ├── schemas.ts            # Branded types (TaskId, SubtaskId, AetherNoteId, NexusDocumentId, ChatMessageId, DueDate, SubjectId) + Zod schemas IPC
+│   ├── aiUtils.ts            # truncateContext, generateStructuredContentWithRetry, constantes de contexto
 │   └── nexusCrypto.ts        # Cifrado/descifrado AES-256-GCM
 ├── data/
 │   └── lti.ts                # Datos académicos oficiales UTEC Plan 2024
