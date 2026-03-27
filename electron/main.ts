@@ -132,11 +132,27 @@ async function initStore() {
 
 	// Migración desde .env: si hay variables de entorno de API keys,
 	// importarlas al store en el primer arranque y no volver a migrar.
-	const envKeys = ["VITE_GOOGLE_AI_API_KEY", "VITE_FIREBASE_API_KEY"] as const;
-	for (const envKey of envKeys) {
-		const storeKey = envKey.replace("VITE_", "").toLowerCase();
-		if (process.env[envKey] && !store.get(storeKey)) {
-			store.set(storeKey, process.env[envKey] as string);
+	// SC-03 (#265): solo migrar si safeStorage está disponible — con fallback.key
+	// la clave de cifrado es débil y no es seguro persistir API keys.
+	const canMigrate =
+		safeStorage.isEncryptionAvailable() || !!process.env.CORTEX_MASTER_SECRET;
+	if (!canMigrate) {
+		logger.warn(
+			"Config",
+			"Migración de API keys omitida: safeStorage no disponible y CORTEX_MASTER_SECRET no configurado.",
+		);
+	} else {
+		const envKeys = [
+			"VITE_GOOGLE_AI_API_KEY",
+			"VITE_FIREBASE_API_KEY",
+		] as const;
+		for (const envKey of envKeys) {
+			const storeKey = envKey.replace("VITE_", "").toLowerCase();
+			if (process.env[envKey] && !store.get(storeKey)) {
+				store.set(storeKey, process.env[envKey] as string);
+			}
+			// Sanitizar variable de entorno para que no persista en memoria del proceso
+			delete (process.env as Record<string, string | undefined>)[envKey];
 		}
 	}
 

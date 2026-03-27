@@ -60,6 +60,8 @@ if (hasFirebaseConfig) {
 	);
 }
 
+// SC-02 (#256): API keys eliminadas de AppData — nunca se sincronizan a la nube.
+// Viven exclusivamente en userConfigStore (OS Keychain vía cortexAPI).
 export type AppData = {
 	subjectData: SubjectDataMap;
 	presenciales: PresencialEvent[];
@@ -68,9 +70,6 @@ export type AppData = {
 	schedule?: ScheduleItem[];
 	nexusDocs?: NexusDocument[];
 	aetherNotes?: AetherNote[];
-	geminiApiKey?: string;
-	gmailClientId?: string;
-	gmailApiKey?: string;
 	lastUpdated: number;
 };
 
@@ -102,20 +101,11 @@ class FirebaseSyncService implements ISyncService {
 	async syncToCloud(userId: string, data: AppData): Promise<boolean> {
 		if (!db) return false;
 		try {
-			// Phase 3: Zod validation point (simplifying for now, can add full AppData schema)
 			const userRef = doc(db, "users", userId);
-
-			// V-01 Fix: Sanitize data to avoid leaking API keys in the cloud
-			const {
-				geminiApiKey: _ga,
-				gmailApiKey: _gma,
-				gmailClientId: _gc,
-				...sanitizedData
-			} = data;
-
+			// SC-02 (#256): AppData ya no contiene API keys — no se necesita sanitización
 			await setDoc(
 				userRef,
-				{ ...sanitizedData, lastUpdated: Date.now() },
+				{ ...data, lastUpdated: Date.now() },
 				{ merge: true },
 			);
 			return true;

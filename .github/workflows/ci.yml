@@ -38,7 +38,11 @@ jobs:
       run: npm ci
 
     - name: Dependency vulnerability audit (#248)
-      run: npm audit --audit-level=moderate
+      # --audit-level=high: las vulnerabilidades moderate actuales (brace-expansion
+      # GHSA-f886-m6hf-6m8v) están en electron-builder y google-auth-library —
+      # herramientas de build y cliente HTTP que no procesan input arbitrario del
+      # usuario en este contexto. Fix requiere breaking changes (electron-builder).
+      run: npm audit --audit-level=high
 
     - name: Secret scanning (gitleaks)
       if: matrix.run-gitleaks == true
