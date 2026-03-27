@@ -6,6 +6,36 @@ Versionado semántico: [SemVer](https://semver.org/lang/es/).
 
 ---
 
+## [v3.10.0] — 2026-03-27
+
+### Security (p1 — #278–#280)
+- `electron/main.ts` — validación runtime de parámetros IPC en la frontera main↔renderer (#278–#280)
+  - `cortex:query`: `topK` validado como entero 1–50
+  - `observer:toggle`: `active` validado como `boolean` (previene string `"false"` truthy)
+  - `cortex:transcribe`: `model` validado contra enum `VALID_MODELS`
+
+### DX — TypeScript (p1 — #281–#283)
+- `cortexStore.ts` — eliminado estado imposible: `isQuerying: boolean` + `queryError: string | null` reemplazados por variante `{ type: "query_error"; error: string }` en `CortexActivity` (#281)
+- `nexusStore.ts` — eliminado `ydoc as any` innecesario en `Record<string, Y.Doc>` (#282)
+- `GmailInbox.tsx` / `GmailWidget.tsx` — props `loading/error/messages` separados reemplazados por `GmailInboxState` discriminated union (#283)
+
+### Tests (p2 — #284–#286)
+- `branded-types.test-d.ts` (nuevo) — tests de tipo con `expectTypeOf` para los 5 branded types; verifica incompatibilidad estructural (#284)
+- `useCloudSync.test.ts` — bloques `vi.hoisted` consolidados en uno + `afterEach(localStorage.clear())` (#285)
+- `configHandlers.test.ts` — tests de error-path para clave válida en Zod pero ausente de la allowlist (#286)
+
+### Quality/Performance (p2 — #287–#289)
+- `aiUtils.ts` — constantes `NEXUS_AI_CONTEXT_CHARS` (40 000) y `AETHER_NOTES_CONTEXT_CHARS` (30 000) en lugar de magic numbers inconsistentes en `NexusAI.tsx` y `aiClient.ts` (#287)
+- `Horarios.tsx` — `Math.random()` reemplazado por `crypto.randomUUID()` para `instanceId` (#288)
+- `CalendarEventModal.tsx` / `AetherGraphView.tsx` — magic number 100 ms extraído en `MODAL_FOCUS_DELAY_MS` y `GRAPH_INIT_DELAY_MS` (#289)
+
+### Architecture (p3 — #290–#292)
+- `schemas.ts` / `useSubjectData.tsx` — `SubjectDataSchema` incluye `archived` y `archivedAt`; Zod ya no stripea los campos del Soft Delete Protocol al sincronizar (#290)
+- `schemas.ts` / `Tareas.tsx` — `DueDate` branded type con validación regex `YYYY-MM-DD`; guardia `Number.isNaN()` en filtro de notificaciones (#291)
+- `schemas.ts` / `Tareas.tsx` / `AddTaskModal.tsx` — `SubjectId` branded type en `Task.subjectId`; imposible usar strings arbitrarios como referencia de asignatura (#292)
+
+---
+
 ## [v3.7.0] — 2026-03-26
 
 ### Security (p0 — #174–#180)
