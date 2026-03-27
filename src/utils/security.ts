@@ -6,6 +6,8 @@
  * Backward compatible: data with prefix "obv1:" is decoded with legacy XOR.
  */
 
+import { logger } from "./logger";
+
 const PREFIX_V2 = "wcv1:";
 const PREFIX_V1 = "obv1:";
 const LEGACY_XOR_KEY = 0x55;
@@ -71,8 +73,10 @@ export async function obfuscate(str: string): Promise<string> {
 	return PREFIX_V2 + btoa(String.fromCharCode(...combined));
 }
 
-/** Decrypt a string. Handles both v2 (AES-GCM) and v1 (legacy XOR) formats. */
-export async function deobfuscate(str: string): Promise<string> {
+/** Decrypt a string. Handles both v2 (AES-GCM) and v1 (legacy XOR) formats.
+ *  Returns null if decryption fails (auth tag mismatch, corrupted data).
+ *  SC-01 (#255): never return raw ciphertext — caller must handle null. */
+export async function deobfuscate(str: string): Promise<string | null> {
 	if (!str) return str;
 
 	// Legacy XOR format — backward compat for existing IDB data
@@ -95,8 +99,10 @@ export async function deobfuscate(str: string): Promise<string> {
 			encrypted,
 		);
 		return new TextDecoder().decode(decrypted);
-	} catch {
-		return str; // Fallback: return raw if decryption fails
+	} catch (e) {
+		// AES-GCM auth tag mismatch or corrupted data — do NOT return raw ciphertext
+		logger.error("security", "AES-GCM decryption failed — data may be corrupted", e);
+		return null;
 	}
 }
 

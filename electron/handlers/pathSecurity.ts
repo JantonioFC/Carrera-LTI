@@ -11,9 +11,9 @@
  * Ref: Issue #118
  */
 
-import { realpathSync } from "node:fs";
+import { lstatSync, realpathSync } from "node:fs";
 import { homedir } from "node:os";
-import { isAbsolute, resolve, sep } from "node:path";
+import { isAbsolute, join, resolve, sep } from "node:path";
 import { app } from "electron";
 
 /**
@@ -52,5 +52,27 @@ export function assertSafePath(inputPath: string): void {
 		throw new Error(
 			`path traversal: ruta fuera de directorios permitidos — "${resolved}"`,
 		);
+	}
+
+	// SC-04 (#266): verificar que ningún componente intermedio del path resuelto
+	// sea un symlink. realpathSync resuelve el destino final pero no protege contra
+	// symlinks en subdirectorios intermedios dentro de allowedRoots.
+	const components = resolved.split(sep).filter(Boolean);
+	let current: string = sep;
+	for (const component of components) {
+		current = join(current, component);
+		try {
+			const stat = lstatSync(current); // lstat NO sigue symlinks
+			if (stat.isSymbolicLink()) {
+				throw new Error(
+					`path traversal: symlink detectado en componente intermedio — "${current}"`,
+				);
+			}
+		} catch (e) {
+			if (e instanceof Error && e.message.includes("symlink detectado"))
+				throw e;
+			// El archivo aún no existe (nuevo archivo) — aceptar sin validar
+			break;
+		}
 	}
 }

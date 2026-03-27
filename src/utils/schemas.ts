@@ -140,8 +140,6 @@ export const AppDataSchema = z.object({
 	schedule: ScheduleItemsSchema.optional(),
 	nexusDocs: z.array(NexusDocumentSchema).optional(),
 	aetherNotes: AetherNotesSchema.optional(),
-	geminiApiKey: z.string().optional(),
-	gmailClientId: z.string().optional(),
-	gmailApiKey: z.string().optional(),
+	// SC-02 (#256): API keys nunca se sincronizan a la nube — viven en userConfigStore
 	lastUpdated: z.number(),
 });

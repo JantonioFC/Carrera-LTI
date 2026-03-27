@@ -114,16 +114,14 @@ describe("syncService", () => {
 		vi.clearAllMocks();
 	});
 
+	// SC-02 (#256): AppData ya no contiene API keys — nunca se sincronizan a la nube.
 	const baseData = {
 		subjectData: {} as Record<string, unknown>,
 		presenciales: [],
 		lastUpdated: 1000,
-		geminiApiKey: "secret-gemini-key",
-		gmailApiKey: "secret-gmail-key",
-		gmailClientId: "secret-gmail-client-id",
 	};
 
-	it("syncToCloud — llama a setDoc con datos sanitizados (sin API keys)", async () => {
+	it("syncToCloud — llama a setDoc con subjectData y lastUpdated", async () => {
 		mockSetDoc.mockResolvedValue(undefined);
 		mockDoc.mockReturnValue({ id: "users/user-1" });
 
@@ -134,9 +132,6 @@ describe("syncService", () => {
 		expect(mockSetDoc).toHaveBeenCalledOnce();
 
 		const [, dataArg] = mockSetDoc.mock.calls[0];
-		expect(dataArg).not.toHaveProperty("geminiApiKey");
-		expect(dataArg).not.toHaveProperty("gmailApiKey");
-		expect(dataArg).not.toHaveProperty("gmailClientId");
 		expect(dataArg).toHaveProperty("subjectData");
 		expect(dataArg).toHaveProperty("lastUpdated");
 	});

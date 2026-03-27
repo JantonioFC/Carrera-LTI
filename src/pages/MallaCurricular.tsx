@@ -1,6 +1,7 @@
 import { Award, BookOpen, Clock } from "lucide-react";
 import { useMemo, useState } from "react";
 import { CURRICULUM, TOTAL_CREDITS } from "../data/lti";
+import type { SubjectStatus } from "../data/lti.types";
 import { useSubjectData } from "../hooks/useSubjectData";
 
 const STATUS_STYLES = {
@@ -278,15 +279,14 @@ export default function MallaCurricular() {
 												type="button"
 												key={subject.id}
 												onClick={() => {
-													const nextStatus: Record<string, string> = {
+													const nextStatus = {
 														pendiente: "en_curso",
 														en_curso: "aprobada",
 														aprobada: "reprobada",
 														reprobada: "pendiente",
-													};
+													} satisfies Record<SubjectStatus, SubjectStatus>;
 													updateSubject(subject.id, {
-														status: (nextStatus[subject.status] ||
-															"pendiente") as any,
+														status: nextStatus[subject.status],
 													});
 												}}
 												className={`w-full text-left relative overflow-hidden rounded-lg p-2 border text-xs transition-all ${

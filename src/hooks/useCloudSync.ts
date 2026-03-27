@@ -4,7 +4,6 @@ import type { ScheduleItem } from "../pages/Horarios";
 import type { Task } from "../pages/Tareas";
 import { useAetherStore } from "../store/aetherStore";
 import { useNexusStore } from "../store/nexusStore";
-import { useUserConfigStore } from "../store/userConfigStore";
 import { type AppData, authService, syncService } from "../utils/firebase";
 import { logger } from "../utils/logger";
 import { AppDataSchema, type CalendarEventsMap } from "../utils/schemas";
@@ -37,14 +36,6 @@ export function useCloudSync(
 	}, []);
 
 	const { notes: aetherNotes } = useAetherStore();
-	const {
-		geminiApiKey,
-		setGeminiApiKey,
-		gmailClientId,
-		gmailApiKey,
-		setGmailClientId,
-		setGmailApiKey,
-	} = useUserConfigStore();
 	const { documents: nexusDocs } = useNexusStore();
 
 	// Inicializar auth usando el servicio desacoplado
@@ -118,9 +109,6 @@ export function useCloudSync(
 			schedule,
 			nexusDocs,
 			aetherNotes,
-			geminiApiKey,
-			gmailClientId,
-			gmailApiKey,
 			lastUpdated: Date.now(),
 		};
 
@@ -208,17 +196,6 @@ export function useCloudSync(
 				// Restore schedule
 				if (validatedData.schedule) {
 					setSchedule(validatedData.schedule);
-				}
-
-				// Restore API Keys
-				if (validatedData.geminiApiKey) {
-					setGeminiApiKey(validatedData.geminiApiKey);
-				}
-				if (validatedData.gmailClientId) {
-					setGmailClientId(validatedData.gmailClientId);
-				}
-				if (validatedData.gmailApiKey) {
-					setGmailApiKey(validatedData.gmailApiKey);
 				}
 
 				// Restore Aether Notes
