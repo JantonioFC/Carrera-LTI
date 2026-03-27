@@ -14,7 +14,9 @@ describe("NexusContextSurface", () => {
 	});
 
 	it("should_show_loading_state", () => {
-		useCortexStore.getState().setIsQuerying(true);
+		useCortexStore
+			.getState()
+			.setActivity({ type: "querying", query: "Estudiar TCP" });
 		render(<NexusContextSurface taskTitle="Estudiar TCP" />);
 		expect(screen.getByTestId("nexus-context-loading")).toBeInTheDocument();
 	});
@@ -48,7 +50,9 @@ describe("NexusContextSurface", () => {
 	});
 
 	it("should_show_error_state", () => {
-		useCortexStore.getState().setQueryError("índice no disponible");
+		useCortexStore
+			.getState()
+			.setActivity({ type: "query_error", error: "índice no disponible" });
 		render(<NexusContextSurface taskTitle="Cualquier tarea" />);
 		expect(screen.getByTestId("nexus-context-error")).toHaveTextContent(
 			/índice no disponible/i,

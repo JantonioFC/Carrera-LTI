@@ -29,6 +29,8 @@ function activityLabel(activity: CortexActivity): string {
 			return `Transcribiendo: ${activity.filename}`;
 		case "querying":
 			return `Consultando: ${activity.query}`;
+		case "query_error":
+			return `Error: ${activity.error}`;
 		case "ocr":
 			return `OCR: ${activity.filename}`;
 	}

@@ -26,10 +26,9 @@ function ContextResult({ result }: { result: CortexQueryResult }) {
  */
 export function NexusContextSurface({ taskTitle }: NexusContextSurfaceProps) {
 	const results = useCortexStore((s) => s.queryResults);
-	const isQuerying = useCortexStore((s) => s.isQuerying);
-	const queryError = useCortexStore((s) => s.queryError);
+	const activity = useCortexStore((s) => s.activity);
 
-	if (isQuerying) {
+	if (activity.type === "querying") {
 		return (
 			<div
 				data-testid="nexus-context-loading"
@@ -40,10 +39,10 @@ export function NexusContextSurface({ taskTitle }: NexusContextSurfaceProps) {
 		);
 	}
 
-	if (queryError) {
+	if (activity.type === "query_error") {
 		return (
 			<div data-testid="nexus-context-error" className="nexus-context-error">
-				{queryError}
+				{activity.error}
 			</div>
 		);
 	}

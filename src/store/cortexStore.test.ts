@@ -30,12 +30,10 @@ describe("cortexStore — estado inicial", () => {
 		expect(useCortexStore.getState().queryResults).toEqual([]);
 	});
 
-	it("isQuerying inicial es false", () => {
-		expect(useCortexStore.getState().isQuerying).toBe(false);
-	});
-
-	it("queryError inicial es null", () => {
-		expect(useCortexStore.getState().queryError).toBeNull();
+	it("la actividad inicial no es query_error ni querying", () => {
+		const { activity } = useCortexStore.getState();
+		expect(activity.type).not.toBe("querying");
+		expect(activity.type).not.toBe("query_error");
 	});
 });
 
@@ -145,35 +143,32 @@ describe("cortexStore — setQueryResults", () => {
 	});
 });
 
-describe("cortexStore — setIsQuerying", () => {
+describe("cortexStore — activity query_error", () => {
 	beforeEach(resetStore);
 	afterEach(resetStore);
 
-	it("setIsQuerying(true) activa el flag", () => {
-		useCortexStore.getState().setIsQuerying(true);
-		expect(useCortexStore.getState().isQuerying).toBe(true);
+	it("setActivity(query_error) almacena el mensaje de error", () => {
+		useCortexStore
+			.getState()
+			.setActivity({ type: "query_error", error: "Error de conexión" });
+		const { activity } = useCortexStore.getState();
+		expect(activity.type).toBe("query_error");
+		if (activity.type === "query_error") {
+			expect(activity.error).toBe("Error de conexión");
+		}
 	});
 
-	it("setIsQuerying(false) desactiva el flag", () => {
-		useCortexStore.getState().setIsQuerying(true);
-		useCortexStore.getState().setIsQuerying(false);
-		expect(useCortexStore.getState().isQuerying).toBe(false);
-	});
-});
-
-describe("cortexStore — setQueryError", () => {
-	beforeEach(resetStore);
-	afterEach(resetStore);
-
-	it("setQueryError guarda el mensaje de error", () => {
-		useCortexStore.getState().setQueryError("Error de conexión");
-		expect(useCortexStore.getState().queryError).toBe("Error de conexión");
+	it("setActivity(idle) después de query_error limpia el estado de error", () => {
+		useCortexStore
+			.getState()
+			.setActivity({ type: "query_error", error: "fallo" });
+		useCortexStore.getState().setActivity({ type: "idle" });
+		expect(useCortexStore.getState().activity.type).toBe("idle");
 	});
 
-	it("setQueryError(null) limpia el error", () => {
-		useCortexStore.getState().setQueryError("Error previo");
-		useCortexStore.getState().setQueryError(null);
-		expect(useCortexStore.getState().queryError).toBeNull();
+	it("setActivity(querying) establece el estado de carga", () => {
+		useCortexStore.getState().setActivity({ type: "querying", query: "TCP" });
+		expect(useCortexStore.getState().activity.type).toBe("querying");
 	});
 });
 
@@ -191,8 +186,9 @@ describe("cortexStore — reset", () => {
 			.setQueryResults([
 				{ chunkId: "c1", docId: "d1", content: "x", score: 0.8 },
 			]);
-		useCortexStore.getState().setIsQuerying(true);
-		useCortexStore.getState().setQueryError("fallo");
+		useCortexStore
+			.getState()
+			.setActivity({ type: "query_error", error: "fallo" });
 
 		useCortexStore.getState().reset();
 
@@ -201,7 +197,5 @@ describe("cortexStore — reset", () => {
 		expect(s.indexedDocCount).toBe(0);
 		expect(s.lastIndexedAt).toBeNull();
 		expect(s.queryResults).toEqual([]);
-		expect(s.isQuerying).toBe(false);
-		expect(s.queryError).toBeNull();
 	});
 });

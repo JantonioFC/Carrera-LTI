@@ -104,7 +104,7 @@ export const useNexusStore = create<NexusState & NexusActions>()(
 				// para evitar fugas si un render intermedio re-entra (#163).
 				set((state) => {
 					state.yDocsCreating.add(idStr);
-					state.yDocs[idStr] = ydoc as any;
+					state.yDocs[idStr] = ydoc;
 					state.yDocsCreating.delete(idStr);
 				});
 

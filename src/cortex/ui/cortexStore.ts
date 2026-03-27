@@ -17,6 +17,7 @@ export type CortexActivity =
 	| { type: "indexing"; docTitle: string; progress?: number }
 	| { type: "transcribing"; filename: string }
 	| { type: "querying"; query: string }
+	| { type: "query_error"; error: string }
 	| { type: "ocr"; filename: string };
 
 export interface CortexState {
@@ -24,8 +25,6 @@ export interface CortexState {
 	indexedDocCount: number;
 	lastIndexedAt: number | null;
 	queryResults: CortexChunk[];
-	isQuerying: boolean;
-	queryError: string | null;
 }
 
 interface CortexActions {
@@ -33,8 +32,6 @@ interface CortexActions {
 	setIndexedDocCount: (count: number) => void;
 	setLastIndexedAt: (ts: number) => void;
 	setQueryResults: (results: CortexChunk[]) => void;
-	setIsQuerying: (v: boolean) => void;
-	setQueryError: (err: string | null) => void;
 	reset: () => void;
 }
 
@@ -43,8 +40,6 @@ const initialState: CortexState = {
 	indexedDocCount: 0,
 	lastIndexedAt: null,
 	queryResults: [],
-	isQuerying: false,
-	queryError: null,
 };
 
 export const useCortexStore = create<CortexState & CortexActions>()(
@@ -69,16 +64,6 @@ export const useCortexStore = create<CortexState & CortexActions>()(
 		setQueryResults: (results) =>
 			set((s) => {
 				s.queryResults = results;
-			}),
-
-		setIsQuerying: (v) =>
-			set((s) => {
-				s.isQuerying = v;
-			}),
-
-		setQueryError: (err) =>
-			set((s) => {
-				s.queryError = err;
 			}),
 
 		reset: () => set(() => ({ ...initialState })),

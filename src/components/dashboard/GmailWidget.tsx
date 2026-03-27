@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { type GmailMessage, gmailService } from "../../services/gmail";
 import { useUserConfigStore } from "../../store/userConfigStore";
 import { logger } from "../../utils/logger";
-import { GmailInbox } from "./GmailInbox";
+import { GmailInbox, type GmailInboxState } from "./GmailInbox";
 import { GmailMinimized } from "./GmailMinimized";
 import { GmailSettingsPanel } from "./GmailSettingsPanel";
 
@@ -104,11 +104,15 @@ export function GmailWidget() {
 	}
 
 	// --- Render Full Window ---
+	const inboxState: GmailInboxState = error
+		? { type: "error", error }
+		: loading
+			? { type: "loading" }
+			: { type: "success", messages };
+
 	return (
 		<GmailInbox
-			messages={messages}
-			loading={loading}
-			error={error}
+			state={inboxState}
 			isAuthenticated={isAuthenticated}
 			onLogin={handleLogin}
 			onRefresh={fetchEmails}

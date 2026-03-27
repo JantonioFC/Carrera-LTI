@@ -10,10 +10,14 @@ import {
 } from "lucide-react";
 import type { GmailMessage } from "../../services/gmail";
 
+// DX-03 (#283): discriminated union elimina estados imposibles (loading=true && messages.length>0)
+export type GmailInboxState =
+	| { type: "loading" }
+	| { type: "error"; error: string }
+	| { type: "success"; messages: GmailMessage[] };
+
 interface GmailInboxProps {
-	messages: GmailMessage[];
-	loading: boolean;
-	error: string | null;
+	state: GmailInboxState;
 	isAuthenticated: boolean;
 	onLogin: () => void;
 	onRefresh: () => void;
@@ -23,9 +27,7 @@ interface GmailInboxProps {
 }
 
 export function GmailInbox({
-	messages,
-	loading,
-	error,
+	state,
 	isAuthenticated,
 	onLogin,
 	onRefresh,
@@ -48,20 +50,26 @@ export function GmailInbox({
 				<div className="flex items-center gap-1">
 					{isAuthenticated && (
 						<button
+							type="button"
 							onClick={onRefresh}
-							disabled={loading}
+							disabled={state.type === "loading"}
 							className="p-1.5 text-slate-400 hover:text-white hover:bg-navy-800 rounded-md transition-all"
 						>
-							<RefreshCw size={14} className={loading ? "animate-spin" : ""} />
+							<RefreshCw
+								size={14}
+								className={state.type === "loading" ? "animate-spin" : ""}
+							/>
 						</button>
 					)}
 					<button
+						type="button"
 						onClick={onSettingsOpen}
 						className="p-1.5 text-slate-400 hover:text-white hover:bg-navy-800 rounded-md transition-all"
 					>
 						<Settings size={14} />
 					</button>
 					<button
+						type="button"
 						onClick={onMinimize}
 						className="p-1.5 text-slate-400 hover:text-white hover:bg-navy-800 rounded-md transition-all"
 					>
@@ -78,18 +86,19 @@ export function GmailInbox({
 							Conecta tu cuenta para monitorear correos.
 						</p>
 						<button
+							type="button"
 							onClick={onLogin}
 							className="px-4 py-2 bg-white text-navy-950 text-xs font-bold rounded-lg hover:bg-slate-200 transition-colors"
 						>
 							Iniciar Sesión
 						</button>
 					</div>
-				) : error ? (
+				) : state.type === "error" ? (
 					<div className="flex-1 flex flex-col items-center justify-center text-center p-4 space-y-3">
 						<AlertCircle size={24} className="text-lti-coral" />
-						<p className="text-xs text-slate-500 italic">{error}</p>
+						<p className="text-xs text-slate-500 italic">{state.error}</p>
 					</div>
-				) : messages.length === 0 && !loading ? (
+				) : state.type === "loading" || state.messages.length === 0 ? (
 					<div className="flex-1 flex flex-col items-center justify-center text-center p-4 opacity-40">
 						<Mail size={32} className="text-slate-600 mb-2" />
 						<p className="text-xs text-slate-500 font-medium tracking-wide uppercase">
@@ -98,7 +107,7 @@ export function GmailInbox({
 					</div>
 				) : (
 					<div className="space-y-2 overflow-y-auto pr-1 custom-scrollbar">
-						{messages.map((msg) => (
+						{state.messages.map((msg) => (
 							<a
 								key={msg.id}
 								href={`https://mail.google.com/mail/u/0/#inbox/${msg.threadId}`}
@@ -142,6 +151,7 @@ export function GmailInbox({
 						ABRIR EN GMAIL <ExternalLink size={10} />
 					</a>
 					<button
+						type="button"
 						onClick={onSignOut}
 						className="text-[10px] text-slate-400 hover:text-lti-coral transition-colors"
 					>
