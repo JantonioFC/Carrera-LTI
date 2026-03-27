@@ -79,6 +79,7 @@ export function AssistantGuide({ onClose }: { onClose: () => void }) {
 					</h2>
 				</div>
 				<button
+					type="button"
 					onClick={onClose}
 					className="p-1 hover:bg-navy-800 rounded-lg text-slate-400"
 				>
@@ -151,6 +152,7 @@ export function AssistantGuide({ onClose }: { onClose: () => void }) {
 
 			<div className="p-6 border-t border-navy-800 bg-navy-900/20 flex gap-3">
 				<button
+					type="button"
 					onClick={() => setCurrentStep((prev) => Math.max(0, prev - 1))}
 					disabled={currentStep === 0}
 					className="flex-1 py-3 bg-navy-800 text-slate-300 text-xs font-bold rounded-xl hover:bg-navy-700 disabled:opacity-30 flex items-center justify-center gap-2"
@@ -159,6 +161,7 @@ export function AssistantGuide({ onClose }: { onClose: () => void }) {
 				</button>
 				{currentStep === STEPS.length - 1 ? (
 					<button
+						type="button"
 						onClick={onClose}
 						className="flex-[2] py-3 gradient-blue text-white text-xs font-bold rounded-xl shadow-lg shadow-lti-blue/20 flex items-center justify-center gap-2"
 					>
@@ -166,6 +169,7 @@ export function AssistantGuide({ onClose }: { onClose: () => void }) {
 					</button>
 				) : (
 					<button
+						type="button"
 						onClick={() =>
 							setCurrentStep((prev) => Math.min(STEPS.length - 1, prev + 1))
 						}

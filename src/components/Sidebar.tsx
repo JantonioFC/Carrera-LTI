@@ -113,6 +113,7 @@ export default function Sidebar({
 				/>
 				{onCloseMobile && (
 					<button
+						type="button"
 						onClick={onCloseMobile}
 						className="md:hidden text-slate-400 hover:text-white p-1"
 						aria-label="Cerrar menú de navegación"
@@ -150,6 +151,7 @@ export default function Sidebar({
 				{isConfigured ? (
 					<div className="flex gap-2">
 						<button
+							type="button"
 							onClick={syncNow}
 							disabled={syncStatus === "syncing"}
 							className="flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 bg-navy-900 border border-navy-600 rounded hover:bg-navy-800 text-xs text-slate-300 transition-colors disabled:opacity-50"
@@ -162,6 +164,7 @@ export default function Sidebar({
 							<span>Subir</span>
 						</button>
 						<button
+							type="button"
 							onClick={restoreFromCloud}
 							disabled={syncStatus === "syncing"}
 							className="flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 bg-navy-900 border border-navy-600 rounded hover:bg-navy-800 text-xs text-slate-300 transition-colors disabled:opacity-50"

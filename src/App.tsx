@@ -157,6 +157,7 @@ function App() {
 						<span className="text-white font-bold text-sm">Carrera LTI</span>
 					</div>
 					<button
+						type="button"
 						onClick={() => setIsSidebarOpen(true)}
 						className="text-white p-1 bg-navy-800 rounded-md"
 						aria-label="Abrir menú de navegación"

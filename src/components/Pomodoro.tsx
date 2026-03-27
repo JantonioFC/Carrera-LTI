@@ -74,6 +74,7 @@ export default function Pomodoro() {
 	if (!isOpen) {
 		return (
 			<button
+				type="button"
 				onClick={() => setIsOpen(true)}
 				className="fixed bottom-6 right-20 w-12 h-12 rounded-full gradient-blue text-white shadow-xl shadow-lti-blue/20 hover:scale-110 transition-transform animate-fade-in z-[150] flex items-center justify-center group"
 			>
@@ -102,6 +103,7 @@ export default function Pomodoro() {
 					</h3>
 				</div>
 				<button
+					type="button"
 					onClick={() => setIsOpen(false)}
 					className="text-slate-400 hover:text-white text-lg leading-none cursor-pointer"
 				>
@@ -113,12 +115,14 @@ export default function Pomodoro() {
 				{/* Mode Switcher */}
 				<div className="flex gap-1 p-1 bg-navy-900 rounded-lg mb-6 w-full">
 					<button
+						type="button"
 						onClick={() => switchMode("focus")}
 						className={`flex-1 text-xs py-1.5 rounded-md font-medium transition-colors ${mode === "focus" ? "bg-navy-700 text-white" : "text-slate-400 hover:text-slate-200"}`}
 					>
 						Concentración
 					</button>
 					<button
+						type="button"
 						onClick={() => switchMode("break")}
 						className={`flex-1 text-xs py-1.5 rounded-md font-medium transition-colors ${mode === "break" ? "bg-navy-700 text-white" : "text-slate-400 hover:text-slate-200"}`}
 					>
@@ -134,6 +138,7 @@ export default function Pomodoro() {
 				{/* Controls */}
 				<div className="flex items-center gap-4">
 					<button
+						type="button"
 						onClick={resetTimer}
 						className="p-3 text-slate-400 bg-navy-900 border border-navy-600 hover:text-white rounded-full transition-colors"
 						title="Reiniciar"
@@ -142,6 +147,7 @@ export default function Pomodoro() {
 					</button>
 
 					<button
+						type="button"
 						onClick={toggleTimer}
 						className={`p-4 rounded-full text-white shadow-lg transition-transform hover:scale-105 ${isActive ? "bg-lti-coral hover:bg-lti-coral/90" : "gradient-blue"}`}
 					>
