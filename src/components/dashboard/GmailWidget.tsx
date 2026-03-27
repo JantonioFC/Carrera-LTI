@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { type GmailMessage, gmailService } from "../../services/gmail";
 import { useUserConfigStore } from "../../store/userConfigStore";
 import { logger } from "../../utils/logger";
-import { type GmailInboxState, GmailInbox } from "./GmailInbox";
+import { GmailInbox, type GmailInboxState } from "./GmailInbox";
 import { GmailMinimized } from "./GmailMinimized";
 import { GmailSettingsPanel } from "./GmailSettingsPanel";
 

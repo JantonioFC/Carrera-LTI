@@ -55,7 +55,10 @@ export function GmailInbox({
 							disabled={state.type === "loading"}
 							className="p-1.5 text-slate-400 hover:text-white hover:bg-navy-800 rounded-md transition-all"
 						>
-							<RefreshCw size={14} className={state.type === "loading" ? "animate-spin" : ""} />
+							<RefreshCw
+								size={14}
+								className={state.type === "loading" ? "animate-spin" : ""}
+							/>
 						</button>
 					)}
 					<button

@@ -70,11 +70,13 @@ export function CortexFloatingPanel({ onQuery }: CortexFloatingPanelProps) {
 				</div>
 			)}
 
-			{activity.type !== "querying" && activity.type !== "query_error" && results.length === 0 && (
-				<div data-testid="cortex-empty" className="cortex-empty">
-					Sin resultados
-				</div>
-			)}
+			{activity.type !== "querying" &&
+				activity.type !== "query_error" &&
+				results.length === 0 && (
+					<div data-testid="cortex-empty" className="cortex-empty">
+						Sin resultados
+					</div>
+				)}
 
 			{results.length > 0 && (
 				<ul className="cortex-results-list">
