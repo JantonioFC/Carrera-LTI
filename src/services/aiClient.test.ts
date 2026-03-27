@@ -27,6 +27,8 @@ vi.mock("../utils/aiUtils", () => ({
 		mockGenerateStructuredContentWithRetry(...args),
 	truncateContext: (text: string, maxChars?: number) =>
 		mockTruncateContext(text, maxChars),
+	NEXUS_AI_CONTEXT_CHARS: 40_000,
+	AETHER_NOTES_CONTEXT_CHARS: 30_000,
 }));
 
 // ---------------------------------------------------------------------------
