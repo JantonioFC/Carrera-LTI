@@ -35,3 +35,14 @@ testsprite_tests/
 
 # Vitest coverage output
 coverage/
+
+# Legacy Obsidian vault (proyecto anterior a Carrera LTI)
+.obsidian/
+Tareas/
+_templates/
+
+# SDD openspec artifacts (generados por Claude, no son código del app)
+openspec/
+
+# Electron build output
+dist-electron/
