@@ -185,9 +185,21 @@ function initRuVector(): void {
 		rateLimiters.cortexIndex();
 		return ruVector.cortexIndex(docPath);
 	});
-	ipcMain.handle("cortex:query", (_event, text: string, topK?: number) => {
+	ipcMain.handle("cortex:query", (_event, text: string, topK?: unknown) => {
 		rateLimiters.cortexQuery();
-		return ruVector.cortexQuery(text, topK);
+		// SC-01 (#278): validar topK en la boundary IPC antes de delegar al handler
+		if (
+			topK !== undefined &&
+			(typeof topK !== "number" ||
+				!Number.isInteger(topK) ||
+				topK < 1 ||
+				topK > 50)
+		) {
+			throw new Error(
+				`cortex:query — topK debe ser un entero entre 1 y 50, recibido: ${JSON.stringify(topK)}`,
+			);
+		}
+		return ruVector.cortexQuery(text, topK as number | undefined);
 	});
 
 	logger.info("RuVector", "handlers registrados");
@@ -241,9 +253,25 @@ function initWhisper(): void {
 
 	ipcMain.handle(
 		"cortex:transcribe",
-		(_event, wavPath: string, model?: string) => {
+		(_event, wavPath: string, model?: unknown) => {
 			rateLimiters.cortexTranscribe();
-			return whisper.transcribe(wavPath, model);
+			// SC-03 (#280): validar model en la boundary IPC antes de pasar al subprocess
+			const VALID_MODELS = [
+				"tiny",
+				"base",
+				"small",
+				"medium",
+				"large",
+			] as const;
+			if (
+				model !== undefined &&
+				!VALID_MODELS.includes(model as (typeof VALID_MODELS)[number])
+			) {
+				throw new Error(
+					`cortex:transcribe — model debe ser uno de ${VALID_MODELS.join(", ")}, recibido: ${JSON.stringify(model)}`,
+				);
+			}
+			return whisper.transcribe(wavPath, model as string | undefined);
 		},
 	);
 
@@ -264,8 +292,14 @@ function initObserver(): void {
 		recordingsDir: OBSERVER_RECORDINGS_DIR,
 	});
 
-	ipcMain.handle("observer:toggle", async (_event, active: boolean) => {
+	ipcMain.handle("observer:toggle", async (_event, active: unknown) => {
 		rateLimiters.observerToggle();
+		// SC-02 (#279): validar tipo boolean en la boundary IPC — un string "false" es truthy
+		if (typeof active !== "boolean") {
+			throw new Error(
+				`observer:toggle — active debe ser boolean, recibido: ${typeof active}`,
+			);
+		}
 		// En macOS solicitar permiso de micrófono antes de capturar.
 		if (active && process.platform === "darwin") {
 			const granted = await systemPreferences.askForMediaAccess("microphone");

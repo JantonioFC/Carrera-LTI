@@ -26,8 +26,7 @@ function ResultItem({ result }: { result: CortexQueryResult }) {
 export function CortexFloatingPanel({ onQuery }: CortexFloatingPanelProps) {
 	const [input, setInput] = useState("");
 	const results = useCortexStore((s) => s.queryResults);
-	const isQuerying = useCortexStore((s) => s.isQuerying);
-	const queryError = useCortexStore((s) => s.queryError);
+	const activity = useCortexStore((s) => s.activity);
 
 	const handleSubmit = () => {
 		const trimmed = input.trim();
@@ -59,19 +58,19 @@ export function CortexFloatingPanel({ onQuery }: CortexFloatingPanelProps) {
 				</button>
 			</div>
 
-			{isQuerying && (
+			{activity.type === "querying" && (
 				<div data-testid="cortex-loading" className="cortex-loading">
 					Consultando…
 				</div>
 			)}
 
-			{queryError && (
+			{activity.type === "query_error" && (
 				<div data-testid="cortex-error" className="cortex-error">
-					{queryError}
+					{activity.error}
 				</div>
 			)}
 
-			{!isQuerying && !queryError && results.length === 0 && (
+			{activity.type !== "querying" && activity.type !== "query_error" && results.length === 0 && (
 				<div data-testid="cortex-empty" className="cortex-empty">
 					Sin resultados
 				</div>

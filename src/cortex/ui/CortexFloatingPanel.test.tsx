@@ -50,7 +50,7 @@ describe("CortexFloatingPanel — interacción", () => {
 	});
 
 	it("should_show_loading_spinner_while_querying", () => {
-		useCortexStore.getState().setIsQuerying(true);
+		useCortexStore.getState().setActivity({ type: "querying", query: "TCP" });
 		render(<CortexFloatingPanel onQuery={mockOnQuery} />);
 		expect(screen.getByTestId("cortex-loading")).toBeInTheDocument();
 	});
@@ -76,7 +76,9 @@ describe("CortexFloatingPanel — interacción", () => {
 	});
 
 	it("should_show_error_message_when_query_fails", () => {
-		useCortexStore.getState().setQueryError("RuVector no disponible");
+		useCortexStore
+			.getState()
+			.setActivity({ type: "query_error", error: "RuVector no disponible" });
 		render(<CortexFloatingPanel onQuery={mockOnQuery} />);
 		expect(screen.getByTestId("cortex-error")).toHaveTextContent(
 			"RuVector no disponible",
