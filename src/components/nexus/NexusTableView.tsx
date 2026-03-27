@@ -7,6 +7,7 @@ import {
 	Type,
 } from "lucide-react";
 import { memo } from "react";
+import type { NexusFieldValue } from "../../hooks/useNexusDB";
 
 interface NexusField {
 	id: string;
@@ -27,7 +28,11 @@ interface NexusTableViewProps {
 	) => void;
 	onAddRow: () => void;
 	onUpdateFieldName: (fieldId: string, name: string) => void;
-	onUpdateRowData: (rowId: string, fieldId: string, value: unknown) => void;
+	onUpdateRowData: (
+		rowId: string,
+		fieldId: string,
+		value: NexusFieldValue,
+	) => void;
 }
 
 function FieldIcon({ type }: { type: string }) {

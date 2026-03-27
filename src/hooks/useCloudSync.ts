@@ -26,12 +26,17 @@ export function useCloudSync(
 	>("idle");
 	// QP-01 (#225): ref para cancelar el timeout de reset en desmonte del componente
 	const idleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+	// DX-02/QP-01 (#264/#259): AbortController para cancelar requests en-flight
+	// al desmontar el componente o cuando llega un nuevo sync antes de que termine el anterior.
+	const syncAbortRef = useRef<AbortController | null>(null);
 
 	useEffect(() => {
 		return () => {
 			if (idleTimerRef.current !== null) {
 				clearTimeout(idleTimerRef.current);
 			}
+			// Cancelar cualquier request en-flight al desmontar (#264)
+			syncAbortRef.current?.abort();
 		};
 	}, []);
 
@@ -101,6 +106,11 @@ export function useCloudSync(
 	const syncNow = async () => {
 		if (!userId) return;
 
+		// Cancelar sync anterior en-flight antes de iniciar uno nuevo (#259)
+		syncAbortRef.current?.abort();
+		const controller = new AbortController();
+		syncAbortRef.current = controller;
+
 		const appData: AppData = {
 			subjectData,
 			presenciales,
@@ -134,6 +144,8 @@ export function useCloudSync(
 			setSyncStatus("syncing");
 			const success = await syncService.syncToCloud(userId, validation.data);
 
+			if (controller.signal.aborted) return;
+
 			if (success) {
 				localStorage.removeItem("lti_sync_queue");
 				setSyncStatus("success");
@@ -143,6 +155,7 @@ export function useCloudSync(
 				setSyncStatus("error");
 			}
 		} catch (error) {
+			if (controller.signal.aborted) return;
 			logger.error("useCloudSync", "Error syncing to cloud", error);
 			localStorage.setItem("lti_sync_queue", JSON.stringify(validation.data));
 			setSyncStatus("error");
@@ -152,10 +165,17 @@ export function useCloudSync(
 	// Función para restaurar datos desde la nube (backup)
 	const restoreFromCloud = async () => {
 		if (!userId) return;
+
+		// Cancelar operación anterior en-flight (#259/#264)
+		syncAbortRef.current?.abort();
+		const controller = new AbortController();
+		syncAbortRef.current = controller;
+
 		setSyncStatus("syncing");
 
 		try {
 			const remoteData = await syncService.getFromCloud(userId);
+			if (controller.signal.aborted) return;
 			if (remoteData) {
 				// Validación de datos remotos (ADR-002)
 				const validation = AppDataSchema.safeParse(remoteData);
@@ -214,6 +234,7 @@ export function useCloudSync(
 				setSyncStatus("error");
 			}
 		} catch (error) {
+			if (controller.signal.aborted) return;
 			logger.error("useCloudSync", "Error restoring from cloud", error);
 			setSyncStatus("error");
 		}

@@ -1,7 +1,7 @@
 import { LayoutDashboard, Plus } from "lucide-react";
 import { memo } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { db } from "../../hooks/useNexusDB";
+import { db, type NexusFieldValue } from "../../hooks/useNexusDB";
 
 interface NexusField {
 	id: string;
@@ -21,7 +21,11 @@ interface NexusKanbanViewProps {
 	rows: NexusRow[];
 	activeDbId: string;
 	onAddField: (type: "select") => void;
-	onUpdateRowData: (rowId: string, fieldId: string, value: unknown) => void;
+	onUpdateRowData: (
+		rowId: string,
+		fieldId: string,
+		value: NexusFieldValue,
+	) => void;
 }
 
 function NexusKanbanViewInner({

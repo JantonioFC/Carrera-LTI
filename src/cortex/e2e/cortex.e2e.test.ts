@@ -39,13 +39,33 @@ const FIXTURES = [
 // ── E2E con subprocesos reales ───────────────────────────────────────────────
 
 describe.skipIf(!E2E)("Cortex E2E — subprocesos reales", () => {
-	// En el job de E2E real, aquí se inicializaría CortexOrchestrator,
-	// se indexarían los fixtures via Docling/RuVector y se harían queries.
-	// Por ahora el esqueleto está listo para cuando los binarios estén disponibles.
+	// Requiere: binarios ruvector + docling en PATH, E2E=true en entorno.
+	// Job CI dedicado: .github/workflows/e2e.yml (timeout 5 min).
+	// Flujo esperado: SubprocessAdapter real → RuVectorAdapter → index → query → grounding.
 
-	it("placeholder — implementar cuando binarios estén disponibles en CI", () => {
-		expect(true).toBe(true);
-	});
+	it.todo(
+		"indexDocument — indexa un fixture .txt y retorna chunks mayor que 0",
+	);
+
+	it.todo(
+		"query — recupera chunks relevantes (score > 0.5) para consulta TCP on-topic",
+	);
+
+	it.todo(
+		"pipeline completo — index + query + isGrounded retorna true para consulta dentro del índice",
+	);
+
+	it.todo(
+		"pipeline completo — isGrounded retorna false para consulta fuera del índice (fotosíntesis)",
+	);
+
+	it.todo(
+		"deleteDocument — tras eliminar doc, query posterior retorna 0 chunks de ese docId",
+	);
+
+	it.todo(
+		"shouldRestart — orquestador reinicia subproceso caído si crashCount < MAX_CRASH_COUNT",
+	);
 });
 
 // ── Tests de grounding con fixtures controlados (siempre corren) ─────────────
