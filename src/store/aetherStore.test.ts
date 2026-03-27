@@ -27,7 +27,6 @@ import { useUserConfigStore } from "./userConfigStore";
 function resetStore() {
 	useAetherStore.setState({
 		notes: [],
-		chatHistory: [],
 	});
 	useUserConfigStore.setState({
 		geminiApiKey: "",

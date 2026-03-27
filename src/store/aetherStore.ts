@@ -1,5 +1,7 @@
-// AR-03 (#234): API keys extraídas a userConfigStore. aetherStore conserva
-// notas + embeddings. La separación de embeddingStore queda pendiente (gradual).
+// AR-03 (#234): API keys extraídas a userConfigStore.
+// AR-04 (#269): chatHistory extraído a aetherChatStore para reducir las 6
+// responsabilidades del God Store. aetherStore conserva: notas, embeddings,
+// grafo, backlinks e importación.
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
 import { create } from "zustand";
@@ -8,10 +10,10 @@ import { immer } from "zustand/middleware/immer";
 import { findSimilarNotes, generateEmbedding } from "../utils/embeddings";
 import { idbStorage } from "../utils/idbStorage";
 import { logger } from "../utils/logger";
-import type { AetherNoteId, ChatMessageId } from "../utils/schemas";
+import type { AetherNoteId } from "../utils/schemas";
 import { useUserConfigStore } from "./userConfigStore";
 
-export type { AetherNoteId, ChatMessageId };
+export type { AetherNoteId };
 
 export interface AetherNote {
 	id: AetherNoteId;
@@ -33,16 +35,8 @@ export interface GraphData {
 	links: GraphLink[];
 }
 
-export interface ChatMessage {
-	id: ChatMessageId;
-	role: "user" | "model";
-	text: string;
-	timestamp: number;
-}
-
 interface AetherState {
 	notes: AetherNote[];
-	chatHistory: ChatMessage[];
 }
 
 interface AetherActions {
@@ -54,11 +48,6 @@ interface AetherActions {
 	findBacklinks: (nodeId: AetherNoteId) => AetherNote[];
 	ingestNote: (id: AetherNoteId) => Promise<void>;
 	semanticSearch: (query: string, limit?: number) => Promise<AetherNote[]>;
-	addChatMessage: (
-		msg: Omit<ChatMessage, "id" | "timestamp"> | ChatMessage,
-	) => ChatMessageId;
-	appendChatMessage: (id: ChatMessageId, textChunk: string) => void;
-	clearChatHistory: () => void;
 	importNotes: (json: string) => void;
 }
 
@@ -91,7 +80,6 @@ export const useAetherStore = create<AetherState & AetherActions>()(
 
 			return {
 				notes: defaultNotes,
-				chatHistory: [],
 
 				addNote: (title = "Nueva Nota") => {
 					const newNote: AetherNote = {
@@ -192,36 +180,6 @@ export const useAetherStore = create<AetherState & AetherActions>()(
 					return findSimilarNotes(queryVector, notes, limit);
 				},
 
-				addChatMessage: (msg) => {
-					const fullMsg: ChatMessage =
-						"id" in msg
-							? (msg as ChatMessage)
-							: {
-									...msg,
-									id: `msg_${uuidv4()}` as ChatMessageId,
-									timestamp: Date.now(),
-								};
-					set((state) => {
-						state.chatHistory.push(fullMsg);
-					});
-					return fullMsg.id;
-				},
-
-				appendChatMessage: (id, textChunk) => {
-					set((state) => {
-						const msg = state.chatHistory.find((m) => m.id === id);
-						if (msg) {
-							msg.text += textChunk;
-						}
-					});
-				},
-
-				clearChatHistory: () => {
-					set((state) => {
-						state.chatHistory = [];
-					});
-				},
-
 				importNotes: (json: string) => {
 					try {
 						const data = JSON.parse(json);
@@ -254,10 +212,8 @@ export const useAetherStore = create<AetherState & AetherActions>()(
 		{
 			name: "aether-storage",
 			storage: createJSONStorage(() => idbStorage),
-			// API keys no se persisten en IDB — van al OS Keychain vía cortexAPI (#109)
 			partialize: (state) => ({
 				notes: state.notes,
-				chatHistory: state.chatHistory,
 			}),
 			onRehydrateStorage: () => async () => {
 				const api = window.cortexAPI;

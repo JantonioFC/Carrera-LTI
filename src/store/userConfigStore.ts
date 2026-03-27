@@ -9,6 +9,27 @@
  * reactivo a esos valores en el renderer.
  */
 import { create } from "zustand";
+
+/**
+ * Adaptador para persistir API keys en el OS Keychain vía cortexAPI (#109).
+ * Inyectable en tests para evitar side-effects de IPC directos en los setters.
+ * AR-03 (#267)
+ */
+export interface ConfigPersistAdapter {
+	set(key: string, value: string): void;
+}
+
+const electronAdapter: ConfigPersistAdapter = {
+	set: (key, value) => void window.cortexAPI?.config.set(key, value),
+};
+
+let _persistAdapter: ConfigPersistAdapter = electronAdapter;
+
+/** Permite reemplazar el adaptador de persistencia. Solo para tests. */
+export function setConfigPersistAdapter(adapter: ConfigPersistAdapter): void {
+	_persistAdapter = adapter;
+}
+
 import { immer } from "zustand/middleware/immer";
 
 interface UserConfigState {
@@ -33,21 +54,21 @@ export const useUserConfigStore = create<UserConfigState & UserConfigActions>()(
 			set((state) => {
 				state.geminiApiKey = key;
 			});
-			window.cortexAPI?.config.set("gemini_api_key", key);
+			_persistAdapter.set("gemini_api_key", key);
 		},
 
 		setGmailClientId: (id) => {
 			set((state) => {
 				state.gmailClientId = id;
 			});
-			window.cortexAPI?.config.set("gmail_client_id", id);
+			_persistAdapter.set("gmail_client_id", id);
 		},
 
 		setGmailApiKey: (key) => {
 			set((state) => {
 				state.gmailApiKey = key;
 			});
-			window.cortexAPI?.config.set("gmail_api_key", key);
+			_persistAdapter.set("gmail_api_key", key);
 		},
 	})),
 );

@@ -122,7 +122,8 @@ describe("idbStorage", () => {
 			const parsed = JSON.parse(result as string);
 			expect(parsed.state.notes).toEqual(notes);
 			expect(parsed.state.geminiApiKey).toBe("");
-			expect(parsed.state.chatHistory).toEqual([]);
+			// chatHistory se migró a aetherChatStore (AR-04/#269); no aparece en aether-storage
+			expect(parsed.state.chatHistory).toBeUndefined();
 			expect(parsed.version).toBe(0);
 
 			// Las claves legacy deben haber sido eliminadas
@@ -130,7 +131,7 @@ describe("idbStorage", () => {
 			expect(localStorage.getItem("lti_aether_chat")).toBeNull();
 		});
 
-		it("migra lti_aether_vault y lti_aether_chat juntas", async () => {
+		it("migra lti_aether_vault aunque exista lti_aether_chat (chat se descarta de aether-storage)", async () => {
 			const notes = [{ id: "1", title: "Nota" }];
 			const chatHistory = [{ role: "user", content: "Hola" }];
 			localStorage.setItem("lti_aether_vault", JSON.stringify(notes));
@@ -141,7 +142,8 @@ describe("idbStorage", () => {
 			expect(result).not.toBeNull();
 			const parsed = JSON.parse(result as string);
 			expect(parsed.state.notes).toEqual(notes);
-			expect(parsed.state.chatHistory).toEqual(chatHistory);
+			// chatHistory ya no se persiste en aether-storage (AR-04/#269)
+			expect(parsed.state.chatHistory).toBeUndefined();
 
 			expect(localStorage.getItem("lti_aether_vault")).toBeNull();
 			expect(localStorage.getItem("lti_aether_chat")).toBeNull();
