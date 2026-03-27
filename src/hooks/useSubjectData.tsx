@@ -24,6 +24,9 @@ export interface SubjectData {
 	status: SubjectStatus;
 	grade?: number | undefined;
 	resources: SubjectResource[];
+	/** AR-NEW-1 (#290): flag del soft-delete protocol — debe estar en el schema para que Zod no lo stripee al sincronizar. */
+	archived?: boolean | undefined;
+	archivedAt?: string | undefined;
 }
 
 export type SubjectDataMap = Record<string, SubjectData>;

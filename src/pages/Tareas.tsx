@@ -2,9 +2,9 @@ import { Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { AddTaskModal } from "../components/tareas/AddTaskModal";
 import { KanbanColumn } from "../components/tareas/KanbanColumn";
-import type { SubtaskId, TaskId } from "../utils/schemas";
+import type { DueDate, SubjectId, SubtaskId, TaskId } from "../utils/schemas";
 
-export type { SubtaskId, TaskId };
+export type { DueDate, SubjectId, SubtaskId, TaskId };
 export type KanbanStatus = "todo" | "inProgress" | "done";
 export type Priority = "alta" | "media" | "baja";
 
@@ -17,8 +17,10 @@ export interface Subtask {
 export interface Task {
 	id: TaskId;
 	title: string;
-	subjectId: string;
-	dueDate: string;
+	/** AR-NEW-3 (#292): typed como SubjectId para impedir referencias a asignaturas inexistentes. */
+	subjectId: SubjectId;
+	/** AR-NEW-2 (#291): value object — garantiza formato YYYY-MM-DD antes de pasar a new Date(). */
+	dueDate: DueDate;
 	priority: Priority;
 	status: KanbanStatus;
 	subtasks: Subtask[];
@@ -51,12 +53,13 @@ export default function Tareas({ tasks, onUpdateTasks }: TareasProps) {
 			const tomorrow = new Date();
 			tomorrow.setDate(tomorrow.getDate() + 1);
 
-			const dueTasks = tasks.filter(
-				(t) =>
-					t.status !== "done" &&
-					t.dueDate &&
-					new Date(t.dueDate).getTime() <= tomorrow.getTime(),
-			);
+			const dueTasks = tasks.filter((t) => {
+				if (t.status === "done" || !t.dueDate) return false;
+				const dueTime = new Date(t.dueDate).getTime();
+				// AR-NEW-2 (#291): guardia explícita — DueDate valida el formato pero new Date()
+				// puede devolver NaN si el valor proviene de datos legacy sin schema.
+				return !Number.isNaN(dueTime) && dueTime <= tomorrow.getTime();
+			});
 
 			const hasSent = sessionStorage.getItem("lti_notified");
 

@@ -1,6 +1,12 @@
 import { useState } from "react";
 import { useSubjectData } from "../../hooks/useSubjectData";
-import type { KanbanStatus, Priority, Task } from "../../pages/Tareas";
+import type {
+	DueDate,
+	KanbanStatus,
+	Priority,
+	SubjectId,
+	Task,
+} from "../../pages/Tareas";
 
 export function AddTaskModal({
 	onAdd,
@@ -12,8 +18,8 @@ export function AddTaskModal({
 	const { allSubjects } = useSubjectData();
 	const [form, setForm] = useState<Omit<Task, "id">>({
 		title: "",
-		subjectId: "",
-		dueDate: "",
+		subjectId: "" as SubjectId,
+		dueDate: "" as DueDate,
 		priority: "media",
 		status: "todo",
 		subtasks: [],
@@ -53,7 +59,9 @@ export function AddTaskModal({
 						</label>
 						<select
 							value={form.subjectId}
-							onChange={(e) => setForm({ ...form, subjectId: e.target.value })}
+							onChange={(e) =>
+								setForm({ ...form, subjectId: e.target.value as SubjectId })
+							}
 							className="w-full bg-navy-900 border border-navy-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-lti-blue"
 						>
 							<option value="">Seleccionar U.C.</option>
@@ -72,7 +80,9 @@ export function AddTaskModal({
 							<input
 								type="date"
 								value={form.dueDate}
-								onChange={(e) => setForm({ ...form, dueDate: e.target.value })}
+								onChange={(e) =>
+									setForm({ ...form, dueDate: e.target.value as DueDate })
+								}
 								className="w-full bg-navy-900 border border-navy-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-lti-blue"
 							/>
 						</div>

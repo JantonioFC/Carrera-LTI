@@ -7,6 +7,12 @@ export type NexusDocumentId = `doc_${string}`;
 export type SubtaskId = `st${string}`;
 export type TaskId = `t${string}`;
 
+// AR-NEW-2 (#291): value object para fechas en formato YYYY-MM-DD
+export type DueDate = string & { readonly __brand: "DueDate" };
+
+// AR-NEW-3 (#292): branded type para IDs de asignaturas — impide usar strings arbitrarios como subjectId
+export type SubjectId = string & { readonly __brand: "SubjectId" };
+
 // ─── Aether ───────────────────────────────────────────────────
 export const AetherNoteSchema = z.object({
 	id: z
@@ -70,8 +76,16 @@ export const TaskSchema = z.object({
 		.startsWith("t")
 		.transform((v) => v as TaskId),
 	title: z.string(),
-	subjectId: z.string(),
-	dueDate: z.string(),
+	// AR-NEW-3 (#292): SubjectId branded para impedir strings arbitrarios
+	subjectId: z.string().transform((v) => v as SubjectId),
+	// AR-NEW-2 (#291): DueDate con validación de formato YYYY-MM-DD
+	dueDate: z
+		.string()
+		.regex(
+			/^\d{4}-\d{2}-\d{2}$/,
+			"Formato de fecha inválido: se esperaba YYYY-MM-DD",
+		)
+		.transform((v) => v as DueDate),
 	priority: z.enum(["alta", "media", "baja"]),
 	status: z.enum(["todo", "inProgress", "done"]),
 	subtasks: z.array(SubtaskSchema),
@@ -127,6 +141,9 @@ export const SubjectDataSchema = z.object({
 	status: z.enum(["en_curso", "pendiente", "aprobada", "reprobada"]),
 	grade: z.number().optional(),
 	resources: z.array(SubjectResourceSchema),
+	// AR-NEW-1 (#290): campos del soft-delete protocol — sin estos Zod los stripea al sincronizar
+	archived: z.boolean().optional(),
+	archivedAt: z.string().optional(),
 });
 
 export const SubjectDataMapSchema = z.record(z.string(), SubjectDataSchema);
