@@ -219,7 +219,7 @@ export default function Horarios({
 						"Horarios",
 						`[DND] Cloning master ${activeId} to day ${overDay}`,
 					);
-					const instanceId = `inst-${newItem.subjectId}-${Math.random().toString(36).substring(2, 9)}`;
+					const instanceId = `inst-${newItem.subjectId}-${crypto.randomUUID().replace(/-/g, "").slice(0, 7)}`;
 
 					// IMPORTANT: The master stays in the bank (day null)
 					// We insert the new instance at the same position or reordered

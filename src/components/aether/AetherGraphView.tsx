@@ -1,6 +1,9 @@
 import { lazy, Suspense, useEffect, useState } from "react";
 import type { AetherNoteId } from "../../store/aetherStore";
 
+/** QP-NEW-3 (#289): delay en ms antes de medir el tamaño inicial del contenedor. */
+const GRAPH_INIT_DELAY_MS = 100;
+
 const ForceGraph2D = lazy(() => import("react-force-graph-2d"));
 
 interface GraphData {
@@ -41,7 +44,7 @@ export function AetherGraphView({
 		};
 
 		window.addEventListener("resize", throttled);
-		const timer = setTimeout(update, 100);
+		const timer = setTimeout(update, GRAPH_INIT_DELAY_MS);
 		return () => {
 			window.removeEventListener("resize", throttled);
 			clearTimeout(timer);

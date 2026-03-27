@@ -1,5 +1,5 @@
 import { act, renderHook, waitFor } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 // vi.hoisted permite definir mocks antes del hoisting de vi.mock
 const { mockAuthService, mockSyncService } = vi.hoisted(() => {
@@ -20,7 +20,16 @@ vi.mock("../utils/firebase", () => ({
 	syncService: mockSyncService,
 }));
 
-const mockUpdateSubject = vi.hoisted(() => vi.fn());
+// Consolidados en un único bloque hoisted para reducir fragmentación
+const { mockUpdateSubject, mockSetGeminiApiKey, mockSetGmailClientId, mockSetGmailApiKey, mockAetherSetState, mockNexusSetState } =
+	vi.hoisted(() => ({
+		mockUpdateSubject: vi.fn(),
+		mockSetGeminiApiKey: vi.fn(),
+		mockSetGmailClientId: vi.fn(),
+		mockSetGmailApiKey: vi.fn(),
+		mockAetherSetState: vi.fn(),
+		mockNexusSetState: vi.fn(),
+	}));
 
 vi.mock("./useSubjectData", () => ({
 	useSubjectData: () => ({
@@ -28,12 +37,6 @@ vi.mock("./useSubjectData", () => ({
 		updateSubject: mockUpdateSubject,
 	}),
 }));
-
-const mockSetGeminiApiKey = vi.hoisted(() => vi.fn());
-const mockSetGmailClientId = vi.hoisted(() => vi.fn());
-const mockSetGmailApiKey = vi.hoisted(() => vi.fn());
-const mockAetherSetState = vi.hoisted(() => vi.fn());
-const mockNexusSetState = vi.hoisted(() => vi.fn());
 
 vi.mock("../store/aetherStore", () => ({
 	useAetherStore: Object.assign(
@@ -90,6 +93,10 @@ describe("useCloudSync", () => {
 			writable: true,
 			configurable: true,
 		});
+	});
+
+	afterEach(() => {
+		localStorage.clear();
 	});
 
 	// ─── 1. authService.init se llama al montar ──────────────────────────────

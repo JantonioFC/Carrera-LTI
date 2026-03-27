@@ -52,15 +52,24 @@ export async function generateContentWithRetry(
 }
 
 /**
+ * Límites de truncación de contexto para cada punto de uso.
+ *
+ * QP-NEW-2 (#287): unifica los magic numbers 40000/30000 dispersos en
+ * NexusAI.tsx y aiClient.ts en constantes nombradas y exportadas.
+ */
+export const NEXUS_AI_CONTEXT_CHARS = 40_000;
+export const AETHER_NOTES_CONTEXT_CHARS = 30_000;
+
+/**
  * Truncates text to prevent exceeding the model's token limits.
  *
  * @param text - The original large string.
- * @param maxChars - Maximum characters to allow. Defaults to 40000.
+ * @param maxChars - Maximum characters to allow. Defaults to NEXUS_AI_CONTEXT_CHARS.
  * @returns The truncated string if it exceeded the limit.
  */
 export function truncateContext(
 	text: string,
-	maxChars: number = 40000,
+	maxChars: number = NEXUS_AI_CONTEXT_CHARS,
 ): string {
 	if (text.length <= maxChars) return text;
 	return `${text.slice(0, maxChars)}\n\n...[Contenido truncado por límite de tokens]`;

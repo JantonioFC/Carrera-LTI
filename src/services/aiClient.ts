@@ -2,6 +2,7 @@ import type { Schema } from "@google/genai";
 import { GoogleGenAI } from "@google/genai";
 import type { ZodType } from "zod";
 import {
+	AETHER_NOTES_CONTEXT_CHARS,
 	generateStructuredContentWithRetry,
 	truncateContext,
 } from "../utils/aiUtils";
@@ -98,7 +99,7 @@ export class AIBackendClient {
 		const systemInstruction = `${AETHER_SYSTEM_INSTRUCTION}
 
 Aquí están las notas actuales del usuario en su bóveda:
-${truncateContext(contextNotes, 30000)}`;
+${truncateContext(contextNotes, AETHER_NOTES_CONTEXT_CHARS)}`;
 
 		return generateStructuredContentWithRetry(
 			ai,
@@ -164,7 +165,7 @@ Acción: Retorno la lista estructurada con colores (si aplica).`;
 		const systemInstruction = `${AETHER_SYSTEM_INSTRUCTION}
 
 Aquí están las notas actuales del usuario en su bóveda:
-${truncateContext(contextNotes, 30000)}`;
+${truncateContext(contextNotes, AETHER_NOTES_CONTEXT_CHARS)}`;
 
 		const response = await ai.models.generateContentStream({
 			model: "gemini-2.5-flash",
