@@ -53,7 +53,7 @@ describe("FeedbackStore.applyPenalty", () => {
 			{ resultId: "doc-1", signal: "negative", createdAt: Date.now() },
 		];
 		const penalized = applyPenalty(results, feedback);
-		expect(penalized[0].score).toBeGreaterThanOrEqual(0);
+		expect(penalized[0]!.score).toBeGreaterThanOrEqual(0);
 	});
 
 	it("should_clamp_score_to_max_1_after_boost", () => {
@@ -62,7 +62,7 @@ describe("FeedbackStore.applyPenalty", () => {
 			{ resultId: "doc-1", signal: "positive", createdAt: Date.now() },
 		];
 		const boosted = applyPenalty(results, feedback);
-		expect(boosted[0].score).toBeLessThanOrEqual(1);
+		expect(boosted[0]!.score).toBeLessThanOrEqual(1);
 	});
 
 	it("should_apply_multiple_feedback_signals_cumulatively", () => {
@@ -76,7 +76,7 @@ describe("FeedbackStore.applyPenalty", () => {
 		];
 		const double = applyPenalty(results, feedback);
 		const once = applyPenalty(results, single);
-		expect(double[0].score).toBeLessThan(once[0].score);
+		expect(double[0]!.score).toBeLessThan(once[0]!.score);
 	});
 });
 

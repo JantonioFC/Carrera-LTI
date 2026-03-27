@@ -16,12 +16,17 @@ export interface NexusField {
 	options?: string[]; // For 'select' type
 }
 
+/** Valor admitido para un campo dinámico de NexusRow.
+ * QP-04 (#270): reemplaza Record<string,any> — cubre todos los tipos
+ * de NexusField (text, number, date, select, relation). */
+export type NexusFieldValue = string | number | boolean | null | undefined;
+
 export interface NexusRow {
 	id: string;
 	databaseId: string;
 	createdAt: number;
 	// Dynamic fields stored as a record
-	data: Record<string, any>;
+	data: Record<string, NexusFieldValue>;
 }
 
 // --- Dexie Database Setup ---

@@ -149,7 +149,7 @@ describe("GmailService.authenticate", () => {
 		// Simular que requestAccessToken dispara el callback con éxito
 		const tokenClient = (
 			window.google.accounts.oauth2.initTokenClient as ReturnType<typeof vi.fn>
-		).mock.results[0].value;
+		).mock.results[0]!.value;
 		tokenClient.requestAccessToken = vi.fn(() => {
 			(tokenClient.callback as (r: { error?: string }) => void)({});
 		});
@@ -163,7 +163,7 @@ describe("GmailService.authenticate", () => {
 
 		const tokenClient = (
 			window.google.accounts.oauth2.initTokenClient as ReturnType<typeof vi.fn>
-		).mock.results[0].value;
+		).mock.results[0]!.value;
 		tokenClient.requestAccessToken = vi.fn(() => {
 			(tokenClient.callback as (r: { error?: string }) => void)({
 				error: "access_denied",
@@ -180,7 +180,7 @@ describe("GmailService.authenticate", () => {
 
 		const tokenClient = (
 			window.google.accounts.oauth2.initTokenClient as ReturnType<typeof vi.fn>
-		).mock.results[0].value;
+		).mock.results[0]!.value;
 		tokenClient.requestAccessToken = vi.fn((opts: { prompt: string }) => {
 			expect(opts.prompt).toBe("consent");
 			(tokenClient.callback as (r: { error?: string }) => void)({});
@@ -198,7 +198,7 @@ describe("GmailService.authenticate", () => {
 
 		const tokenClient = (
 			window.google.accounts.oauth2.initTokenClient as ReturnType<typeof vi.fn>
-		).mock.results[0].value;
+		).mock.results[0]!.value;
 		tokenClient.requestAccessToken = vi.fn((opts: { prompt: string }) => {
 			expect(opts.prompt).toBe("");
 			(tokenClient.callback as (r: { error?: string }) => void)({});
@@ -250,9 +250,9 @@ describe("GmailService.fetchUnreadMessages", () => {
 
 		const messages = await svc.fetchUnreadMessages();
 		expect(messages).toHaveLength(1);
-		expect(messages[0].subject).toBe("Notas del examen");
-		expect(messages[0].from).toBe("prof@universidad.edu");
-		expect(messages[0].snippet).toBe("El examen será el viernes");
+		expect(messages[0]!.subject).toBe("Notas del examen");
+		expect(messages[0]!.from).toBe("prof@universidad.edu");
+		expect(messages[0]!.snippet).toBe("El examen será el viernes");
 	});
 
 	it("usa '(Sin asunto)' cuando Subject no está en headers", async () => {
@@ -269,7 +269,7 @@ describe("GmailService.fetchUnreadMessages", () => {
 		const svc = GmailService.getInstance();
 		await svc.initialize("client-id", "api-key");
 		const messages = await svc.fetchUnreadMessages();
-		expect(messages[0].subject).toBe("(Sin asunto)");
+		expect(messages[0]!.subject).toBe("(Sin asunto)");
 	});
 
 	it("usa 'Desconocido' cuando From no está en headers", async () => {
@@ -288,7 +288,7 @@ describe("GmailService.fetchUnreadMessages", () => {
 		const svc = GmailService.getInstance();
 		await svc.initialize("client-id", "api-key");
 		const messages = await svc.fetchUnreadMessages();
-		expect(messages[0].from).toBe("Desconocido");
+		expect(messages[0]!.from).toBe("Desconocido");
 	});
 
 	it("respeta el parámetro maxResults", async () => {

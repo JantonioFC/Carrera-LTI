@@ -132,21 +132,21 @@ describe("CURRICULUM — propiedades de Subject", () => {
 // -----------------------------------------------------------------------
 describe("CURRICULUM — materias específicas", () => {
 	it("s1-3 es 'Fundamentos e Introducción a la Programación' con 10 créditos", () => {
-		const subject = CURRICULUM[0].subjects.find((s) => s.id === "s1-3");
+		const subject = CURRICULUM[0]!.subjects.find((s) => s.id === "s1-3");
 		expect(subject).toBeDefined();
 		expect(subject!.name).toBe("Fundamentos e Introducción a la Programación");
 		expect(subject!.credits).toBe(10);
 	});
 
 	it("s8-3 es 'Proyecto Final de Licenciatura' con 25 créditos", () => {
-		const subject = CURRICULUM[7].subjects.find((s) => s.id === "s8-3");
+		const subject = CURRICULUM[7]!.subjects.find((s) => s.id === "s8-3");
 		expect(subject).toBeDefined();
 		expect(subject!.name).toBe("Proyecto Final de Licenciatura");
 		expect(subject!.credits).toBe(25);
 	});
 
 	it("s4-5 es 'Proyecto Final Tecnicatura' con 9 créditos", () => {
-		const subject = CURRICULUM[3].subjects.find((s) => s.id === "s4-5");
+		const subject = CURRICULUM[3]!.subjects.find((s) => s.id === "s4-5");
 		expect(subject).toBeDefined();
 		expect(subject!.name).toBe("Proyecto Final Tecnicatura");
 		expect(subject!.credits).toBe(9);

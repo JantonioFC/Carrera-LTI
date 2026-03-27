@@ -20,7 +20,7 @@ export interface AetherNote {
 	createdAt: number;
 	updatedAt: number;
 	tags: string[];
-	embedding?: number[];
+	embedding?: number[] | undefined;
 }
 
 export interface GraphLink {
@@ -78,7 +78,7 @@ const ImportedNoteSchema = z.object({
 
 const extractLinks = (text: string): string[] => {
 	const links = Array.from(text.matchAll(/\[\[(.*?)\]\]/g), (match) =>
-		match[1]?.trim(),
+		match[1]!.trim(),
 	).filter(Boolean);
 	return [...new Set(links)];
 };

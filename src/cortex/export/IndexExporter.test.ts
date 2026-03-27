@@ -37,7 +37,7 @@ describe("IndexExporter", () => {
 			uid: "user-123",
 			indexPath: "/data/ruvector.db",
 		});
-		const call = storage.upload.mock.calls[0][0] as Record<string, string>;
+		const call = storage.upload.mock.calls[0]![0] as Record<string, string>;
 		expect(call.remotePath).toMatch(/backup_\d+/);
 	});
 

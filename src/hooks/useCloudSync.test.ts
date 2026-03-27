@@ -99,7 +99,7 @@ describe("useCloudSync", () => {
 		renderHook(() => useCloudSync(...defaultArgs()));
 
 		expect(mockAuthService.init).toHaveBeenCalledOnce();
-		expect(typeof mockAuthService.init.mock.calls[0][0]).toBe("function");
+		expect(typeof mockAuthService.init.mock.calls[0]![0]).toBe("function");
 	});
 
 	// ─── 2. Login anónimo si uid es null en el callback ──────────────────────
@@ -161,7 +161,7 @@ describe("useCloudSync", () => {
 		});
 
 		expect(mockSyncService.syncToCloud).toHaveBeenCalledOnce();
-		expect(mockSyncService.syncToCloud.mock.calls[0][0]).toBe(uid);
+		expect(mockSyncService.syncToCloud.mock.calls[0]![0]).toBe(uid);
 		expect(result.current.syncStatus).toBe("success");
 	});
 

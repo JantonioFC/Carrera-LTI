@@ -20,7 +20,7 @@ export function EditPresencialModal({
 	const [form, setForm] = useState<PresencialEvent>(
 		event || {
 			id: `pres-${Date.now()}`,
-			date: new Date().toISOString().split("T")[0],
+			date: new Date().toISOString().slice(0, 10),
 			activity: "",
 			area: "Desarrollo",
 			sede: "Río Negro",

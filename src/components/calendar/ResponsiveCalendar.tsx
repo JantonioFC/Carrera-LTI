@@ -45,7 +45,11 @@ const ResponsiveCalendar: React.FC<ResponsiveCalendarProps> = ({
 
 	const getSelectedDate = () => {
 		if (!selectedDateKey) return new Date();
-		const [y, m, d] = selectedDateKey.split("-").map(Number);
+		const [y, m, d] = selectedDateKey.split("-").map(Number) as [
+			number,
+			number,
+			number,
+		];
 		return new Date(y, m - 1, d);
 	};
 

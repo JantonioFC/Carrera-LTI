@@ -59,6 +59,17 @@ describe("idbStorage", () => {
 			expect(set).toHaveBeenCalledWith("my-key", "obf:my-value");
 			expect(idbStore.get("my-key")).toBe("obf:my-value");
 		});
+
+		it("propaga QuotaExceededError si IDB rechaza por cuota (#261)", async () => {
+			const { set } = await import("idb-keyval");
+			vi.mocked(set).mockRejectedValueOnce(
+				new DOMException("QuotaExceededError", "QuotaExceededError"),
+			);
+
+			await expect(idbStorage.setItem("my-key", "big-value")).rejects.toThrow(
+				"QuotaExceededError",
+			);
+		});
 	});
 
 	describe("getItem", () => {
@@ -72,6 +83,17 @@ describe("idbStorage", () => {
 
 		it("retorna null para una clave inexistente", async () => {
 			const result = await idbStorage.getItem("clave-que-no-existe");
+
+			expect(result).toBeNull();
+		});
+
+		it("retorna null si deobfuscate falla (ciphertext corrupto) — #255", async () => {
+			const { deobfuscate } = await import("./security");
+			idbStore.set("my-key", "datos-corruptos");
+			// Simula el comportamiento del fix #255: deobfuscate retorna null en error
+			vi.mocked(deobfuscate).mockResolvedValueOnce(null);
+
+			const result = await idbStorage.getItem("my-key");
 
 			expect(result).toBeNull();
 		});

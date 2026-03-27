@@ -65,11 +65,11 @@ if (hasFirebaseConfig) {
 export type AppData = {
 	subjectData: SubjectDataMap;
 	presenciales: PresencialEvent[];
-	calendarEvents?: CalendarEventsMap;
-	tasks?: Task[];
-	schedule?: ScheduleItem[];
-	nexusDocs?: NexusDocument[];
-	aetherNotes?: AetherNote[];
+	calendarEvents?: CalendarEventsMap | undefined;
+	tasks?: Task[] | undefined;
+	schedule?: ScheduleItem[] | undefined;
+	nexusDocs?: NexusDocument[] | undefined;
+	aetherNotes?: AetherNote[] | undefined;
 	lastUpdated: number;
 };
 

@@ -22,7 +22,7 @@ export function CreateSubjectModal({
 			name: name.trim(),
 			credits: Number(credits),
 			semester: 1,
-			color: AREA_COLORS[area] || "#64748b",
+			color: (AREA_COLORS as Record<string, string>)[area] || "#64748b",
 			area,
 			status: "en_curso",
 		};

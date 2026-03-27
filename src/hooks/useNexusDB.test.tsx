@@ -46,8 +46,8 @@ const { dbMock } = vi.hoisted(() => {
 							.filter((r) => (r as Record<string, string>)[field] === val)
 							.sort(
 								(a, b) =>
-									(a as Record<string, number>)[sortField] -
-									(b as Record<string, number>)[sortField],
+									(a as Record<string, number>)[sortField]! -
+									(b as Record<string, number>)[sortField]!,
 							),
 					),
 				})),

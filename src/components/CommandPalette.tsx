@@ -90,6 +90,7 @@ export function CommandPalette({
 								Acciones Rápidas
 							</div>
 							<button
+								type="button"
 								onClick={() => navigateTo("/nexus")}
 								className="w-full flex items-center px-3 py-3 rounded-lg hover:bg-navy-800 text-left transition-colors group"
 							>
@@ -104,6 +105,7 @@ export function CommandPalette({
 								</div>
 							</button>
 							<button
+								type="button"
 								onClick={() => navigateTo("/aether/chat")}
 								className="w-full flex items-center px-3 py-3 rounded-lg hover:bg-navy-800 text-left transition-colors group"
 							>
@@ -118,6 +120,7 @@ export function CommandPalette({
 								</div>
 							</button>
 							<button
+								type="button"
 								onClick={() => navigateTo("/nexus/db")}
 								className="w-full flex items-center px-3 py-3 rounded-lg hover:bg-navy-800 text-left transition-colors group"
 							>
@@ -142,6 +145,7 @@ export function CommandPalette({
 							</div>
 							{filteredDocs.map((doc) => (
 								<button
+									type="button"
 									key={doc.id}
 									onClick={() => navigateTo("/nexus")}
 									className="w-full flex items-center px-3 py-2 rounded-lg hover:bg-navy-800 text-left transition-colors group"
@@ -171,6 +175,7 @@ export function CommandPalette({
 							</div>
 							{filteredDbs.map((db) => (
 								<button
+									type="button"
 									key={db.id}
 									onClick={() => navigateTo("/nexus/db")}
 									className="w-full flex items-center px-3 py-2 rounded-lg hover:bg-navy-800 text-left transition-colors group"
@@ -190,6 +195,7 @@ export function CommandPalette({
 							Sistema
 						</div>
 						<button
+							type="button"
 							onClick={() => {
 								if (
 									confirm(

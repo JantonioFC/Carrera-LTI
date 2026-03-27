@@ -131,7 +131,7 @@ describe("cortexStore — setQueryResults", () => {
 		];
 		useCortexStore.getState().setQueryResults(results);
 		expect(useCortexStore.getState().queryResults).toHaveLength(2);
-		expect(useCortexStore.getState().queryResults[0].chunkId).toBe("c1");
+		expect(useCortexStore.getState().queryResults[0]!.chunkId).toBe("c1");
 	});
 
 	it("setQueryResults con array vacío limpia los resultados", () => {

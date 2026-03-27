@@ -131,7 +131,7 @@ describe("syncService", () => {
 		expect(result).toBe(true);
 		expect(mockSetDoc).toHaveBeenCalledOnce();
 
-		const [, dataArg] = mockSetDoc.mock.calls[0];
+		const [, dataArg] = mockSetDoc.mock.calls[0]!;
 		expect(dataArg).toHaveProperty("subjectData");
 		expect(dataArg).toHaveProperty("lastUpdated");
 	});

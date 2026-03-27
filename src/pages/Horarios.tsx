@@ -129,7 +129,7 @@ export default function Horarios({
 				const activeIndex = prev.findIndex((i) => i.id === activeId);
 				if (activeIndex === -1) return prev;
 
-				const item = { ...prev[activeIndex] };
+				const item = { ...prev[activeIndex]! };
 				if (item.day === overDay) {
 					// Reorder within same day if over another task
 					if (overData?.type === "Task") {
@@ -204,13 +204,13 @@ export default function Horarios({
 				}
 				// If it's the master bank item, just ensure it stays in bank
 				const newItems = [...prev];
-				newItems[activeIndex] = { ...prev[activeIndex], day: null };
+				newItems[activeIndex] = { ...prev[activeIndex]!, day: null };
 				return newItems;
 			}
 
 			// Case 2: Dropped on a day
 			if (overDay !== undefined && overDay !== null) {
-				const originalItem = prev[activeIndex];
+				const originalItem = prev[activeIndex]!;
 				const newItem = { ...originalItem, day: overDay };
 
 				// If it's a bank master, clone it by giving it a new instance ID

@@ -251,7 +251,7 @@ export function EditSubjectModal({
 							onClick={() => {
 								onSave({
 									status,
-									grade: grade ? Number(grade) : undefined,
+									...(grade ? { grade: Number(grade) } : {}),
 									resources,
 								});
 								if (onUpdateBase) {

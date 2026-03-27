@@ -57,8 +57,8 @@ describe("aetherStore — mutaciones de notas", () => {
 		useAetherStore.getState().addNote("Primera");
 		useAetherStore.getState().addNote("Segunda");
 		const { notes } = useAetherStore.getState();
-		expect(notes[0].title).toBe("Segunda");
-		expect(notes[1].title).toBe("Primera");
+		expect(notes[0]!.title).toBe("Segunda");
+		expect(notes[1]!.title).toBe("Primera");
 	});
 
 	it("updateNote cambia título y actualiza updatedAt", async () => {
@@ -89,7 +89,7 @@ describe("aetherStore — mutaciones de notas", () => {
 		useAetherStore.getState().deleteNote(a.id);
 		const { notes } = useAetherStore.getState();
 		expect(notes).toHaveLength(1);
-		expect(notes[0].id).toBe(b.id);
+		expect(notes[0]!.id).toBe(b.id);
 	});
 
 	it("getNote devuelve la nota correcta por id", () => {
@@ -273,7 +273,7 @@ describe("aetherStore — importNotes", () => {
 		];
 		useAetherStore.getState().importNotes(JSON.stringify(notes));
 		expect(useAetherStore.getState().notes).toHaveLength(1);
-		expect(useAetherStore.getState().notes[0].title).toBe("Importada");
+		expect(useAetherStore.getState().notes[0]!.title).toBe("Importada");
 	});
 
 	it("ignora notas con formato inválido (falla Zod)", () => {
@@ -316,6 +316,6 @@ describe("aetherStore — importNotes", () => {
 			],
 		};
 		useAetherStore.getState().importNotes(JSON.stringify(data));
-		expect(useAetherStore.getState().notes[0].title).toBe("Envuelta");
+		expect(useAetherStore.getState().notes[0]!.title).toBe("Envuelta");
 	});
 });

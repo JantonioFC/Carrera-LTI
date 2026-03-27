@@ -63,6 +63,7 @@ export class ErrorBoundary extends React.Component<
 					)}
 					<div className="flex gap-3">
 						<button
+							type="button"
 							onClick={this.handleReset}
 							className="flex items-center gap-2 px-4 py-2 bg-navy-800 hover:bg-navy-700 text-white text-sm font-medium rounded-lg border border-navy-600/50 transition-colors"
 						>
@@ -70,6 +71,7 @@ export class ErrorBoundary extends React.Component<
 							Reintentar
 						</button>
 						<button
+							type="button"
 							onClick={() => window.location.reload()}
 							className="px-4 py-2 text-sm text-slate-400 hover:text-white transition-colors"
 						>

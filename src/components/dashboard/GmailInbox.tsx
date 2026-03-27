@@ -108,7 +108,7 @@ export function GmailInbox({
 							>
 								<div className="flex justify-between items-start gap-2 mb-1">
 									<p className="text-xs font-bold text-slate-200 truncate group-hover:text-lti-blue transition-colors">
-										{msg.from?.split("<")[0].trim()}
+										{msg.from?.split("<")[0]?.trim()}
 									</p>
 									<p className="text-[10px] text-slate-500 whitespace-nowrap">
 										{msg.date

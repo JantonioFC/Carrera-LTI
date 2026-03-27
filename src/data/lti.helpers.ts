@@ -26,7 +26,11 @@ export const SEDE = "Minas";
 
 export function formatDate(dateStr: string): string {
 	if (!dateStr) return "Sin fecha";
-	const [year, month, day] = dateStr.split("-").map(Number);
+	const [year, month, day] = dateStr.split("-").map(Number) as [
+		number,
+		number,
+		number,
+	];
 	const date = new Date(year, month - 1, day);
 	return date.toLocaleDateString("es-UY", {
 		day: "numeric",
@@ -37,7 +41,11 @@ export function formatDate(dateStr: string): string {
 
 export function formatDateShort(dateStr: string): string {
 	if (!dateStr) return "--";
-	const [year, month, day] = dateStr.split("-").map(Number);
+	const [year, month, day] = dateStr.split("-").map(Number) as [
+		number,
+		number,
+		number,
+	];
 	const date = new Date(year, month - 1, day);
 	return date.toLocaleDateString("es-UY", { day: "numeric", month: "short" });
 }
@@ -46,7 +54,11 @@ export function getDaysUntil(dateStr: string): number {
 	if (!dateStr) return 0;
 	const today = new Date();
 	today.setHours(0, 0, 0, 0);
-	const [year, month, day] = dateStr.split("-").map(Number);
+	const [year, month, day] = dateStr.split("-").map(Number) as [
+		number,
+		number,
+		number,
+	];
 	const target = new Date(year, month - 1, day);
 	return Math.ceil(
 		(target.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),

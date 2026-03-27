@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 import { NexusKanbanView } from "../components/nexus/NexusKanbanView";
 import { NexusSidebar } from "../components/nexus/NexusSidebar";
 import { NexusTableView } from "../components/nexus/NexusTableView";
-import { db, useNexusDB } from "../hooks/useNexusDB";
+import { db, type NexusFieldValue, useNexusDB } from "../hooks/useNexusDB";
 
 export default function NexusDatabaseView() {
 	const { allDatabases } = useNexusDB();
@@ -54,7 +54,7 @@ export default function NexusDatabaseView() {
 	const updateRowData = async (
 		rowId: string,
 		fieldId: string,
-		value: unknown,
+		value: NexusFieldValue,
 	) => {
 		const row = await db.rows.get(rowId);
 		if (row) {

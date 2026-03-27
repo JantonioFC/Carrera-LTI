@@ -49,9 +49,9 @@ describe("AutoResearchClaw — búsqueda", () => {
 
 	it("should_include_title_abstract_and_url_in_each_result", async () => {
 		const results = await claw.search("TCP");
-		expect(results[0].title).toBe("TCP Congestion Control");
-		expect(results[0].abstract).toBeDefined();
-		expect(results[0].url).toContain("arxiv.org");
+		expect(results[0]!.title).toBe("TCP Congestion Control");
+		expect(results[0]!.abstract).toBeDefined();
+		expect(results[0]!.url).toContain("arxiv.org");
 	});
 
 	it("should_not_auto_import_anything_without_approval", async () => {
@@ -82,32 +82,32 @@ describe("AutoResearchClaw — aprobación individual (REQ-08)", () => {
 
 	it("should_index_paper_when_approved", async () => {
 		const results = await claw.search("TCP");
-		await claw.approve(results[0].id);
+		await claw.approve(results[0]!.id);
 		expect(indexer.indexDocument).toHaveBeenCalledWith(
-			expect.objectContaining({ docId: results[0].id }),
+			expect.objectContaining({ docId: results[0]!.id }),
 		);
 	});
 
 	it("should_mark_result_as_approved_after_approval", async () => {
 		const results = await claw.search("TCP");
-		await claw.approve(results[0].id);
+		await claw.approve(results[0]!.id);
 		const updated = claw.getPendingResults();
-		expect(updated.find((r) => r.id === results[0].id)?.status).toBe(
+		expect(updated.find((r) => r.id === results[0]!.id)?.status).toBe(
 			"approved",
 		);
 	});
 
 	it("should_not_index_paper_when_rejected", async () => {
 		const results = await claw.search("TCP");
-		claw.reject(results[1].id);
+		claw.reject(results[1]!.id);
 		expect(indexer.indexDocument).not.toHaveBeenCalled();
 	});
 
 	it("should_mark_result_as_rejected_after_rejection", async () => {
 		const results = await claw.search("TCP");
-		claw.reject(results[0].id);
+		claw.reject(results[0]!.id);
 		expect(
-			claw.getPendingResults().find((r) => r.id === results[0].id)?.status,
+			claw.getPendingResults().find((r) => r.id === results[0]!.id)?.status,
 		).toBe("rejected");
 	});
 
@@ -118,9 +118,11 @@ describe("AutoResearchClaw — aprobación individual (REQ-08)", () => {
 
 	it("should_allow_approving_only_one_result_independently", async () => {
 		const results = await claw.search("TCP");
-		await claw.approve(results[0].id); // solo el primero
+		await claw.approve(results[0]!.id); // solo el primero
 		expect(indexer.indexDocument).toHaveBeenCalledTimes(1);
 		const pending = claw.getPendingResults();
-		expect(pending.find((r) => r.id === results[1].id)?.status).toBe("pending");
+		expect(pending.find((r) => r.id === results[1]!.id)?.status).toBe(
+			"pending",
+		);
 	});
 });

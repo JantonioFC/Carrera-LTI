@@ -61,9 +61,9 @@ describe("findSimilarNotes", () => {
 	it("ordena por similitud descendente", () => {
 		const results = findSimilarNotes([1, 0, 0], notes, 3);
 		// 'a' es idéntico → debe ser el primero
-		expect(results[0].id).toBe("a");
+		expect(results[0]!.id).toBe("a");
 		// 'c' es más similar a [1,0,0] que 'b'
-		expect(results[1].id).toBe("c");
+		expect(results[1]!.id).toBe("c");
 	});
 
 	it("respeta el límite de resultados", () => {

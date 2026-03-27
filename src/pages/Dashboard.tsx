@@ -31,7 +31,7 @@ export default function Dashboard({
 	);
 	const [isCreating, setIsCreating] = useState(false);
 	const daysToStart = getDaysUntil(SEMESTER_START);
-	const sem1 = CURRICULUM[0].subjects;
+	const sem1 = CURRICULUM[0]!.subjects;
 
 	// Map id→subject para O(1) lookup en lugar de flatMap().find() por render (#187)
 	const subjectById = useMemo(() => {

@@ -50,9 +50,9 @@ const Examenes: React.FC<ExamenesProps> = ({
 	const handleRemoveExam = (date: string, title: string) => {
 		const updated = {
 			...calendarEvents,
-			[date]: calendarEvents[date].filter((e) => e.title !== title),
+			[date]: calendarEvents[date]!.filter((e) => e.title !== title),
 		};
-		if (updated[date].length === 0) delete updated[date];
+		if (updated[date]!.length === 0) delete updated[date];
 		onUpdateCalendarEvents(updated);
 	};
 
@@ -189,7 +189,7 @@ const Examenes: React.FC<ExamenesProps> = ({
 											})}
 										</span>
 										<span className="text-xl font-black text-white">
-											{parseInt(exam.date.split("-")[2], 10)}
+											{parseInt(exam.date.split("-")[2]!, 10)}
 										</span>
 									</div>
 									<div>

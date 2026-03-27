@@ -1,7 +1,9 @@
 import type { RuVectorChunk } from "../ruvector/RuVectorAdapter";
 
-/** Mínimo de palabras significativas en común para considerar grounded */
-const MIN_OVERLAP_WORDS = 2;
+/** Mínimo de palabras significativas en común para considerar grounded.
+ * QP-02 (#260): valor 2 era bypasseable con respuestas de 2 palabras triviales.
+ * Valor 4 requiere evidencia real de solapamiento con el contexto recuperado. */
+const MIN_OVERLAP_WORDS = 4;
 
 /** Palabras vacías que no cuentan como evidencia de grounding */
 const STOP_WORDS = new Set([

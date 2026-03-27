@@ -85,7 +85,7 @@ export function SelectSubjectModal({ onClose }: SelectSubjectModalProps) {
 									<div className="h-px flex-1 bg-navy-700"></div>
 								</div>
 								<div className="space-y-0.5">
-									{groupedBySemester[sem].map((s) => (
+									{groupedBySemester[sem]!.map((s) => (
 										<button
 											key={s.id}
 											onClick={() => handleAdd(s.id)}
