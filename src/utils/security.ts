@@ -101,7 +101,11 @@ export async function deobfuscate(str: string): Promise<string | null> {
 		return new TextDecoder().decode(decrypted);
 	} catch (e) {
 		// AES-GCM auth tag mismatch or corrupted data — do NOT return raw ciphertext
-		logger.error("security", "AES-GCM decryption failed — data may be corrupted", e);
+		logger.error(
+			"security",
+			"AES-GCM decryption failed — data may be corrupted",
+			e,
+		);
 		return null;
 	}
 }
