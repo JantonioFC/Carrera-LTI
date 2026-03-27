@@ -1,4 +1,14 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
+
+/** Nombre del evento emitido cuando una asignatura cambia a estado "en_curso". */
+export const LTI_SUBJECT_ACTIVATED = "lti-subject-activated" as const;
+
+/** Tipado del detail del CustomEvent lti-subject-activated. */
+export interface LtiSubjectActivatedDetail {
+	id: string;
+	name: string;
+}
+
 import { CURRICULUM, type Subject, type SubjectStatus } from "../data/lti";
 import { logger } from "../utils/logger";
 import { safeParseJSON } from "../utils/safeStorage";
@@ -91,7 +101,7 @@ export function SubjectDataProvider({
 				}
 				// Emit a custom event for other modules
 				window.dispatchEvent(
-					new CustomEvent("lti-subject-activated", {
+					new CustomEvent<LtiSubjectActivatedDetail>(LTI_SUBJECT_ACTIVATED, {
 						detail: { id, name: subject.name },
 					}),
 				);

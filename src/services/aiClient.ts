@@ -216,5 +216,12 @@ Acción: Retorno la lista estructurada con colores (si aplica).`;
 	}
 }
 
-// Singleton client instance
-export const apiBackend = new AIBackendClient();
+// Singleton client instance.
+// Usar `let` permite reemplazarlo en tests con _setApiBackend().
+// AR-02 (#258): evita acoplamiento a GoogleGenAI en tests de variantes.
+export let apiBackend: AIBackendClient = new AIBackendClient();
+
+/** Para tests únicamente: reemplaza la instancia singleton. */
+export function _setApiBackend(client: AIBackendClient): void {
+	apiBackend = client;
+}

@@ -345,4 +345,169 @@ describe("useCloudSync", () => {
 			expect(result.current.isConfigured).toBe(true);
 		});
 	});
+	// ─── 7. Flujo offline→online (TS-04/#272) ────────────────────────────────
+	describe("flujo offline → online", () => {
+		it("syncNow encola en localStorage cuando navigator.onLine es false", async () => {
+			const uid = "user-offline";
+			mockAuthService.init.mockImplementation(
+				(cb: (uid: string | null) => void) => {
+					cb(uid);
+				},
+			);
+			Object.defineProperty(navigator, "onLine", {
+				value: false,
+				writable: true,
+				configurable: true,
+			});
+
+			const { result } = renderHook(() => useCloudSync(...defaultArgs()));
+			await waitFor(() => expect(result.current.userId).toBe(uid));
+
+			await act(async () => {
+				await result.current.syncNow();
+			});
+
+			// No llamó a syncToCloud — estaba offline
+			expect(mockSyncService.syncToCloud).not.toHaveBeenCalled();
+			// Los datos quedaron encolados en localStorage
+			expect(localStorage.getItem("lti_sync_queue")).not.toBeNull();
+		});
+
+		it("el evento online procesa la cola y llama a syncToCloud", async () => {
+			const uid = "user-online-event";
+			mockAuthService.init.mockImplementation(
+				(cb: (uid: string | null) => void) => {
+					cb(uid);
+				},
+			);
+			mockSyncService.syncToCloud.mockResolvedValue(true);
+
+			// Pre-cargar cola con datos válidos
+			const queuedData = {
+				subjectData: {},
+				presenciales: [],
+				calendarEvents: {},
+				tasks: [],
+				schedule: [],
+				lastUpdated: Date.now(),
+			};
+			localStorage.setItem("lti_sync_queue", JSON.stringify(queuedData));
+
+			renderHook(() => useCloudSync(...defaultArgs()));
+			await waitFor(() => expect(mockAuthService.init).toHaveBeenCalled());
+			// Esperar que userId se setee via callback
+			await act(async () => {
+				// simular que el callback de authService.init se ejecuta
+			});
+
+			// Simular evento online
+			await act(async () => {
+				window.dispatchEvent(new Event("online"));
+				// Dar tiempo para que el handler async se ejecute
+				await new Promise((r) => setTimeout(r, 0));
+			});
+
+			// syncToCloud fue llamado con los datos de la cola
+			await waitFor(() => {
+				expect(mockSyncService.syncToCloud).toHaveBeenCalled();
+			});
+		});
+
+		it("el evento online con datos de schema inválido no llama a syncToCloud", async () => {
+			const uid = "user-invalid-queue";
+			mockAuthService.init.mockImplementation(
+				(cb: (uid: string | null) => void) => {
+					cb(uid);
+				},
+			);
+
+			// Cola con datos inválidos (falta lastUpdated)
+			localStorage.setItem(
+				"lti_sync_queue",
+				JSON.stringify({ invalid: "data", noLastUpdated: true }),
+			);
+
+			renderHook(() => useCloudSync(...defaultArgs()));
+
+			await act(async () => {
+				window.dispatchEvent(new Event("online"));
+				await new Promise((r) => setTimeout(r, 0));
+			});
+
+			// Los datos inválidos no se envían a la nube
+			expect(mockSyncService.syncToCloud).not.toHaveBeenCalled();
+			// void uid — solo para que el lint no se queje
+			void uid;
+		});
+
+		it("cuando syncToCloud online tiene éxito, limpia la cola de localStorage", async () => {
+			const uid = "user-queue-clear";
+			mockAuthService.init.mockImplementation(
+				(cb: (uid: string | null) => void) => {
+					cb(uid);
+				},
+			);
+			mockSyncService.syncToCloud.mockResolvedValue(true);
+
+			const queuedData = {
+				subjectData: {},
+				presenciales: [],
+				lastUpdated: Date.now(),
+			};
+			localStorage.setItem("lti_sync_queue", JSON.stringify(queuedData));
+
+			renderHook(() => useCloudSync(...defaultArgs()));
+
+			await act(async () => {
+				window.dispatchEvent(new Event("online"));
+				await new Promise((r) => setTimeout(r, 10));
+			});
+
+			await waitFor(() => {
+				expect(mockSyncService.syncToCloud).toHaveBeenCalled();
+			});
+
+			// La cola fue limpiada tras el sync exitoso
+			expect(localStorage.getItem("lti_sync_queue")).toBeNull();
+		});
+
+		it("syncNow cancela un sync anterior en-flight (AbortController)", async () => {
+			const uid = "user-abort";
+			mockAuthService.init.mockImplementation(
+				(cb: (uid: string | null) => void) => {
+					cb(uid);
+				},
+			);
+
+			// El primer sync tarda — el segundo lo cancela
+			let resolveFirst!: (v: boolean) => void;
+			const firstSyncPromise = new Promise<boolean>(
+				(resolve) => (resolveFirst = resolve),
+			);
+			mockSyncService.syncToCloud
+				.mockReturnValueOnce(firstSyncPromise)
+				.mockResolvedValue(true);
+
+			const { result } = renderHook(() => useCloudSync(...defaultArgs()));
+			await waitFor(() => expect(result.current.userId).toBe(uid));
+
+			// Lanzar primer sync (no esperamos — queda pendiente)
+			act(() => {
+				void result.current.syncNow();
+			});
+
+			// Lanzar segundo sync (debería abortar el primero)
+			await act(async () => {
+				await result.current.syncNow();
+			});
+
+			// Resolver el primer sync DESPUÉS de que ya fue abortado
+			resolveFirst(true);
+
+			// El estado final corresponde al segundo sync
+			expect(result.current.syncStatus).toBe("success");
+			// syncToCloud fue llamado dos veces
+			expect(mockSyncService.syncToCloud).toHaveBeenCalledTimes(2);
+		});
+	});
 });

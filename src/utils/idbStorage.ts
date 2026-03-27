@@ -20,7 +20,7 @@ export const idbStorage: StateStorage = {
 						state: {
 							notes: oldVault ? JSON.parse(oldVault) : [],
 							geminiApiKey: oldKey || "",
-							chatHistory: oldChat ? JSON.parse(oldChat) : [],
+							// chatHistory: movido a aetherChatStore (AR-04/#269)
 						},
 						version: 0,
 					};

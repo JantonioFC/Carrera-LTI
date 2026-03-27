@@ -1,4 +1,5 @@
 import type { IFs } from "memfs";
+import { logger } from "../../utils/logger";
 
 export interface QueueOperation {
 	id: string;
@@ -63,8 +64,21 @@ export class QueueManager {
 		try {
 			const raw = this.fs.readFileSync(this.queuePath, "utf8") as string;
 			this.items = JSON.parse(raw) as QueueOperation[];
-		} catch {
-			// Archivo inexistente o corrupto → arrancar con cola vacía
+		} catch (error: unknown) {
+			// Si el archivo no existe (primera ejecución), silencio intencional.
+			// Para cualquier otro error (JSON corrupto, permisos, etc.) se loguea
+			// para diagnóstico antes de hacer recovery con cola vacía.
+			const isNotFound =
+				error instanceof Error &&
+				"code" in error &&
+				(error as { code: string }).code === "ENOENT";
+			if (!isNotFound) {
+				logger.warn(
+					"QueueManager",
+					"restoreQueue: archivo corrupto o ilegible — arrancando con cola vacía",
+					error,
+				);
+			}
 			this.items = [];
 		}
 	}
