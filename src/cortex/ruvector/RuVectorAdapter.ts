@@ -62,7 +62,7 @@ export class RuVectorAdapter {
 			},
 			opts,
 		);
-		return { chunks: (response.data as Record<string, number>).chunks };
+		return { chunks: (response.data as Record<string, number>).chunks! };
 	}
 
 	async query(

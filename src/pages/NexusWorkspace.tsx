@@ -38,8 +38,6 @@ export default function NexusWorkspace() {
 			// pero TypeScript no puede inferir el tipo sin el cast.
 			dictionary: esDictionary as unknown as Dictionary,
 			collaboration: {
-				// provider es opcional en CollaborationOptions; undefined es válido.
-				provider: undefined,
 				fragment: yDoc.getXmlFragment("document-store"),
 				user: {
 					name: "User",

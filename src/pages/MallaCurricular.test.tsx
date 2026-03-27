@@ -46,7 +46,7 @@ describe("MallaCurricular — currentSemester", () => {
 
 	it("retorna el semestre mínimo con materias en_curso", () => {
 		// Poner una materia de semestre 3 en_curso
-		const subjectSem3 = CURRICULUM[2].subjects[0];
+		const subjectSem3 = CURRICULUM[2]!.subjects[0]!;
 		vi.mocked(useSubjectData).mockReturnValue({
 			data: makeData({ [subjectSem3.id]: { status: "en_curso" } }),
 			allSubjects: staticSubjects,
@@ -68,7 +68,7 @@ describe("MallaCurricular — currentSemester", () => {
 
 describe("MallaCurricular — cálculo de créditos", () => {
 	it("creditsDone suma solo créditos aprobados", () => {
-		const subject = staticSubjects[0];
+		const subject = staticSubjects[0]!;
 		vi.mocked(useSubjectData).mockReturnValue({
 			data: makeData({ [subject.id]: { status: "aprobada" } }),
 			allSubjects: staticSubjects,
@@ -88,7 +88,7 @@ describe("MallaCurricular — cálculo de créditos", () => {
 	});
 
 	it("creditsActive suma solo créditos en_curso", () => {
-		const subject = staticSubjects[0];
+		const subject = staticSubjects[0]!;
 		vi.mocked(useSubjectData).mockReturnValue({
 			data: makeData({ [subject.id]: { status: "en_curso" } }),
 			allSubjects: staticSubjects,
@@ -135,8 +135,8 @@ describe("MallaCurricular — cálculo de créditos", () => {
 describe("MallaCurricular — tcDone", () => {
 	it("solo cuenta créditos aprobados de semestres 1-4", () => {
 		// Aprobar una materia del semestre 1 y una del semestre 5
-		const subjectSem1 = CURRICULUM[0].subjects[0];
-		const subjectSem5 = CURRICULUM[4].subjects[0];
+		const subjectSem1 = CURRICULUM[0]!.subjects[0]!;
+		const subjectSem5 = CURRICULUM[4]!.subjects[0]!;
 		vi.mocked(useSubjectData).mockReturnValue({
 			data: makeData({
 				[subjectSem1.id]: { status: "aprobada" },
@@ -166,7 +166,7 @@ describe("MallaCurricular — tcDone", () => {
 describe("MallaCurricular — pct", () => {
 	it("calcula el porcentaje correcto sobre totalRequired", () => {
 		// Aprobar todas las materias del semestre 1
-		const sem1Subjects = CURRICULUM[0].subjects;
+		const sem1Subjects = CURRICULUM[0]!.subjects;
 		const creditsDone = sem1Subjects.reduce((acc, s) => acc + s.credits, 0);
 		const totalRequired = Math.max(
 			TOTAL_CREDITS,

@@ -12,7 +12,7 @@ export interface SubjectResource {
 
 export interface SubjectData {
 	status: SubjectStatus;
-	grade?: number;
+	grade?: number | undefined;
 	resources: SubjectResource[];
 }
 

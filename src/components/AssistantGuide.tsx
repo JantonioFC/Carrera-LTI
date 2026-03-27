@@ -62,6 +62,7 @@ const STEPS: Step[] = [
 
 export function AssistantGuide({ onClose }: { onClose: () => void }) {
 	const [currentStep, setCurrentStep] = useState(0);
+	const currentStepData = STEPS[currentStep]!;
 
 	return (
 		<motion.div
@@ -111,16 +112,16 @@ export function AssistantGuide({ onClose }: { onClose: () => void }) {
 								Paso {currentStep + 1} de {STEPS.length}
 							</p>
 							<h3 className="text-white font-bold text-lg leading-tight">
-								{STEPS[currentStep].title}
+								{currentStepData.title}
 							</h3>
 						</div>
 
 						<p className="text-sm text-slate-400 leading-relaxed italic">
-							{STEPS[currentStep].description}
+							{currentStepData.description}
 						</p>
 
 						<div className="bg-navy-900/50 rounded-xl p-4 border border-navy-800 space-y-3">
-							{STEPS[currentStep].items.map((item, i) => (
+							{currentStepData.items.map((item, i) => (
 								<div key={i} className="flex gap-3">
 									<div className="w-5 h-5 rounded-full bg-lti-blue/10 border border-lti-blue/20 flex items-center justify-center flex-shrink-0 mt-0.5">
 										<span className="text-lti-blue text-[10px] font-bold">
@@ -134,13 +135,13 @@ export function AssistantGuide({ onClose }: { onClose: () => void }) {
 							))}
 						</div>
 
-						{STEPS[currentStep].imageDesc && (
+						{currentStepData.imageDesc && (
 							<div className="bg-navy-900 p-3 rounded-lg border border-dashed border-navy-700 flex items-center gap-3">
 								<div className="p-2 bg-navy-800 rounded">
 									<Key size={14} className="text-slate-500" />
 								</div>
 								<p className="text-[10px] text-slate-500 font-medium">
-									TIP VISUAL: {STEPS[currentStep].imageDesc}
+									TIP VISUAL: {currentStepData.imageDesc}
 								</p>
 							</div>
 						)}

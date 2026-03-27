@@ -150,9 +150,9 @@ describe("Examenes", () => {
 		fireEvent.submit(form);
 
 		expect(onUpdateCalendarEvents).toHaveBeenCalledOnce();
-		const updated: EventsState = onUpdateCalendarEvents.mock.calls[0][0];
+		const updated: EventsState = onUpdateCalendarEvents.mock.calls[0]![0]!;
 		expect(updated["2026-07-10"]).toBeDefined();
-		expect(updated["2026-07-10"][0]).toMatchObject({
+		expect(updated["2026-07-10"]![0]!).toMatchObject({
 			title: "Examen: Matemáticas",
 			type: "examen",
 			time: "09:00",
@@ -181,15 +181,15 @@ describe("Examenes", () => {
 
 		// Hacer click en el primer botón de borrar (Matemáticas, primer examen)
 		const deleteButtons = examList.querySelectorAll("button");
-		fireEvent.click(deleteButtons[0]);
+		fireEvent.click(deleteButtons[0]!);
 
 		expect(onUpdateCalendarEvents).toHaveBeenCalledOnce();
-		const updated: EventsState = onUpdateCalendarEvents.mock.calls[0][0];
+		const updated: EventsState = onUpdateCalendarEvents.mock.calls[0]![0]!;
 
 		// Matemáticas debe haber sido eliminada
-		const remaining = updated["2026-07-10"];
+		const remaining = updated["2026-07-10"]!;
 		expect(remaining).toHaveLength(1);
-		expect(remaining[0].title).toBe("Examen: Física");
+		expect(remaining[0]!.title).toBe("Examen: Física");
 	});
 
 	// 5. Lista exámenes ordenados por fecha

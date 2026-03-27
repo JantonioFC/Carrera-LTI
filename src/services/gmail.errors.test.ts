@@ -62,7 +62,7 @@ async function initializeService(svc: GmailService) {
 	await svc.initialize("client-id", "api-key");
 	return (
 		window.google.accounts.oauth2.initTokenClient as ReturnType<typeof vi.fn>
-	).mock.results[0].value;
+	).mock.results[0]!.value;
 }
 
 // ─── Setup / Teardown ────────────────────────────────────────────────────────

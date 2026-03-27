@@ -81,21 +81,19 @@ export default function Materias() {
 						}
 					}
 					onSave={(updated) => updateSubject(editingSubject.id, updated)}
-					onUpdateBase={
-						customSubjects.some((s) => s.id === editingSubject.id)
-							? (updates) => updateCustomSubject(editingSubject.id, updates)
-							: undefined
-					}
-					onDelete={
-						customSubjects.some((s) => s.id === editingSubject.id)
-							? () => {
+					{...(customSubjects.some((s) => s.id === editingSubject.id)
+						? {
+								onUpdateBase: (
+									updates: Parameters<typeof updateCustomSubject>[1],
+								) => updateCustomSubject(editingSubject.id, updates),
+								onDelete: () => {
 									if (confirm("¿Eliminar esta materia personalizada?")) {
 										removeCustomSubject(editingSubject.id);
 										setEditingSubject(null);
 									}
-								}
-							: undefined
-					}
+								},
+							}
+						: {})}
 					onClose={() => setEditingSubject(null)}
 				/>
 			)}

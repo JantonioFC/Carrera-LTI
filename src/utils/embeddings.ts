@@ -27,7 +27,7 @@ export async function generateEmbedding(
  * Calculates cosine similarity between two vectors.
  */
 export function cosineSimilarity(v1: number[], v2: number[]): number {
-	const dotProduct = v1.reduce((acc, val, i) => acc + val * v2[i], 0);
+	const dotProduct = v1.reduce((acc, val, i) => acc + val * v2[i]!, 0);
 	const magnitude1 = Math.sqrt(v1.reduce((acc, val) => acc + val * val, 0));
 	const magnitude2 = Math.sqrt(v2.reduce((acc, val) => acc + val * val, 0));
 	if (magnitude1 === 0 || magnitude2 === 0) return 0;
@@ -37,11 +37,9 @@ export function cosineSimilarity(v1: number[], v2: number[]): number {
 /**
  * Local vector search implementation.
  */
-export function findSimilarNotes<T extends { embedding?: number[] }>(
-	targetVector: number[],
-	items: T[],
-	limit: number = 3,
-): T[] {
+export function findSimilarNotes<
+	T extends { embedding?: number[] | undefined },
+>(targetVector: number[], items: T[], limit: number = 3): T[] {
 	return items
 		.filter((item) => item.embedding && item.embedding.length > 0)
 		.map((item) => ({

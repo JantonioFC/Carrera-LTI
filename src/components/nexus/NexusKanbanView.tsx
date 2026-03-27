@@ -89,9 +89,9 @@ function NexusKanbanViewInner({
 								>
 									<input
 										className="w-full bg-transparent text-sm font-semibold text-white focus:outline-none mb-2"
-										value={(row.data[fields[0].id] as string) || ""}
+										value={(row.data[fields[0]!.id] as string) || ""}
 										onChange={(e) =>
-											onUpdateRowData(row.id, fields[0].id, e.target.value)
+											onUpdateRowData(row.id, fields[0]!.id, e.target.value)
 										}
 										placeholder="Título de la fila"
 									/>

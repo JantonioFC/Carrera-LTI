@@ -75,7 +75,7 @@ export function AetherGraphView({
 						const textWidth = ctx.measureText(label).width;
 						const bckgDimensions = [textWidth, fontSize].map(
 							(n) => n + fontSize * 0.2,
-						);
+						) as [number, number];
 						ctx.fillStyle = "rgba(13, 17, 23, 0.8)";
 						ctx.fillRect(
 							node.x! - bckgDimensions[0] / 2,

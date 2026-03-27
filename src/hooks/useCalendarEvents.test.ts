@@ -42,7 +42,7 @@ describe("useCalendarEvents", () => {
 		});
 
 		expect(result.current.events["2026-03-15"]).toHaveLength(1);
-		expect(result.current.events["2026-03-15"][0]).toEqual(event);
+		expect(result.current.events["2026-03-15"]![0]).toEqual(event);
 	});
 
 	it("saveEvent appends when dateKey already has events", () => {
@@ -58,8 +58,8 @@ describe("useCalendarEvents", () => {
 		});
 
 		expect(result.current.events["2026-03-15"]).toHaveLength(2);
-		expect(result.current.events["2026-03-15"][0]).toEqual(first);
-		expect(result.current.events["2026-03-15"][1]).toEqual(second);
+		expect(result.current.events["2026-03-15"]![0]).toEqual(first);
+		expect(result.current.events["2026-03-15"]![1]).toEqual(second);
 	});
 
 	it("saveEvent persists to localStorage", () => {
@@ -88,7 +88,7 @@ describe("useCalendarEvents", () => {
 		});
 
 		expect(result.current.events["2026-03-20"]).toHaveLength(1);
-		expect(result.current.events["2026-03-20"][0]).toEqual(second);
+		expect(result.current.events["2026-03-20"]![0]).toEqual(second);
 	});
 
 	it("deleteEvent removes dateKey when no events remain", () => {

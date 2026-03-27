@@ -72,7 +72,7 @@ describe("useObserverIPC — onStart", () => {
 
 describe("useObserverIPC — onStop", () => {
 	it("llama a observer.toggle(false)", async () => {
-		const api = makeCortexAPI({ toggleResult: { wavPath: undefined } });
+		const api = makeCortexAPI({ toggleResult: {} });
 		(window as unknown as { cortexAPI: typeof api }).cortexAPI = api;
 
 		const cb = makeCallbacks();
@@ -89,7 +89,7 @@ describe("useObserverIPC — onStop", () => {
 	});
 
 	it("no llama a transcribe si toggle no devuelve wavPath", async () => {
-		const api = makeCortexAPI({ toggleResult: { wavPath: undefined } });
+		const api = makeCortexAPI({ toggleResult: {} });
 		(window as unknown as { cortexAPI: typeof api }).cortexAPI = api;
 
 		const cb = makeCallbacks();

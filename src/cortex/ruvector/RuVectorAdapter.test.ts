@@ -81,7 +81,7 @@ describe("RuVectorAdapter — query", () => {
 			topK: 2,
 		});
 		expect(result).toHaveLength(2);
-		expect(result[0].score).toBeGreaterThan(result[1].score);
+		expect(result[0]!.score).toBeGreaterThan(result[1]!.score);
 	});
 
 	it("should_return_empty_array_when_index_is_empty", async () => {

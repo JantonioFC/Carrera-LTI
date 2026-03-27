@@ -41,7 +41,7 @@ describe("nexusStore — mutaciones de documentos", () => {
 		useNexusStore.getState().addDocument("Primero");
 		useNexusStore.getState().addDocument("Segundo");
 		const { documents } = useNexusStore.getState();
-		expect(documents[0].title).toBe("Segundo");
+		expect(documents[0]!.title).toBe("Segundo");
 	});
 
 	it("updateDocument cambia título y actualiza updatedAt", async () => {
@@ -70,7 +70,7 @@ describe("nexusStore — mutaciones de documentos", () => {
 		useNexusStore.getState().deleteDocument(a.id);
 		const { documents } = useNexusStore.getState();
 		expect(documents).toHaveLength(1);
-		expect(documents[0].id).toBe(b.id);
+		expect(documents[0]!.id).toBe(b.id);
 	});
 
 	it("getDocument retorna el doc por id", () => {

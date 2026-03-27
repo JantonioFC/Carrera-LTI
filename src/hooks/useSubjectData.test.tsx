@@ -48,8 +48,8 @@ describe("useSubjectData", () => {
 			});
 		});
 
-		expect(result.current.data[subjectId].status).toBe("aprobada");
-		expect(result.current.data[subjectId].grade).toBe(10);
+		expect(result.current.data[subjectId]!.status).toBe("aprobada");
+		expect(result.current.data[subjectId]!.grade).toBe(10);
 	});
 
 	it("should calculate average correctly", () => {

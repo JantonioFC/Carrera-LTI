@@ -5,7 +5,7 @@
 import type { PresencialEvent, Semester } from "./lti.types";
 
 // ---- COLORES POR ÁREA ----
-export const AREA_COLORS: Record<string, string> = {
+export const AREA_COLORS = {
 	Desarrollo: "#0ea5e9",
 	Testing: "#a855f7",
 	Datos: "#06b6d4",
