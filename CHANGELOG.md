@@ -6,6 +6,15 @@ Versionado semántico: [SemVer](https://semver.org/lang/es/).
 
 ---
 
+## [v3.10.1] — 2026-03-27
+
+### Chore
+- Eliminados del repo archivos legacy del proyecto anterior (vault Obsidian): `.obsidian/`, `Tareas/`, `_templates/`, `openspec/`
+- Actualizado `.gitignore` para cubrir `dist-electron/` y las carpetas legacy — evita que vuelvan a colarse
+- Los archivos se conservan en disco local; solo se quitaron del tracking de git
+
+---
+
 ## [v3.10.0] — 2026-03-27
 
 ### Security (p1 — #278–#280)
