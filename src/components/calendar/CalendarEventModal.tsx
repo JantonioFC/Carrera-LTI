@@ -58,9 +58,9 @@ export const CalendarEventModal: React.FC<CalendarEventModalProps> = ({
 
 				<form onSubmit={handleSubmit} className="p-6 space-y-4">
 					<div>
-						<label className="block text-xs font-medium text-slate-400 uppercase tracking-wider mb-1.5">
+						<span className="block text-xs font-medium text-slate-400 uppercase tracking-wider mb-1.5">
 							Fecha
-						</label>
+						</span>
 						<div className="bg-navy-800/50 border border-navy-700 rounded-lg px-3 py-2 text-slate-300 text-sm">
 							{date.toLocaleDateString("es-ES", {
 								weekday: "long",

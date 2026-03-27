@@ -6,19 +6,19 @@
  * Resuelve TS-NEW-1 (#284): cero tests de tipo para branded types.
  */
 import { describe, expectTypeOf, it } from "vitest";
-import {
-	AetherNoteSchema,
-	ChatMessageSchema,
-	NexusDocumentSchema,
-	SubtaskSchema,
-	TaskSchema,
-} from "./schemas";
 import type {
 	AetherNoteId,
 	ChatMessageId,
 	NexusDocumentId,
 	SubtaskId,
 	TaskId,
+} from "./schemas";
+import {
+	AetherNoteSchema,
+	ChatMessageSchema,
+	NexusDocumentSchema,
+	SubtaskSchema,
+	TaskSchema,
 } from "./schemas";
 
 describe("AetherNoteId branded type", () => {

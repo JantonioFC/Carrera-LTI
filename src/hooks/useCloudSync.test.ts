@@ -21,15 +21,21 @@ vi.mock("../utils/firebase", () => ({
 }));
 
 // Consolidados en un único bloque hoisted para reducir fragmentación
-const { mockUpdateSubject, mockSetGeminiApiKey, mockSetGmailClientId, mockSetGmailApiKey, mockAetherSetState, mockNexusSetState } =
-	vi.hoisted(() => ({
-		mockUpdateSubject: vi.fn(),
-		mockSetGeminiApiKey: vi.fn(),
-		mockSetGmailClientId: vi.fn(),
-		mockSetGmailApiKey: vi.fn(),
-		mockAetherSetState: vi.fn(),
-		mockNexusSetState: vi.fn(),
-	}));
+const {
+	mockUpdateSubject,
+	mockSetGeminiApiKey,
+	mockSetGmailClientId,
+	mockSetGmailApiKey,
+	mockAetherSetState,
+	mockNexusSetState,
+} = vi.hoisted(() => ({
+	mockUpdateSubject: vi.fn(),
+	mockSetGeminiApiKey: vi.fn(),
+	mockSetGmailClientId: vi.fn(),
+	mockSetGmailApiKey: vi.fn(),
+	mockAetherSetState: vi.fn(),
+	mockNexusSetState: vi.fn(),
+}));
 
 vi.mock("./useSubjectData", () => ({
 	useSubjectData: () => ({
