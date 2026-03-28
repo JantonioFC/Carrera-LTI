@@ -6,12 +6,13 @@ import {
 } from "./embeddings";
 
 // Hoisted: mock de @google/genai para el test de error de API
+const mockEmbedContent = vi.hoisted(() =>
+	vi.fn().mockRejectedValue(new Error("API error")),
+);
 vi.mock("@google/genai", () => ({
-	GoogleGenAI: vi.fn().mockImplementation(() => ({
-		models: {
-			embedContent: vi.fn().mockRejectedValue(new Error("API error")),
-		},
-	})),
+	GoogleGenAI: vi.fn(function () {
+		return { models: { embedContent: mockEmbedContent } };
+	}),
 }));
 
 // --- cosineSimilarity ---

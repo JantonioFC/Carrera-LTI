@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import { act } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // --- Mocks top-level ---
@@ -76,12 +77,14 @@ describe("GmailWidget — estado sin credenciales", () => {
 });
 
 describe("GmailWidget — estado minimizado", () => {
-	it("renderiza estado minimizado cuando isMinimized es true (estado inicial)", () => {
+	it("renderiza estado minimizado cuando isMinimized es true (estado inicial)", async () => {
 		setupStore({ gmailClientId: "client-id", gmailApiKey: "api-key" });
 		vi.mocked(gmailService.isAuthenticated).mockReturnValue(false);
 		vi.mocked(gmailService.initialize).mockResolvedValue(undefined as any);
 
-		render(<GmailWidget />);
+		await act(async () => {
+			render(<GmailWidget />);
+		});
 
 		// Estado inicial: isMinimized = true → renderiza el botón circular con Mail
 		// El tooltip muestra "0 correos nuevos"
@@ -100,7 +103,9 @@ describe("GmailWidget — estado de loading", () => {
 			() => new Promise(() => {}), // Never resolves — simula loading
 		);
 
-		render(<GmailWidget />);
+		await act(async () => {
+			render(<GmailWidget />);
+		});
 
 		// El widget empieza minimizado, por lo que no se muestra el spinner directamente
 		// Solo verificamos que el widget se montó correctamente
@@ -118,7 +123,9 @@ describe("GmailWidget — estado de error", () => {
 			new Error("Network error"),
 		);
 
-		render(<GmailWidget />);
+		await act(async () => {
+			render(<GmailWidget />);
+		});
 
 		// El widget inicia minimizado y el error se muestra al expandirlo.
 		// Sin interacción de usuario, verificamos que el widget montó sin crash.
