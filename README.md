@@ -1,5 +1,7 @@
 # Carrera LTI — UTEC Uruguay 🎓
 
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/JantonioFC/Carrera-LTI)
+
 Una **súper-app académica y de productividad** diseñada para estudiantes de la **Licenciatura en Tecnologías de la Información (Plan 2024)** de la **Universidad Tecnológica (UTEC) de Uruguay**.
 
 Combina gestión académica, un Segundo Cerebro (Aether), un Espacio de Trabajo Unificado con IA (Nexus) y un asistente de IA local (Cortex) en una sola aplicación local-first y offline-ready. Disponible como **PWA** y como **app de escritorio** (Electron). Desarrollada bajo la marca **URU/IA.LABS**.
