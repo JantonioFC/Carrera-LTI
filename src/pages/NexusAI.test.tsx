@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import { act } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // --- Mocks top-level ---
@@ -155,7 +156,7 @@ describe("NexusAI — render con messages vacíos", () => {
 });
 
 describe("NexusAI — clearChat", () => {
-	it("limpia localStorage con la clave lti_nexus_ai_history", () => {
+	it("limpia localStorage con la clave lti_nexus_ai_history", async () => {
 		setupMocks({ apiKey: "my-key" });
 		localStorage.setItem(
 			"lti_nexus_ai_history",
@@ -166,7 +167,9 @@ describe("NexusAI — clearChat", () => {
 
 		// Llamar directamente al botón de limpiar chat
 		const clearBtn = screen.getByTitle("Limpiar chat");
-		clearBtn.click();
+		await act(async () => {
+			clearBtn.click();
+		});
 
 		expect(localStorage.getItem("lti_nexus_ai_history")).toBeNull();
 	});

@@ -1,4 +1,5 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ObserverAIToggle } from "./ObserverAIToggle";
 import { useObserverStore } from "./observerStore";
@@ -39,27 +40,35 @@ describe("ObserverAIToggle — renderizado", () => {
 describe("ObserverAIToggle — interacción", () => {
 	it("should_call_onStart_when_toggled_on", async () => {
 		render(<ObserverAIToggle onStart={mockOnStart} onStop={mockOnStop} />);
-		fireEvent.click(screen.getByRole("switch"));
+		await act(async () => {
+			fireEvent.click(screen.getByRole("switch"));
+		});
 		expect(mockOnStart).toHaveBeenCalledOnce();
 	});
 
 	it("should_call_onStop_when_toggled_off", async () => {
 		useObserverStore.getState().setRunning(true);
 		render(<ObserverAIToggle onStart={mockOnStart} onStop={mockOnStop} />);
-		fireEvent.click(screen.getByRole("switch"));
+		await act(async () => {
+			fireEvent.click(screen.getByRole("switch"));
+		});
 		expect(mockOnStop).toHaveBeenCalledOnce();
 	});
 
 	it("should_set_running_true_after_start", async () => {
 		render(<ObserverAIToggle onStart={mockOnStart} onStop={mockOnStop} />);
-		fireEvent.click(screen.getByRole("switch"));
+		await act(async () => {
+			fireEvent.click(screen.getByRole("switch"));
+		});
 		// onStart es async — el store se actualiza en el callback
 		expect(mockOnStart).toHaveBeenCalled();
 	});
 
 	it("should_show_notification_when_activated", async () => {
 		render(<ObserverAIToggle onStart={mockOnStart} onStop={mockOnStop} />);
-		fireEvent.click(screen.getByRole("switch"));
+		await act(async () => {
+			fireEvent.click(screen.getByRole("switch"));
+		});
 		await waitFor(() =>
 			expect(screen.getByTestId("observer-notification")).toBeInTheDocument(),
 		);
