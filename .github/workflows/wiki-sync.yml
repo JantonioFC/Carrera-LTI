@@ -1,0 +1,42 @@
+name: Wiki Sync
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'docs/wiki_es/**'
+
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    name: Sync docs/wiki_es → GitHub Wiki
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Push wiki content
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          git clone "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.wiki.git" /tmp/wiki
+
+          cp docs/wiki_es/*.md /tmp/wiki/
+
+          cd /tmp/wiki
+          git add -A
+
+          if git diff --cached --quiet; then
+            echo "Sin cambios en la wiki, nada que hacer."
+            exit 0
+          fi
+
+          git commit -m "docs(wiki): sync desde docs/wiki_es @ ${GITHUB_SHA::7}"
+          git push

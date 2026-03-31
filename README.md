@@ -18,6 +18,7 @@ Combina gestión académica, un Segundo Cerebro (Aether), un Espacio de Trabajo 
 | **Malla Curricular** | Grid interactivo de 8 semestres con créditos y barra de progreso |
 | **U.C.** | Gestión de materias: notas, estado, enlaces y recursos por unidad curricular |
 | **Tareas** | Kanban avanzado con subtareas, prioridades, fechas y notificaciones push |
+| **Exámenes** | Registro y gestión de exámenes con fechas, materias y temas |
 | **Horarios** | Generador visual drag-and-drop con `@dnd-kit` |
 
 ### 🧠 Aether (Segundo Cerebro)
@@ -71,7 +72,7 @@ Combina gestión académica, un Segundo Cerebro (Aether), un Espacio de Trabajo 
 | DnD | @dnd-kit |
 | PWA | vite-plugin-pwa |
 | Cloud (opcional) | Firebase Firestore + Auth anónima |
-| Desktop | Electron 36 + vite-plugin-electron |
+| Desktop | Electron 41 + vite-plugin-electron |
 | IPC / Subprocesos | StdioTransport (NDJSON) + Python venv |
 | IA Local (Cortex) | Docling · OpenAI Whisper · RuVector · sounddevice |
 | Iconos | Lucide React |
@@ -126,7 +127,7 @@ npm run dev:electron
 ```text
 src/
 ├── components/
-│   ├── Sidebar.tsx           # Navegación principal (13 módulos)
+│   ├── Sidebar.tsx           # Navegación principal (14 módulos)
 │   ├── CommandPalette.tsx    # Paleta de comandos global (Ctrl+K)
 │   └── Pomodoro.tsx          # Timer flotante
 ├── cortex/
@@ -150,6 +151,7 @@ src/
 │   ├── MallaCurricular.tsx   # Malla de 8 semestres
 │   ├── Materias.tsx          # Gestión de U.C.
 │   ├── Tareas.tsx            # Kanban avanzado
+│   ├── Examenes.tsx          # Registro y gestión de exámenes
 │   ├── Horarios.tsx          # Generador visual de horarios
 │   ├── AetherVault.tsx       # Editor + Grafo de conocimiento
 │   ├── AetherCanvas.tsx      # Canvas espacial infinito
