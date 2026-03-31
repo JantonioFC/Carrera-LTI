@@ -30,4 +30,4 @@ Carrera LTI es una **"super-app" académica local-first** diseñada para estudia
 - [[ADRs]]: Registro de decisiones de arquitectura.
 
 ---
-*Documentación actualizada al 23 de marzo de 2026 · Carrera LTI v3.0*
+*Documentación actualizada al 31 de marzo de 2026 · Carrera LTI v3.12.0*
