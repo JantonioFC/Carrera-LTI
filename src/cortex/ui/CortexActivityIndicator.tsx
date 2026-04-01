@@ -1,19 +1,5 @@
-import { type CortexActivity, useCortexStore } from "./cortexStore";
-
-function activityLabel(activity: CortexActivity): string {
-	switch (activity.type) {
-		case "idle":
-			return "Inactivo";
-		case "indexing":
-			return `Indexando: ${activity.docTitle}`;
-		case "querying":
-			return `Consultando: ${activity.query}`;
-		case "query_error":
-			return `Error: ${activity.error}`;
-		case "ocr":
-			return `OCR: ${activity.filename}`;
-	}
-}
+import { useCortexStore } from "./cortexStore";
+import { activityLabel } from "./activityLabel";
 
 /**
  * Indicador compacto del estado actual de Cortex.

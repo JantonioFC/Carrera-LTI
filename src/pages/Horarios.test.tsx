@@ -93,7 +93,7 @@ describe("Horarios — subjectStatusById Map", () => {
 			getApprovedCount: vi.fn(),
 			getApprovedCredits: vi.fn(),
 			getAverage: vi.fn(),
-		} as any);
+		} as ReturnType<typeof useSubjectData>);
 
 		render(<Horarios schedule={[]} onUpdateSchedule={vi.fn()} />);
 		// Si el componente renderizó sin errores, el Map se construyó correctamente
@@ -119,7 +119,7 @@ describe("Horarios — items filter", () => {
 			getApprovedCount: vi.fn(),
 			getApprovedCredits: vi.fn(),
 			getAverage: vi.fn(),
-		} as any);
+		} as ReturnType<typeof useSubjectData>);
 
 		const schedule: ScheduleItem[] = [
 			{ id: "item-1", subjectId: "s1", day: 1 },
@@ -145,7 +145,7 @@ describe("Horarios — items filter", () => {
 			getApprovedCount: vi.fn(),
 			getApprovedCredits: vi.fn(),
 			getAverage: vi.fn(),
-		} as any);
+		} as ReturnType<typeof useSubjectData>);
 
 		expect(() =>
 			render(<Horarios schedule={[]} onUpdateSchedule={vi.fn()} />),
@@ -167,7 +167,7 @@ describe("Horarios — items con status no-en_curso no aparecen", () => {
 			getApprovedCount: vi.fn(),
 			getApprovedCredits: vi.fn(),
 			getAverage: vi.fn(),
-		} as any);
+		} as ReturnType<typeof useSubjectData>);
 
 		const schedule: ScheduleItem[] = [
 			{ id: "item-2", subjectId: "s2", day: 3 },
@@ -194,7 +194,7 @@ describe("Horarios — items con status no-en_curso no aparecen", () => {
 			getApprovedCount: vi.fn(),
 			getApprovedCredits: vi.fn(),
 			getAverage: vi.fn(),
-		} as any);
+		} as ReturnType<typeof useSubjectData>);
 
 		const schedule: ScheduleItem[] = [
 			{ id: "item-1", subjectId: "s1", day: 1 },

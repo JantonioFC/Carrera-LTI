@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import type { AetherNoteId } from "../utils/schemas";
 
 // Mock embeddings para ingestNote y semanticSearch
 vi.mock("../utils/embeddings", () => ({
@@ -77,7 +78,7 @@ describe("aetherStore — mutaciones de notas", () => {
 		expect(() =>
 			useAetherStore
 				.getState()
-				.updateNote("note_inexistente" as any, { title: "X" }),
+				.updateNote("note_inexistente" as AetherNoteId, { title: "X" }),
 		).not.toThrow();
 		expect(useAetherStore.getState().notes).toHaveLength(1);
 	});
@@ -100,7 +101,7 @@ describe("aetherStore — mutaciones de notas", () => {
 
 	it("getNote devuelve undefined para id inexistente", () => {
 		expect(
-			useAetherStore.getState().getNote("note_nada" as any),
+			useAetherStore.getState().getNote("note_nada" as AetherNoteId),
 		).toBeUndefined();
 	});
 });
@@ -164,7 +165,7 @@ describe("aetherStore — findBacklinks", () => {
 
 	it("devuelve [] si el nodo no existe", () => {
 		expect(
-			useAetherStore.getState().findBacklinks("note_ghost" as any),
+			useAetherStore.getState().findBacklinks("note_ghost" as AetherNoteId),
 		).toEqual([]);
 	});
 });
@@ -181,7 +182,7 @@ describe("aetherStore — ingestNote", () => {
 
 	it("si la nota no existe, retorna sin hacer nada", async () => {
 		useUserConfigStore.setState({ geminiApiKey: "test-key" });
-		await useAetherStore.getState().ingestNote("note_noexiste" as any);
+		await useAetherStore.getState().ingestNote("note_noexiste" as AetherNoteId);
 		expect(generateEmbedding).not.toHaveBeenCalled();
 	});
 

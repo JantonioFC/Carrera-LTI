@@ -36,7 +36,7 @@ describe("MallaCurricular — currentSemester", () => {
 			getApprovedCount: vi.fn(),
 			getApprovedCredits: vi.fn(),
 			getAverage: vi.fn(),
-		} as any);
+		} as ReturnType<typeof useSubjectData>);
 
 		render(<MallaCurricular />);
 		// El semestre 1 debe aparecer resaltado (no es posible verificar CSS pero sí que la
@@ -58,7 +58,7 @@ describe("MallaCurricular — currentSemester", () => {
 			getApprovedCount: vi.fn(),
 			getApprovedCredits: vi.fn(),
 			getAverage: vi.fn(),
-		} as any);
+		} as ReturnType<typeof useSubjectData>);
 
 		render(<MallaCurricular />);
 		// El semestre 3 debe estar presente y ser el mínimo
@@ -80,7 +80,7 @@ describe("MallaCurricular — cálculo de créditos", () => {
 			getApprovedCount: vi.fn(),
 			getApprovedCredits: vi.fn(),
 			getAverage: vi.fn(),
-		} as any);
+		} as ReturnType<typeof useSubjectData>);
 
 		render(<MallaCurricular />);
 		// creditsDone se muestra en la card "Obtenidos"
@@ -100,7 +100,7 @@ describe("MallaCurricular — cálculo de créditos", () => {
 			getApprovedCount: vi.fn(),
 			getApprovedCredits: vi.fn(),
 			getAverage: vi.fn(),
-		} as any);
+		} as ReturnType<typeof useSubjectData>);
 
 		render(<MallaCurricular />);
 		// creditsActive aparece en la card "En Curso"
@@ -125,7 +125,7 @@ describe("MallaCurricular — cálculo de créditos", () => {
 			getApprovedCount: vi.fn(),
 			getApprovedCredits: vi.fn(),
 			getAverage: vi.fn(),
-		} as any);
+		} as ReturnType<typeof useSubjectData>);
 
 		render(<MallaCurricular />);
 		expect(screen.getByText(String(totalPending))).toBeInTheDocument();
@@ -151,7 +151,7 @@ describe("MallaCurricular — tcDone", () => {
 			getApprovedCount: vi.fn(),
 			getApprovedCredits: vi.fn(),
 			getAverage: vi.fn(),
-		} as any);
+		} as ReturnType<typeof useSubjectData>);
 
 		render(<MallaCurricular />);
 		// tcDone debe ser solo los créditos de subjectSem1 (sem 5 no cuenta)
@@ -188,7 +188,7 @@ describe("MallaCurricular — pct", () => {
 			getApprovedCount: vi.fn(),
 			getApprovedCredits: vi.fn(),
 			getAverage: vi.fn(),
-		} as any);
+		} as ReturnType<typeof useSubjectData>);
 
 		render(<MallaCurricular />);
 		expect(screen.getByText(`${expectedPct}%`)).toBeInTheDocument();
@@ -208,7 +208,7 @@ describe("MallaCurricular — render de cards", () => {
 			getApprovedCount: vi.fn(),
 			getApprovedCredits: vi.fn(),
 			getAverage: vi.fn(),
-		} as any);
+		} as ReturnType<typeof useSubjectData>);
 
 		render(<MallaCurricular />);
 		expect(screen.getByText(/Obtenidos/i)).toBeInTheDocument();

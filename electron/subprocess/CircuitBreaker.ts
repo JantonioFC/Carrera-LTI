@@ -15,7 +15,7 @@
  *               Si falla       → OPEN de nuevo (con timer reiniciado).
  *
  * Uso:
- *   const cb = new CircuitBreaker({ name: "whisper", failureThreshold: 3 });
+ *   const cb = new CircuitBreaker({ name: "docling", failureThreshold: 3 });
  *   const result = await cb.call(() => adapter.request(...));
  */
 

@@ -28,6 +28,8 @@ export interface CortexState {
 
 interface CortexActions {
 	setActivity: (activity: CortexActivity) => void;
+	/** AR-03 (#327): muta solo activity.progress sin re-setear docTitle. No-op si activity.type !== "indexing". */
+	setIndexingProgress: (progress: number) => void;
 	setIndexedDocCount: (count: number) => void;
 	setLastIndexedAt: (ts: number) => void;
 	setQueryResults: (results: CortexChunk[]) => void;
@@ -48,6 +50,13 @@ export const useCortexStore = create<CortexState & CortexActions>()(
 		setActivity: (activity) =>
 			set((s) => {
 				s.activity = activity;
+			}),
+
+		setIndexingProgress: (progress) =>
+			set((s) => {
+				if (s.activity.type === "indexing") {
+					s.activity.progress = progress;
+				}
 			}),
 
 		setIndexedDocCount: (count) =>

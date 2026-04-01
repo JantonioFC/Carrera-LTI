@@ -73,42 +73,4 @@ describe("SubprocessAdapter — Docling (OCR)", () => {
 	});
 });
 
-describe("SubprocessAdapter — Whisper (transcripción)", () => {
-	let transport: ReturnType<typeof makeMockTransport>;
-	let adapter: SubprocessAdapter;
-
-	beforeEach(() => {
-		transport = makeMockTransport();
-		adapter = new SubprocessAdapter({
-			name: "whisper",
-			transport: transport as never,
-		});
-	});
-
-	it("should_send_transcribe_request_and_return_text", async () => {
-		transport.send.mockResolvedValueOnce({
-			id: "req-4",
-			status: "ok",
-			data: { text: "El teorema de Bayes establece..." },
-		});
-
-		const result = await adapter.request({
-			id: "req-4",
-			action: "transcribe",
-			payload: { path: "/tmp/audio.wav" },
-		});
-		expect(result.status).toBe("ok");
-		expect((result.data as Record<string, unknown>).text).toContain("Bayes");
-	});
-
-	it("should_include_subprocess_name_in_timeout_error", async () => {
-		transport.send.mockImplementationOnce(() => new Promise(() => {}));
-
-		await expect(
-			adapter.request(
-				{ id: "req-5", action: "transcribe", payload: {} },
-				{ timeoutMs: 50 },
-			),
-		).rejects.toThrow("whisper");
-	});
-});
+// QP-03 (#322): bloque Whisper eliminado — Whisper deprecado en v3.13.0 (ADR-009)
