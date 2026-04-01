@@ -126,3 +126,50 @@ describe("ruVectorHandlers — cortexQuery", () => {
 		expect(result).toEqual([]);
 	});
 });
+
+describe("ruVectorHandlers — validación de inputs (TS-03)", () => {
+	it("cortexQuery_rechaza_texto_vacio", async () => {
+		const adapter = makeMockAdapter({ results: [] });
+		const handlers = makeRuVectorHandlers(adapter);
+
+		await expect(handlers.cortexQuery("")).rejects.toThrow();
+	});
+
+	it("cortexQuery_rechaza_topK_cero", async () => {
+		const adapter = makeMockAdapter({ results: [] });
+		const handlers = makeRuVectorHandlers(adapter);
+
+		await expect(handlers.cortexQuery("integrales", 0)).rejects.toThrow();
+	});
+
+	it("cortexQuery_rechaza_topK_mayor_50", async () => {
+		const adapter = makeMockAdapter({ results: [] });
+		const handlers = makeRuVectorHandlers(adapter);
+
+		await expect(handlers.cortexQuery("integrales", 51)).rejects.toThrow();
+	});
+
+	it("cortexIndex_rechaza_path_vacio", async () => {
+		const adapter = makeMockAdapter({ chunks: 0 });
+		const handlers = makeRuVectorHandlers(adapter);
+
+		await expect(handlers.cortexIndex("")).rejects.toThrow();
+	});
+
+	it("cortexIndex_rechaza_path_mayor_4096_chars", async () => {
+		const adapter = makeMockAdapter({ chunks: 0 });
+		const handlers = makeRuVectorHandlers(adapter);
+		const longPath = `/docs/${"a".repeat(4092)}`;
+
+		await expect(handlers.cortexIndex(longPath)).rejects.toThrow();
+	});
+
+	it("cortexQuery_lanza_si_respuesta_no_es_objeto", async () => {
+		const adapter = {
+			request: vi.fn().mockResolvedValue({ id: "x", status: "ok", data: null }),
+		} as unknown as SubprocessAdapter;
+		const handlers = makeRuVectorHandlers(adapter);
+
+		await expect(handlers.cortexQuery("test")).rejects.toThrow();
+	});
+});

@@ -60,6 +60,7 @@ export class StdioTransport implements SubprocessTransport {
 		rl.on("line", (line) => {
 			try {
 				const msg = parseIPCMessage(line);
+				if (msg.status === "progress") return; // RFC-001 — ignorar mensajes intermedios
 				const handler = this.pending.get(msg.id);
 				if (handler) {
 					this.pending.delete(msg.id);
@@ -67,6 +68,15 @@ export class StdioTransport implements SubprocessTransport {
 				}
 			} catch {
 				// Ignorar líneas no-NDJSON (banners de arranque, logs, etc.)
+			}
+		});
+
+		rl.on("close", () => {
+			for (const [id, handler] of this.pending) {
+				this.pending.delete(id);
+				handler.reject(
+					new Error(`StdioTransport: subprocess stdout closed — id=${id}`),
+				);
 			}
 		});
 	}
@@ -97,8 +107,10 @@ export class StdioTransport implements SubprocessTransport {
 		}
 		return new Promise<IPCMessage>((resolve, reject) => {
 			const timer = setTimeout(() => {
+				const handler = this.pending.get(msg.id);
+				if (!handler) return; // AR-01 — ya fue procesado por la respuesta
 				this.pending.delete(msg.id);
-				reject(
+				handler.reject(
 					new Error(
 						`StdioTransport: timeout after ${this.timeoutMs}ms for id=${msg.id}`,
 					),

@@ -63,3 +63,53 @@ describe("CortexTab — estructura", () => {
 		expect(screen.getByText(/actividad/i)).toBeInTheDocument();
 	});
 });
+
+describe("CortexTab — actividad (todos los tipos)", () => {
+	it("should_show_querying_activity", () => {
+		useCortexStore
+			.getState()
+			.setActivity({ type: "querying", query: "¿qué es TCP?" });
+		render(<CortexTab />);
+		expect(screen.getByTestId("cortex-activity")).toHaveTextContent(
+			/consultando/i,
+		);
+		expect(screen.getByTestId("cortex-activity")).toHaveTextContent(
+			"¿qué es TCP?",
+		);
+	});
+
+	it("should_show_query_error_activity", () => {
+		useCortexStore
+			.getState()
+			.setActivity({ type: "query_error", error: "índice vacío" });
+		render(<CortexTab />);
+		expect(screen.getByTestId("cortex-activity")).toHaveTextContent(/error/i);
+		expect(screen.getByTestId("cortex-activity")).toHaveTextContent(
+			"índice vacío",
+		);
+	});
+
+	it("should_show_ocr_activity", () => {
+		useCortexStore
+			.getState()
+			.setActivity({ type: "ocr", filename: "parcial2.png" });
+		render(<CortexTab />);
+		expect(screen.getByTestId("cortex-activity")).toHaveTextContent(/ocr/i);
+		expect(screen.getByTestId("cortex-activity")).toHaveTextContent(
+			"parcial2.png",
+		);
+	});
+
+	it("should_show_indexing_with_progress", () => {
+		useCortexStore
+			.getState()
+			.setActivity({ type: "indexing", docTitle: "Resumen UDP", progress: 42 });
+		render(<CortexTab />);
+		expect(screen.getByTestId("cortex-activity")).toHaveTextContent(
+			/indexando/i,
+		);
+		expect(screen.getByTestId("cortex-activity")).toHaveTextContent(
+			"Resumen UDP",
+		);
+	});
+});
