@@ -5,8 +5,7 @@
  * Fase A: base vacía
  * Fase B: config.set / config.get
  * Fase C: cortex.index / cortex.query
- * Fase D: cortex.processDocument / cortex.ocr / cortex.transcribe ← actual
- * Fase E: observer
+ * Fase D: cortex.processDocument / cortex.ocr
  */
 
 export interface ConfigAPI {
@@ -32,24 +31,11 @@ export interface CortexIPC {
 	processDocument(docPath: string): Promise<{ chunks: number; text: string }>;
 	/** Extrae texto de una imagen via Docling OCR. */
 	ocr(imagePath: string): Promise<{ text: string }>;
-	/** Transcribe un archivo WAV 16kHz mono via Whisper. */
-	transcribe(
-		wavPath: string,
-		model?: string,
-	): Promise<{ text: string; language: string }>;
-}
-
-export interface ObserverIPC {
-	/** Inicia (active=true) o detiene (active=false) la captura de audio. */
-	toggle(active: boolean): Promise<{ active: boolean; wavPath?: string }>;
-	/** Devuelve el estado actual del subproceso Observer. */
-	status(): Promise<{ active: boolean }>;
 }
 
 export interface CortexAPI {
 	config: ConfigAPI;
 	cortex: CortexIPC;
-	observer: ObserverIPC;
 }
 
 declare global {

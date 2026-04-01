@@ -8,13 +8,10 @@ import {
 	ipcMain,
 	safeStorage,
 	session,
-	systemPreferences,
 } from "electron";
 import { type ConfigStore, initConfig } from "./handlers/configHandlers";
 import { makeDoclingHandlers } from "./handlers/doclingHandlers";
-import { makeObserverHandlers } from "./handlers/observerHandlers";
 import { makeRuVectorHandlers } from "./handlers/ruVectorHandlers";
-import { makeWhisperHandlers } from "./handlers/whisperHandlers";
 import { SubprocessAdapter } from "./subprocess/SubprocessAdapter";
 import { StdioTransport } from "./transports/StdioTransport";
 import { logger } from "./utils/logger"; // AR-01 (#193): evita importar desde src/ en main process
@@ -38,8 +35,6 @@ const rateLimiters = {
 	cortexQuery: createRateLimiter(30, 60_000), // 30/min
 	cortexProcessDocument: createRateLimiter(5, 60_000), // 5/min
 	cortexOcr: createRateLimiter(5, 60_000), // 5/min
-	cortexTranscribe: createRateLimiter(5, 60_000), // 5/min
-	observerToggle: createRateLimiter(10, 60_000), // 10/min
 };
 
 const DEV_URL = "http://localhost:5173";
@@ -64,14 +59,6 @@ const SCRIPTS_DIR = isDev
 	? join(process.cwd(), "scripts")
 	: join(app.getAppPath(), "scripts");
 const DOCLING_SCRIPT = join(SCRIPTS_DIR, "docling_runner.py");
-const OBSERVER_SCRIPT = join(SCRIPTS_DIR, "observer_runner.py");
-const WHISPER_SCRIPT = join(SCRIPTS_DIR, "whisper_runner.py");
-const OBSERVER_RECORDINGS_DIR = join(
-	homedir(),
-	".carrera-lti",
-	"observer",
-	"recordings",
-);
 
 // ── Encryption key via OS Keychain (safeStorage) — Issue #59 ─────────────────
 // Genera una clave aleatoria en el primer arranque, la cifra con el keychain
@@ -162,7 +149,6 @@ async function initStore() {
 // ── Referencias a transportes para graceful shutdown — Issue #61 ─────────────
 let _ruVectorTransport: StdioTransport | null = null;
 let _doclingTransport: StdioTransport | null = null;
-let _whisperTransport: StdioTransport | null = null;
 
 // ── RuVector ─────────────────────────────────────────────────────────────────
 function initRuVector(): void {
@@ -232,87 +218,6 @@ function initDocling(): void {
 	});
 
 	logger.info("Docling", "handlers registrados");
-}
-
-// ── Whisper ───────────────────────────────────────────────────────────────────
-function initWhisper(): void {
-	if (!existsSync(VENV_PYTHON) || !existsSync(WHISPER_SCRIPT)) {
-		logger.warn(
-			"Whisper",
-			"entorno Python no encontrado. Ejecuta: npm run setup",
-		);
-		return;
-	}
-
-	_whisperTransport = new StdioTransport(VENV_PYTHON, [WHISPER_SCRIPT]);
-	const adapter = new SubprocessAdapter({
-		name: "whisper",
-		transport: _whisperTransport,
-	});
-	const whisper = makeWhisperHandlers(adapter);
-
-	ipcMain.handle(
-		"cortex:transcribe",
-		(_event, wavPath: string, model?: unknown) => {
-			rateLimiters.cortexTranscribe();
-			// SC-03 (#280): validar model en la boundary IPC antes de pasar al subprocess
-			const VALID_MODELS = [
-				"tiny",
-				"base",
-				"small",
-				"medium",
-				"large",
-			] as const;
-			if (
-				model !== undefined &&
-				!VALID_MODELS.includes(model as (typeof VALID_MODELS)[number])
-			) {
-				throw new Error(
-					`cortex:transcribe — model debe ser uno de ${VALID_MODELS.join(", ")}, recibido: ${JSON.stringify(model)}`,
-				);
-			}
-			return whisper.transcribe(wavPath, model as string | undefined);
-		},
-	);
-
-	logger.info("Whisper", "handlers registrados");
-}
-
-// ── Observer AI ───────────────────────────────────────────────────────────────
-function initObserver(): void {
-	if (!existsSync(VENV_PYTHON) || !existsSync(OBSERVER_SCRIPT)) {
-		logger.warn(
-			"Observer",
-			"entorno Python no encontrado. Ejecuta: npm run setup",
-		);
-		return;
-	}
-
-	const observer = makeObserverHandlers(VENV_PYTHON, OBSERVER_SCRIPT, {
-		recordingsDir: OBSERVER_RECORDINGS_DIR,
-	});
-
-	ipcMain.handle("observer:toggle", async (_event, active: unknown) => {
-		rateLimiters.observerToggle();
-		// SC-02 (#279): validar tipo boolean en la boundary IPC — un string "false" es truthy
-		if (typeof active !== "boolean") {
-			throw new Error(
-				`observer:toggle — active debe ser boolean, recibido: ${typeof active}`,
-			);
-		}
-		// En macOS solicitar permiso de micrófono antes de capturar.
-		if (active && process.platform === "darwin") {
-			const granted = await systemPreferences.askForMediaAccess("microphone");
-			if (!granted) {
-				return { active: false, error: "Permiso de micrófono denegado" };
-			}
-		}
-		return observer.toggle(active);
-	});
-
-	ipcMain.handle("observer:status", () => observer.status());
-
-	logger.info("Observer", "handlers registrados");
 }
 
 // ── CSP via main process — Issue #175 ─────────────────────────────────────────
@@ -393,8 +298,6 @@ app.whenReady().then(async () => {
 
 	initRuVector();
 	initDocling();
-	initWhisper();
-	initObserver();
 
 	setupCSP();
 	createWindow();
@@ -411,7 +314,6 @@ app.on("before-quit", (event) => {
 	const transports = [
 		_ruVectorTransport,
 		_doclingTransport,
-		_whisperTransport,
 	].filter(Boolean) as StdioTransport[];
 
 	if (transports.length === 0) return;

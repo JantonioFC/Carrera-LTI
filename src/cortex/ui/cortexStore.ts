@@ -15,7 +15,6 @@ export type { CortexChunk as CortexQueryResult } from "../../types/cortex";
 export type CortexActivity =
 	| { type: "idle" }
 	| { type: "indexing"; docTitle: string; progress?: number }
-	| { type: "transcribing"; filename: string }
 	| { type: "querying"; query: string }
 	| { type: "query_error"; error: string }
 	| { type: "ocr"; filename: string };

@@ -42,19 +42,6 @@ describe("CortexActivityIndicator", () => {
 		expect(screen.queryByTestId("cortex-progress")).not.toBeInTheDocument();
 	});
 
-	it("should_show_transcribing_with_filename", () => {
-		useCortexStore
-			.getState()
-			.setActivity({ type: "transcribing", filename: "clase-01.wav" });
-		render(<CortexActivityIndicator />);
-		expect(screen.getByTestId("cortex-activity")).toHaveTextContent(
-			/transcribiendo/i,
-		);
-		expect(screen.getByTestId("cortex-activity")).toHaveTextContent(
-			"clase-01.wav",
-		);
-	});
-
 	it("should_show_querying_state", () => {
 		useCortexStore
 			.getState()

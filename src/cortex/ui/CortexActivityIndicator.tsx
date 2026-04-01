@@ -6,8 +6,6 @@ function activityLabel(activity: CortexActivity): string {
 			return "Inactivo";
 		case "indexing":
 			return `Indexando: ${activity.docTitle}`;
-		case "transcribing":
-			return `Transcribiendo: ${activity.filename}`;
 		case "querying":
 			return `Consultando: ${activity.query}`;
 		case "query_error":

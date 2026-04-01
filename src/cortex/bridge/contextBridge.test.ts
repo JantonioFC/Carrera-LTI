@@ -38,24 +38,6 @@ function buildMockCortexAPI() {
 			ocr: vi
 				.fn<(imagePath: string) => Promise<{ text: string }>>()
 				.mockResolvedValue({ text: "" }),
-			transcribe: vi
-				.fn<
-					(
-						wavPath: string,
-						model?: string,
-					) => Promise<{ text: string; language: string }>
-				>()
-				.mockResolvedValue({ text: "", language: "unknown" }),
-		},
-		observer: {
-			toggle: vi
-				.fn<
-					(active: boolean) => Promise<{ active: boolean; wavPath?: string }>
-				>()
-				.mockResolvedValue({ active: false }),
-			status: vi
-				.fn<() => Promise<{ active: boolean }>>()
-				.mockResolvedValue({ active: false }),
 		},
 	} satisfies CortexAPI;
 }
@@ -152,10 +134,6 @@ describe("contextBridge — contrato cortexAPI.cortex (Fase D)", () => {
 		expect(typeof api.cortex.ocr).toBe("function");
 	});
 
-	it("should_expose_transcribe_as_function", () => {
-		expect(typeof api.cortex.transcribe).toBe("function");
-	});
-
 	it("should_process_document_return_chunks_and_text", async () => {
 		api.cortex.processDocument.mockResolvedValueOnce({
 			chunks: 5,
@@ -172,63 +150,5 @@ describe("contextBridge — contrato cortexAPI.cortex (Fase D)", () => {
 		const result = await api.cortex.ocr("/imgs/captura.png");
 		expect(result.text).toBe("texto de la imagen");
 		expect(api.cortex.ocr).toHaveBeenCalledWith("/imgs/captura.png");
-	});
-
-	it("should_transcribe_return_text_and_language", async () => {
-		api.cortex.transcribe.mockResolvedValueOnce({
-			text: "hola mundo",
-			language: "es",
-		});
-		const result = await api.cortex.transcribe("/audio/clase.wav");
-		expect(result.text).toBe("hola mundo");
-		expect(result.language).toBe("es");
-		expect(api.cortex.transcribe).toHaveBeenCalledWith("/audio/clase.wav");
-	});
-
-	it("should_transcribe_accept_optional_model_parameter", async () => {
-		await api.cortex.transcribe("/audio/clase.wav", "medium");
-		expect(api.cortex.transcribe).toHaveBeenCalledWith(
-			"/audio/clase.wav",
-			"medium",
-		);
-	});
-});
-
-describe("contextBridge — contrato cortexAPI.observer (Fase E)", () => {
-	let api: ReturnType<typeof buildMockCortexAPI>;
-
-	beforeEach(() => {
-		api = buildMockCortexAPI();
-	});
-
-	it("should_expose_observer_toggle_as_function", () => {
-		expect(typeof api.observer.toggle).toBe("function");
-	});
-
-	it("should_expose_observer_status_as_function", () => {
-		expect(typeof api.observer.status).toBe("function");
-	});
-
-	it("should_observer_toggle_true_returns_active_true", async () => {
-		api.observer.toggle.mockResolvedValueOnce({ active: true });
-		const result = await api.observer.toggle(true);
-		expect(result.active).toBe(true);
-		expect(api.observer.toggle).toHaveBeenCalledWith(true);
-	});
-
-	it("should_observer_toggle_false_returns_active_false_with_wav_path", async () => {
-		api.observer.toggle.mockResolvedValueOnce({
-			active: false,
-			wavPath: "/recordings/recording_1234567890.wav",
-		});
-		const result = await api.observer.toggle(false);
-		expect(result.active).toBe(false);
-		expect(result.wavPath).toMatch(/\.wav$/);
-	});
-
-	it("should_observer_status_return_active_state", async () => {
-		api.observer.status.mockResolvedValueOnce({ active: true });
-		const result = await api.observer.status();
-		expect(result.active).toBe(true);
 	});
 });

@@ -51,15 +51,6 @@ describe("cortexStore — setActivity", () => {
 		expect(useCortexStore.getState().activity).toEqual(activity);
 	});
 
-	it("setActivity cambia la actividad a transcribing", () => {
-		const activity: CortexActivity = {
-			type: "transcribing",
-			filename: "clase01.wav",
-		};
-		useCortexStore.getState().setActivity(activity);
-		expect(useCortexStore.getState().activity).toEqual(activity);
-	});
-
 	it("setActivity cambia la actividad a querying", () => {
 		const activity: CortexActivity = {
 			type: "querying",
