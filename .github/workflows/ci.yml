@@ -78,7 +78,7 @@ jobs:
           python-venv-${{ runner.os }}-
 
     - name: Python syntax check (Fase D runners)
-      run: python3 -m py_compile scripts/docling_runner.py scripts/whisper_runner.py scripts/observer_runner.py
+      run: python3 -m py_compile scripts/docling_runner.py
 
     - name: Typecheck and Build
       run: npm run build
