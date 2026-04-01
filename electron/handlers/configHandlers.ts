@@ -32,6 +32,8 @@ export const ALLOWED_CONFIG_KEYS = new Set([
 	"gmail_api_key",
 	"cortex_update_channel",
 	"llm_api_key",
+	"google_ai_api_key", // SC-03 (#309): clave usada en migración desde VITE_GOOGLE_AI_API_KEY
+	"firebase_api_key", // SC-03 (#309): clave usada en migración desde VITE_FIREBASE_API_KEY
 ]);
 
 export interface ConfigHandlers {

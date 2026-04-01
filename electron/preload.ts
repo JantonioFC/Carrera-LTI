@@ -1,4 +1,5 @@
 import { contextBridge, ipcRenderer } from "electron";
+import type { CortexChunk } from "./types.d.ts";
 
 /**
  * API expuesta al Renderer Process vía contextBridge.
@@ -21,8 +22,8 @@ contextBridge.exposeInMainWorld("cortexAPI", {
 	cortex: {
 		index: (docPath: string): Promise<{ chunks: number }> =>
 			ipcRenderer.invoke("cortex:index", docPath),
-		query: (text: string, topK?: number): Promise<unknown[]> =>
-			ipcRenderer.invoke("cortex:query", text, topK),
+		query: (text: string, topK?: number): Promise<CortexChunk[]> =>
+			ipcRenderer.invoke("cortex:query", text, topK) as Promise<CortexChunk[]>,
 		processDocument: (
 			docPath: string,
 		): Promise<{ chunks: number; text: string }> =>

@@ -161,12 +161,24 @@ function initRuVector(): void {
 	});
 	const ruVector = makeRuVectorHandlers(adapter);
 
-	ipcMain.handle("cortex:index", (_event, docPath: string) => {
+	ipcMain.handle("cortex:index", (_event, docPath: unknown) => {
 		rateLimiters.cortexIndex();
+		// SC-04 (#310): validar tipo en boundary IPC antes de delegar al handler
+		if (typeof docPath !== "string" || docPath.length === 0) {
+			throw new Error(
+				`cortex:index — docPath debe ser un string no vacío, recibido: ${JSON.stringify(docPath)}`,
+			);
+		}
 		return ruVector.cortexIndex(docPath);
 	});
-	ipcMain.handle("cortex:query", (_event, text: string, topK?: unknown) => {
+	ipcMain.handle("cortex:query", (_event, text: unknown, topK?: unknown) => {
 		rateLimiters.cortexQuery();
+		// SC-04 (#310): validar text en boundary IPC
+		if (typeof text !== "string" || text.length === 0) {
+			throw new Error(
+				`cortex:query — text debe ser un string no vacío, recibido: ${JSON.stringify(text)}`,
+			);
+		}
 		// SC-01 (#278): validar topK en la boundary IPC antes de delegar al handler
 		if (
 			topK !== undefined &&
@@ -202,16 +214,39 @@ function initDocling(): void {
 	});
 	const docling = makeDoclingHandlers(adapter);
 
-	ipcMain.handle("cortex:process-document", (_event, docPath: string) => {
+	ipcMain.handle("cortex:process-document", (_event, docPath: unknown) => {
 		rateLimiters.cortexProcessDocument();
+		// SC-04 (#310): validar tipo en boundary IPC antes de delegar al handler
+		if (typeof docPath !== "string" || docPath.length === 0) {
+			throw new Error(
+				`cortex:process-document — docPath debe ser un string no vacío, recibido: ${JSON.stringify(docPath)}`,
+			);
+		}
 		return docling.processDocument(docPath);
 	});
-	ipcMain.handle("cortex:ocr", (_event, imagePath: string) => {
+	ipcMain.handle("cortex:ocr", (_event, imagePath: unknown) => {
 		rateLimiters.cortexOcr();
+		// SC-04 (#310): validar tipo en boundary IPC antes de delegar al handler
+		if (typeof imagePath !== "string" || imagePath.length === 0) {
+			throw new Error(
+				`cortex:ocr — imagePath debe ser un string no vacío, recibido: ${JSON.stringify(imagePath)}`,
+			);
+		}
 		return docling.ocr(imagePath);
 	});
 
 	logger.info("Docling", "handlers registrados");
+}
+
+// ── Helpers de CSP ────────────────────────────────────────────────────────────
+// SC-01 (#308): construir origins de Firebase Realtime Database sin wildcard.
+// VITE_FIREBASE_PROJECT_ID está disponible en dev (via vite-plugin-electron).
+// En producción sin la variable, se omiten los origins de firebaseio.com ya que
+// sin project ID configurado Firebase RTDB no se usa.
+function buildFirebaseRTDBOrigins(): string {
+	const projectId = process.env.VITE_FIREBASE_PROJECT_ID;
+	if (!projectId) return "";
+	return `https://${projectId}.firebaseio.com wss://${projectId}.firebaseio.com`;
 }
 
 // ── CSP via main process — Issue #175 ─────────────────────────────────────────
@@ -238,6 +273,19 @@ function initDocling(): void {
 // La combinación de sandbox + contextIsolation elimina el vector de escalada
 // de privilegios incluso si un atacante logra ejecutar JS en el renderer.
 function setupCSP(): void {
+	// SC-01 (#308): resolver origins de Firebase RTDB sin wildcard en tiempo de arranque
+	const firebaseRTDBOrigins = buildFirebaseRTDBOrigins();
+	const connectSrc = [
+		"'self'",
+		"https://generativelanguage.googleapis.com",
+		"https://identitytoolkit.googleapis.com",
+		"https://firestore.googleapis.com",
+		"https://securetoken.googleapis.com",
+		// SC-09 (#210) + SC-01 (#308): subdominio específico cuando el project ID está disponible;
+		// omitido si Firebase RTDB no está configurado (firebaseRTDBOrigins === "")
+		...(firebaseRTDBOrigins ? [firebaseRTDBOrigins] : []),
+	].join(" ");
+
 	session.defaultSession.webRequest.onHeadersReceived(
 		{ urls: ["<all_urls>"] },
 		(details, callback) => {
@@ -251,8 +299,7 @@ function setupCSP(): void {
 							"style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
 							"font-src 'self' data: https://fonts.gstatic.com",
 							"img-src 'self' data: https:",
-							// SC-09 (#210): allowlist explícita — sin wildcards de subdominio
-							"connect-src 'self' https://generativelanguage.googleapis.com https://identitytoolkit.googleapis.com https://firestore.googleapis.com https://securetoken.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com",
+							`connect-src ${connectSrc}`,
 							"object-src 'none'",
 							"frame-src 'none'",
 						].join("; "),
