@@ -274,12 +274,9 @@ async function installPythonDeps() {
 	// Instalar dependencias Python
 	s.start("Instalando Docling (esto puede tardar varios minutos)...");
 	try {
-		execSync(
-			`"${VENV_PIP}" install --quiet docling`,
-			{
-				stdio: "ignore",
-			},
-		);
+		execSync(`"${VENV_PIP}" install --quiet docling`, {
+			stdio: "ignore",
+		});
 		s.stop("Docling instalado con éxito.");
 	} catch (err) {
 		s.stop(pc.red(`Error al instalar dependencias Python: ${err.message}`));

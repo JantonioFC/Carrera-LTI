@@ -2,13 +2,7 @@ import { randomBytes } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
-import {
-	app,
-	BrowserWindow,
-	ipcMain,
-	safeStorage,
-	session,
-} from "electron";
+import { app, BrowserWindow, ipcMain, safeStorage, session } from "electron";
 import { type ConfigStore, initConfig } from "./handlers/configHandlers";
 import { makeDoclingHandlers } from "./handlers/doclingHandlers";
 import { makeRuVectorHandlers } from "./handlers/ruVectorHandlers";
@@ -311,10 +305,9 @@ app.whenReady().then(async () => {
 // Envía SIGTERM a todos los subprocesos Python antes de cerrar la app,
 // evitando procesos zombie y WAVs incompletos en disco.
 app.on("before-quit", (event) => {
-	const transports = [
-		_ruVectorTransport,
-		_doclingTransport,
-	].filter(Boolean) as StdioTransport[];
+	const transports = [_ruVectorTransport, _doclingTransport].filter(
+		Boolean,
+	) as StdioTransport[];
 
 	if (transports.length === 0) return;
 
