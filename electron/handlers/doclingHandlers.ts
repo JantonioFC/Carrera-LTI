@@ -6,6 +6,15 @@ import { assertSafePath } from "./pathSecurity";
 // SC-02 (#237): validación Zod de inputs IPC antes de assertSafePath
 const PathInputSchema = z.string().min(1, "path must not be empty");
 
+// AR-02 (#316): schemas para validar response.data del subproceso
+const ProcessDocumentResponseSchema = z.object({
+	chunks: z.number().optional().default(0),
+	text: z.string().optional().default(""),
+});
+const OcrResponseSchema = z.object({
+	text: z.string().optional().default(""),
+});
+
 /**
  * Handlers de Docling para ipcMain.
  *
@@ -37,11 +46,8 @@ export function makeDoclingHandlers(
 				action: "process_document",
 				payload: { path: validatedPath },
 			});
-			const data = response.data as Record<string, unknown>;
-			return {
-				chunks: (data.chunks as number) ?? 0,
-				text: (data.text as string) ?? "",
-			};
+			const data = ProcessDocumentResponseSchema.parse(response.data);
+			return { chunks: data.chunks, text: data.text };
 		},
 
 		async ocr(imagePath: string): Promise<{ text: string }> {
@@ -52,8 +58,8 @@ export function makeDoclingHandlers(
 				action: "ocr",
 				payload: { path: validatedPath },
 			});
-			const data = response.data as Record<string, unknown>;
-			return { text: (data.text as string) ?? "" };
+			const data = OcrResponseSchema.parse(response.data);
+			return { text: data.text };
 		},
 	};
 }

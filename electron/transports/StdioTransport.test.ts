@@ -24,13 +24,21 @@ function makeProcessMock(pid?: number) {
 		}
 	});
 
-	const proc = { pid, stdin, stdout } as unknown as ChildProcess;
+	const proc = {
+		pid,
+		stdin,
+		stdout,
+		kill: vi.fn(),
+	} as unknown as ChildProcess;
 
 	return {
 		proc,
 		stdinLines,
 		respond(msg: IPCMessage) {
 			stdout.push(`${JSON.stringify(msg)}\n`);
+		},
+		closeStdout() {
+			stdout.push(null);
 		},
 	};
 }
@@ -93,5 +101,59 @@ describe("StdioTransport", () => {
 			spawnFn: vi.fn().mockReturnValue(mock.proc),
 		});
 		await expect(transport.onReady()).rejects.toThrow(/failed to start/i);
+	});
+
+	it("kill_rechaza_pendientes_SIGTERM", async () => {
+		const mock = makeProcessMock();
+		const transport = new StdioTransport("/bin/ruvector", [], {
+			spawnFn: vi.fn().mockReturnValue(mock.proc),
+		});
+		const msg: IPCMessage = { id: "k-1", status: "ok" };
+
+		const sendPromise = transport.send(msg);
+		transport.kill("SIGTERM");
+
+		await expect(sendPromise).rejects.toThrow(/killed.*SIGTERM/i);
+	});
+
+	it("kill_rechaza_pendientes_SIGKILL", async () => {
+		const mock = makeProcessMock();
+		const transport = new StdioTransport("/bin/ruvector", [], {
+			spawnFn: vi.fn().mockReturnValue(mock.proc),
+		});
+		const msg: IPCMessage = { id: "k-2", status: "ok" };
+
+		const sendPromise = transport.send(msg);
+		transport.kill("SIGKILL");
+
+		await expect(sendPromise).rejects.toThrow(/killed.*SIGKILL/i);
+	});
+
+	it("stdout_close_rechaza_pendientes", async () => {
+		const mock = makeProcessMock();
+		const transport = new StdioTransport("/bin/ruvector", [], {
+			spawnFn: vi.fn().mockReturnValue(mock.proc),
+		});
+		const msg: IPCMessage = { id: "c-1", status: "ok" };
+
+		const sendPromise = transport.send(msg);
+		mock.closeStdout();
+
+		await expect(sendPromise).rejects.toThrow(/stdout closed/i);
+	});
+
+	it("respuestas_progress_no_resuelven_la_promesa", async () => {
+		const mock = makeProcessMock();
+		const transport = new StdioTransport("/bin/ruvector", [], {
+			spawnFn: vi.fn().mockReturnValue(mock.proc),
+			timeoutMs: 50,
+		});
+		const msg: IPCMessage = { id: "p-1", status: "ok" };
+
+		const sendPromise = transport.send(msg);
+		// Respuesta progress con mismo id — debe ser ignorada (RFC-001)
+		mock.respond({ id: "p-1", status: "progress" });
+
+		await expect(sendPromise).rejects.toThrow(/timeout/i);
 	});
 });

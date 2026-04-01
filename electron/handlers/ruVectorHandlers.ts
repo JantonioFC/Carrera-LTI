@@ -9,6 +9,14 @@ const QueryInputSchema = z.object({
 	topK: z.number().int().min(1).max(50).optional(),
 });
 
+// AR-02 (#316): schemas para validar response.data del subproceso
+const IndexResponseSchema = z.object({
+	chunks: z.number().optional().default(0),
+});
+const QueryResponseSchema = z.object({
+	results: z.array(z.unknown()).optional().default([]),
+});
+
 /** Deriva un docId determinista del path del documento (SHA-256). */
 function docIdFromPath(docPath: string): string {
 	return createHash("sha256").update(docPath).digest("hex");
@@ -64,8 +72,8 @@ export function makeRuVectorHandlers(
 					mimeType: mimeTypeFromPath(validPath),
 				},
 			});
-			const data = response.data as Record<string, number>;
-			return { chunks: data.chunks ?? 0 };
+			const data = IndexResponseSchema.parse(response.data);
+			return { chunks: data.chunks };
 		},
 
 		async cortexQuery(text: string, topK = 5): Promise<unknown[]> {
@@ -75,8 +83,8 @@ export function makeRuVectorHandlers(
 				action: "query",
 				payload: { text: input.text, topK: input.topK ?? 5 },
 			});
-			const data = response.data as Record<string, unknown>;
-			return (data.results as unknown[]) ?? [];
+			const data = QueryResponseSchema.parse(response.data);
+			return data.results;
 		},
 	};
 }
