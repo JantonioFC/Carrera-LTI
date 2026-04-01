@@ -113,9 +113,7 @@ describe("doclingHandlers — validación de inputs (TS-03)", () => {
 
 	it("processDocument_lanza_si_respuesta_no_es_objeto", async () => {
 		const adapter = {
-			request: vi
-				.fn()
-				.mockResolvedValue({ id: "x", status: "ok", data: null }),
+			request: vi.fn().mockResolvedValue({ id: "x", status: "ok", data: null }),
 		} as unknown as SubprocessAdapter;
 		const handlers = makeDoclingHandlers(adapter);
 

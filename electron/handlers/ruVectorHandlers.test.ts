@@ -159,16 +159,14 @@ describe("ruVectorHandlers — validación de inputs (TS-03)", () => {
 	it("cortexIndex_rechaza_path_mayor_4096_chars", async () => {
 		const adapter = makeMockAdapter({ chunks: 0 });
 		const handlers = makeRuVectorHandlers(adapter);
-		const longPath = "/docs/" + "a".repeat(4092);
+		const longPath = `/docs/${"a".repeat(4092)}`;
 
 		await expect(handlers.cortexIndex(longPath)).rejects.toThrow();
 	});
 
 	it("cortexQuery_lanza_si_respuesta_no_es_objeto", async () => {
 		const adapter = {
-			request: vi
-				.fn()
-				.mockResolvedValue({ id: "x", status: "ok", data: null }),
+			request: vi.fn().mockResolvedValue({ id: "x", status: "ok", data: null }),
 		} as unknown as SubprocessAdapter;
 		const handlers = makeRuVectorHandlers(adapter);
 
