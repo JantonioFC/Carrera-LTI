@@ -15,7 +15,7 @@ Renderer Process (React 19 + Vite)
   ├─ Dashboard · Calendario · Tareas · Gmail · Progreso
   ├─ Aether Vault  — notas + RAG local + grafo de conocimiento
   ├─ Nexus Editor  — editor de bloques (BlockNote) + IDB/Yjs
-  └─ Cortex Tab    — índice documental + Observer AI
+  └─ Cortex Tab    — índice documental + búsqueda semántica
 
 contextBridge / preload.ts (window.cortexAPI)
 
@@ -25,9 +25,11 @@ Main Process (Electron + Node.js)
   ├─ StdioTransport    — comunicación stdio con binarios/scripts
   └─ electron-store    — configuración cifrada con OS Keychain
 
-Subprocesos Python (scripts/)
+Subprocesos (scripts/ y bin/)
   ├─ ruvector       — búsqueda vectorial semántica (binario Rust)
-  ├─ docling_runner — extracción de texto / OCR (PDF, imágenes)
+  └─ docling_runner — extracción de texto / OCR (PDF, imágenes)
+
+  [Deprecado en v3.13.0 — ver ADR-009]
   ├─ whisper_runner — transcripción de audio (OpenAI Whisper)
   └─ observer_runner— captura de audio en clase
 ```

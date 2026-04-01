@@ -208,32 +208,15 @@ El asistente de inteligencia más avanzado de la aplicación:
 
 Cortex es el módulo de inteligencia artificial que corre **completamente en tu dispositivo**, sin enviar datos a ningún servicio externo.
 
-### Observer AI
-El Observer captura audio de tu micrófono y convierte lo que escuchás (clase, reunión, explicación) en notas automáticas:
-
-1. Abrí la pestaña **Cortex** en el sidebar.
-2. Hacé clic en el toggle **Observer AI** para activarlo. Verás el banner "Grabando…".
-3. Al desactivarlo, el sistema transcribe el audio capturado y crea una nota en Aether automáticamente.
-
-> En macOS se solicita permiso de micrófono al primer uso.
-
 ### Docling — Procesamiento de Documentos
 Procesá PDFs, DOCX e imágenes directamente desde Nexus:
 
 - **processDocument**: Extrae el texto estructurado de un archivo.
 - **ocr**: Reconocimiento óptico de caracteres sobre imágenes o PDFs escaneados.
 
-### Whisper — Transcripción Offline
-Transcribí archivos de audio sin conexión a internet usando el modelo Whisper (por defecto `small`):
-
-- Disponible desde Nexus AI o vía Observer al cerrar la grabación.
-- El archivo WAV temporal se elimina automáticamente tras la transcripción.
-
 ### Requisitos de Cortex
 El wizard `npm run setup` instala automáticamente el entorno Python necesario en `~/.carrera-lti/venv/`:
 - `docling`
-- `openai-whisper`
-- `sounddevice`
 
 ---
 

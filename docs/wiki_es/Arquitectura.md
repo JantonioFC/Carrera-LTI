@@ -16,7 +16,7 @@ graph TD
     Router --> DomainC[Dominio Nexus]
     Router --> DomainD[Cortex — solo Electron]
     DomainD -->|IPC contextBridge| Electron[main.ts]
-    Electron --> Python[Subprocesos Python\nDocling · Whisper · Observer · RuVector]
+    Electron --> Python[Subprocesos Python\nDocling · RuVector]
 ```
 
 ## 🛤️ Enrutamiento y Navegación

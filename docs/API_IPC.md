@@ -26,8 +26,7 @@ Todas las llamadas son **unidireccionales Renderer → Main** y retornan una `Pr
 La API esta disponible en el renderer como `window.cortexAPI` con los siguientes grupos:
 
 - `window.cortexAPI.config` — Configuracion cifrada
-- `window.cortexAPI.cortex` — RuVector, Docling y Whisper
-- `window.cortexAPI.observer` — Observer AI (grabacion de audio)
+- `window.cortexAPI.cortex` — RuVector y Docling
 
 ---
 
@@ -114,69 +113,12 @@ console.log(ocr.text);
 
 ---
 
-## Whisper
-
-Transcripcion de audio a texto mediante OpenAI Whisper ejecutado como script Python (`scripts/whisper_runner.py`). Espera archivos WAV en 16 kHz mono. El runner elimina el archivo WAV tras una transcripcion exitosa (ADR-003).
-
-| Canal | Metodo JS | Parametros | Retorno | Descripcion |
-|---|---|---|---|---|
-| `cortex:transcribe` | `cortexAPI.cortex.transcribe` | `wavPath: string, model?: string` | `Promise<{ text: string; language: string }>` | Transcribe un archivo WAV; `model` por defecto es `"small"` |
-
-Modelos disponibles (heredados de Whisper): `tiny`, `base`, `small`, `medium`, `large`. A mayor modelo, mayor calidad y mayor tiempo de procesamiento.
-
-### Ejemplo
-
-```typescript
-// Transcribir con el modelo por defecto ("small")
-const result = await window.cortexAPI.cortex.transcribe("/tmp/recording_123.wav");
-console.log(`[${result.language}] ${result.text}`);
-
-// Transcribir con el modelo "medium" para mayor precision
-const resultHD = await window.cortexAPI.cortex.transcribe("/tmp/grabacion.wav", "medium");
-```
-
----
-
-## Observer
-
-Observer es un servicio de grabacion de audio continuo implementado como script Python long-running (`scripts/observer_runner.py`). A diferencia de los demas servicios, no sigue el patron request-response: se activa y desactiva con `toggle`.
-
-Al desactivarse, el runner Python recibe SIGTERM, flushea el buffer de audio y guarda el archivo WAV en `~/.carrera-lti/observer/recordings/`. El handler devuelve la ruta del WAV para que el renderer orqueste la transcripcion mediante `cortex:transcribe`.
-
-En macOS, la primera activacion solicita permiso de microfono al sistema operativo.
-
-| Canal | Metodo JS | Parametros | Retorno | Descripcion |
-|---|---|---|---|---|
-| `observer:toggle` | `cortexAPI.observer.toggle` | `active: boolean` | `Promise<{ active: boolean; wavPath?: string }>` | Activa o desactiva la grabacion. Al desactivar, `wavPath` contiene la ruta al WAV si se capturo audio |
-| `observer:status` | `cortexAPI.observer.status` | _(ninguno)_ | `Promise<{ active: boolean }>` | Devuelve si la grabacion esta activa en este momento |
-
-### Ejemplos
-
-```typescript
-// Iniciar grabacion
-const started = await window.cortexAPI.observer.toggle(true);
-console.log(started.active); // true
-
-// Consultar estado
-const status = await window.cortexAPI.observer.status();
-console.log(status.active); // true
-
-// Detener grabacion y transcribir si hay audio
-const stopped = await window.cortexAPI.observer.toggle(false);
-if (stopped.wavPath) {
-  const transcription = await window.cortexAPI.cortex.transcribe(stopped.wavPath);
-  console.log(transcription.text);
-}
-```
-
----
-
 ## Manejo de errores
 
 Todos los canales devuelven una `Promise` que puede rechazarse en los siguientes casos:
 
 - El subproceso no fue inicializado (binario o venv no encontrado tras `npm run setup`).
-- El subproceso supera el timeout (30 segundos por defecto; 120 segundos para transcripcion).
+- El subproceso supera el timeout (30 segundos por defecto).
 - El subproceso retorna un mensaje con `status: "error"`.
 
 Usa `try/catch` en todas las llamadas:
@@ -213,11 +155,6 @@ interface CortexAPI {
     query(text: string, topK?: number): Promise<CortexChunk[]>;
     processDocument(docPath: string): Promise<{ chunks: number; text: string }>;
     ocr(imagePath: string): Promise<{ text: string }>;
-    transcribe(wavPath: string, model?: string): Promise<{ text: string; language: string }>;
-  };
-  observer: {
-    toggle(active: boolean): Promise<{ active: boolean; wavPath?: string }>;
-    status(): Promise<{ active: boolean }>;
   };
 }
 

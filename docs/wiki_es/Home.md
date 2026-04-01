@@ -7,7 +7,7 @@ Carrera LTI es una **"super-app" académica local-first** diseñada para estudia
 1.  **Dominio Académico**: Control total de tu carrera (Malla Curricular, Tareas, Horarios).
 2.  **Aether (Sistema de Conocimiento)**: Organiza tus notas con WikiLinks bidireccionales y grafos espaciales.
 3.  **Nexus Workspace**: Edición de documentos complejos y bases de datos relacionales.
-4.  **Cortex (IA Local — Electron)**: Observer AI, Docling, Whisper y RuVector corriendo 100% en tu dispositivo.
+4.  **Cortex (IA Local — Electron)**: Docling y RuVector corriendo 100% en tu dispositivo.
 
 ## 🏗️ Filosofía de Diseño
 
@@ -30,4 +30,4 @@ Carrera LTI es una **"super-app" académica local-first** diseñada para estudia
 - [[ADRs]]: Registro de decisiones de arquitectura.
 
 ---
-*Documentación actualizada al 31 de marzo de 2026 · Carrera LTI v3.12.0*
+*Documentación actualizada al 1 de abril de 2026 · Carrera LTI v3.13.0*

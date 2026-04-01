@@ -17,8 +17,8 @@ Los límites configurados son:
 | `cortex:query` | 30 / min |
 | `cortex:process-document` | 5 / min |
 | `cortex:ocr` | 5 / min |
-| `cortex:transcribe` | 5 / min |
-| `observer:toggle` | 10 / min |
+| ~~`cortex:transcribe`~~ | ~~5 / min~~ — _deprecado en v3.13.0 (ADR-009)_ |
+| ~~`observer:toggle`~~ | ~~10 / min~~ — _deprecado en v3.13.0 (ADR-009)_ |
 
 Los canales `config:set` y `config:get` no tienen rate limiter dado su bajo coste.
 

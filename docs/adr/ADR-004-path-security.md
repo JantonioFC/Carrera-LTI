@@ -13,7 +13,7 @@ Toda ruta recibida del renderer es validada en `electron/handlers/pathSecurity.t
 2. **Resolución de symlinks** — usa `realpathSync()` para resolver enlaces simbólicos; si el archivo no existe aún, usa `resolve()` como fallback (#150).
 3. **Allowlist de directorios** — el path resuelto debe ser igual a una raíz permitida o comenzar con `root + sep` para evitar bypasses de prefijo (#177). Las raíces permitidas son: `homedir()`, `userData`, `documents` y `temp`.
 
-Los handlers de docling, whisper y ruvector llaman a `assertSafePath()` al inicio de cada invocación.
+Los handlers de docling y ruvector llaman a `assertSafePath()` al inicio de cada invocación.
 
 ## Consecuencias
 

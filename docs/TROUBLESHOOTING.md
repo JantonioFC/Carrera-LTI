@@ -3,12 +3,11 @@
 ## Índice
 
 1. [Problemas de instalación](#instalación)
-2. [Subprocesos Python (Docling · Whisper · Observer)](#subprocesos-python)
+2. [Subprocesos Python (Docling)](#subprocesos-python)
 3. [RuVector (búsqueda vectorial)](#ruvector)
-4. [Observer AI (grabación de audio)](#observer-ai)
-5. [Configuración y API Keys](#configuración-y-api-keys)
-6. [CI / Tests](#ci--tests)
-7. [Electron / ventana en blanco](#electron--ventana-en-blanco)
+4. [Configuración y API Keys](#configuración-y-api-keys)
+5. [CI / Tests](#ci--tests)
+6. [Electron / ventana en blanco](#electron--ventana-en-blanco)
 
 ---
 
@@ -43,10 +42,10 @@ El entorno virtual se crea en `~/.carrera-lti/venv/`. Si falla:
 ```bash
 # Crear manualmente
 python3 -m venv ~/.carrera-lti/venv
-~/.carrera-lti/venv/bin/pip install docling openai-whisper
+~/.carrera-lti/venv/bin/pip install docling
 ```
 
-Si el disco tiene poco espacio, Docling y Whisper requieren ~2 GB libres para los modelos.
+Si el disco tiene poco espacio, Docling requiere ~2 GB libres para los modelos.
 
 ---
 
@@ -83,8 +82,6 @@ chmod +x ~/.carrera-lti/bin/ruvector
 ```bash
 # Probar manualmente el runner
 ~/.carrera-lti/venv/bin/python scripts/docling_runner.py
-~/.carrera-lti/venv/bin/python scripts/whisper_runner.py
-~/.carrera-lti/venv/bin/python scripts/observer_runner.py
 ```
 
 **Solución**: Reinstalar dependencias Python:
@@ -99,17 +96,6 @@ chmod +x ~/.carrera-lti/bin/ruvector
 Después de 3 crasheos consecutivos, el subproceso entra en estado `OPEN` y las llamadas fallan rápido por 30 segundos. Esto es intencional para proteger el proceso principal.
 
 Para reiniciar manualmente: **cerrar y reabrir la aplicación**. El CircuitBreaker se resetea en cada arranque.
-
----
-
-### Archivos WAV no se eliminan después de transcribir
-
-Los archivos de audio se guardan en `~/.carrera-lti/observer/recordings/`. Si la app no termina limpiamente (p.ej. `kill -9`), pueden quedar WAVs incompletos.
-
-```bash
-# Limpiar grabaciones antiguas
-rm ~/.carrera-lti/observer/recordings/*.wav
-```
 
 ---
 
@@ -139,39 +125,6 @@ Si falla, reinstalar:
 2. Verificar que `ruvector` está corriendo:
    - En macOS Activity Monitor / Linux `htop`, buscar el proceso `ruvector`.
 3. Si `ruvector` no aparece, revisar los logs de la app (DevTools → Console en modo dev).
-
----
-
-## Observer AI
-
-### El toggle de Observer AI no aparece
-
-**Causa**: La app está corriendo en modo web (no Electron). Observer AI solo está disponible en la aplicación de escritorio.
-
-La sección "Observer AI" en la Cortex Tab solo se muestra cuando `window.cortexAPI` está definido (entorno Electron).
-
----
-
-### Error: "Permiso de micrófono denegado" (macOS)
-
-En macOS, la primera vez que se activa Observer AI se solicita acceso al micrófono. Si se denegó:
-
-1. Abrir **Preferencias del Sistema → Privacidad y Seguridad → Micrófono**.
-2. Habilitar el acceso para "Carrera LTI".
-3. Reiniciar la aplicación.
-
----
-
-### La transcripción queda vacía después de grabar
-
-**Causa posible 1**: El audio grabado tiene muy poco volumen. Hablar más cerca del micrófono.
-
-**Causa posible 2**: El modelo de Whisper no está descargado. En el primer uso, Whisper descarga el modelo (`base`, ~150 MB). Esto puede tardar varios minutos.
-
-**Verificar**:
-```bash
-ls ~/.cache/whisper/   # debe contener archivos .pt del modelo
-```
 
 ---
 
@@ -238,8 +191,6 @@ El step de CI verifica la sintaxis de los scripts Python. Si falla:
 
 ```bash
 python3 -m py_compile scripts/docling_runner.py
-python3 -m py_compile scripts/whisper_runner.py
-python3 -m py_compile scripts/observer_runner.py
 ```
 
 Corregir los errores de sintaxis Python antes de hacer push.

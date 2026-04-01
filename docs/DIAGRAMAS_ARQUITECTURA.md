@@ -48,34 +48,8 @@ graph TD
     Preload -->|IPC invoke| Main[main.ts]
     Main --> Config[configHandlers\nelectron-store AES]
     Main --> Docling[doclingHandlers\nprocessDocument / ocr]
-    Main --> Whisper[whisperHandlers\ntranscribe]
-    Main --> Observer[observerHandlers\ntoggle on/off]
     Docling -->|NDJSON stdio| DoclingPy[scripts/docling_runner.py]
-    Whisper -->|NDJSON stdio| WhisperPy[scripts/whisper_runner.py]
-    Observer -->|NDJSON stdio + SIGTERM| ObserverPy[scripts/observer_runner.py\nsounddevice → WAV 16kHz]
-    ObserverPy -->|transcripción| Whisper
     Main --> RuVector[StdioTransport\nRuVector IPC]
-```
-
-### Ciclo Observer AI
-```mermaid
-sequenceDiagram
-    participant U as Usuario
-    participant R as Renderer
-    participant O as observerHandlers
-    participant P as observer_runner.py
-
-    U->>R: toggle ON
-    R->>O: observer.toggle(true)
-    O->>P: spawn + NDJSON init
-    P-->>O: {"status":"recording"}
-    U->>R: toggle OFF
-    R->>O: observer.toggle(false)
-    O->>P: SIGTERM
-    P->>P: flush WAV 16kHz mono
-    P-->>O: {"wav_path":"..."}
-    O->>R: transcribe(wav_path)
-    R->>R: addNote + ingestNote (Cortex)
 ```
 
 ## 4. Flujo de Configuración (Setup Wizard)

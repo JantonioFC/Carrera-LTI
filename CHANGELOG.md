@@ -6,6 +6,30 @@ Versionado semántico: [SemVer](https://semver.org/lang/es/).
 
 ---
 
+## [v3.13.0] — 2026-04-01
+
+### Removed — Deprecación de pipeline de transcripción de audio (ADR-009)
+
+- `electron/handlers/whisperHandlers.ts` + tests — handler IPC `cortex:transcribe` eliminado
+- `electron/handlers/observerHandlers.ts` + tests — handler IPC `observer:toggle` / `observer:status` eliminados
+- `scripts/whisper_runner.py` — runner Python de Whisper eliminado
+- `scripts/observer_runner.py` — runner Python de Observer AI eliminado
+- `src/cortex/observer/` — `ObserverAIToggle.tsx`, `ObserverAIToggle.test.tsx`, `observerStore.ts`, `useObserverIPC.ts`, `useObserverIPC.test.ts` eliminados
+- `src/cortex/wav/WavManager.ts` + test — gestor de grabaciones WAV eliminado
+- `src/store/observerStore.test.ts` — tests de estado del Observer eliminados
+- `electron/preload.ts` — métodos `cortex.transcribe` y `observer.*` eliminados del contextBridge
+- `electron/types.d.ts` — interfaces `ObserverIPC` y `CortexIPC.transcribe` eliminadas
+- `scripts/setup.mjs` — `openai-whisper` y `sounddevice` eliminados del pip install
+
+### Architecture
+- ADR-009 — documenta la decisión de deprecar la transcripción local y el fork privado como ruta de evolución
+
+### Chore
+- `.github/workflows/ci.yml` — paso Python syntax check actualizado para referenciar solo `docling_runner.py`
+- Ramas mergeadas limpiadas: `feat/v3.11.0-p{1,2,3}`, `docs/readme-examenes-electron41`, `fix/tsconfig-electron-moduleresolution`, ramas Dependabot resueltas
+
+---
+
 ## [v3.10.1] — 2026-03-27
 
 ### Chore

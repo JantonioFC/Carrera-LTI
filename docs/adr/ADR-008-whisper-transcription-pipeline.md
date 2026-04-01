@@ -1,7 +1,7 @@
 # ADR-005: Pipeline de Transcripción de Audio (Whisper + WAV Cleanup)
 
 ## Estatus
-Implementado — v3.4.0
+~~Implementado — v3.4.0~~ **Supersedido por ADR-009** (deprecado en v3.13.0)
 
 ## Contexto
 El módulo Observer de Cortex captura audio del micrófono y necesita transcribirlo a texto para ingresarlo como nota en Aether Vault. Se requiere una decisión sobre:
