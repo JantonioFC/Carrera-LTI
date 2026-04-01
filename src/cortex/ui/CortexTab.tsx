@@ -1,5 +1,5 @@
-import { useCortexStore } from "./cortexStore";
 import { activityLabel } from "./activityLabel";
+import { useCortexStore } from "./cortexStore";
 
 function formatTs(ts: number | null): string {
 	if (ts === null) return "Nunca";

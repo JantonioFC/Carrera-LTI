@@ -1,5 +1,5 @@
-import { useCortexStore } from "./cortexStore";
 import { activityLabel } from "./activityLabel";
+import { useCortexStore } from "./cortexStore";
 
 /**
  * Indicador compacto del estado actual de Cortex.
