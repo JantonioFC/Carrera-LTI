@@ -129,14 +129,15 @@ const PLATFORM_MAP = {
 };
 
 // SHA-256 de cada binario — se actualiza con cada release de RuVector.
-// "0000..." es un placeholder hasta que exista el primer release real.
+// SC-02 (#312): usar "0000..." como placeholder explícito hasta el primer release real.
+// Al publicar un release, calcular con: sha256sum ruvector-{platform}
+// y reemplazar el valor correspondiente.
+const SHA256_PLACEHOLDER =
+	"0000000000000000000000000000000000000000000000000000000000000000";
 const SHA256 = {
-	"linux-x64":
-		"0000000000000000000000000000000000000000000000000000000000000000",
-	"darwin-x64":
-		"0000000000000000000000000000000000000000000000000000000000000000",
-	"win32-x64":
-		"0000000000000000000000000000000000000000000000000000000000000000",
+	"linux-x64": SHA256_PLACEHOLDER,
+	"darwin-x64": SHA256_PLACEHOLDER,
+	"win32-x64": SHA256_PLACEHOLDER,
 };
 
 async function installRuVector() {
@@ -184,10 +185,18 @@ async function installRuVector() {
 		const buffer = await res.arrayBuffer();
 		const bytes = new Uint8Array(buffer);
 
-		// Verificar checksum SHA-256
+		// Verificar checksum SHA-256 — SC-02 (#312)
 		const hash = createHash("sha256").update(bytes).digest("hex");
 		const expected = SHA256[platform];
-		if (hash !== expected) {
+		if (expected === SHA256_PLACEHOLDER) {
+			// Hash pendiente de release real — verificación omitida intencionalmente.
+			// Actualizar SHA256[platform] en este archivo al publicar el release de RuVector.
+			note(
+				pc.yellow(
+					`[setup] SHA-256 de RuVector no configurado — verificación de integridad omitida.\nActualizar SHA256["${platform}"] en scripts/setup.mjs al publicar el release.`,
+				),
+			);
+		} else if (hash !== expected) {
 			throw new Error(
 				`Checksum inválido: esperado ${expected}, obtenido ${hash}`,
 			);
