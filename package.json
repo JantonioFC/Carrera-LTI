@@ -15,6 +15,7 @@
 		"lint": "biome check .",
 		"lint:fix": "biome check --write .",
 		"type-check": "tsc -b --noEmit",
+		"type-check:electron": "tsc --project tsconfig.electron.json --noEmit",
 		"format": "biome format --write .",
 		"test": "vitest run",
 		"test:watch": "vitest",

@@ -47,7 +47,7 @@ function setupStore({
 		gmailApiKey,
 		setGmailClientId: vi.fn(),
 		setGmailApiKey: vi.fn(),
-	} as any);
+	} as ReturnType<typeof useUserConfigStore>);
 }
 
 beforeEach(() => {
@@ -80,7 +80,7 @@ describe("GmailWidget — estado minimizado", () => {
 	it("renderiza estado minimizado cuando isMinimized es true (estado inicial)", async () => {
 		setupStore({ gmailClientId: "client-id", gmailApiKey: "api-key" });
 		vi.mocked(gmailService.isAuthenticated).mockReturnValue(false);
-		vi.mocked(gmailService.initialize).mockResolvedValue(undefined as any);
+		vi.mocked(gmailService.initialize).mockResolvedValue(undefined);
 
 		await act(async () => {
 			render(<GmailWidget />);
@@ -98,7 +98,7 @@ describe("GmailWidget — estado de loading", () => {
 
 		// initialize resuelve y isAuthenticated true → llama fetchEmails que tarda
 		vi.mocked(gmailService.isAuthenticated).mockReturnValue(true);
-		vi.mocked(gmailService.initialize).mockResolvedValue(undefined as any);
+		vi.mocked(gmailService.initialize).mockResolvedValue(undefined);
 		vi.mocked(gmailService.fetchUnreadMessages).mockImplementation(
 			() => new Promise(() => {}), // Never resolves — simula loading
 		);
@@ -118,7 +118,7 @@ describe("GmailWidget — estado de error", () => {
 		setupStore({ gmailClientId: "client-id", gmailApiKey: "api-key" });
 
 		vi.mocked(gmailService.isAuthenticated).mockReturnValue(true);
-		vi.mocked(gmailService.initialize).mockResolvedValue(undefined as any);
+		vi.mocked(gmailService.initialize).mockResolvedValue(undefined);
 		vi.mocked(gmailService.fetchUnreadMessages).mockRejectedValue(
 			new Error("Network error"),
 		);

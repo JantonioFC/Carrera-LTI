@@ -50,15 +50,15 @@ function setupMocks({
 		setGeminiApiKey: vi.fn(),
 		gmailClientId: "",
 		gmailApiKey: "",
-	} as any);
+	} as ReturnType<typeof useAetherStore>);
 
 	vi.mocked(useNexusStore).mockReturnValue({
 		documents,
-	} as any);
+	} as ReturnType<typeof useNexusStore>);
 
 	vi.mocked(useNexusDB).mockReturnValue({
 		allDatabases,
-	} as any);
+	} as ReturnType<typeof useNexusDB>);
 }
 
 // Extraer buildSystemContext para tests unitarios puros sin renderizar

@@ -34,7 +34,7 @@ function setupHooks() {
 	vi.mocked(useAcademicCalendar).mockReturnValue({
 		academicDates: mockAcademicDates,
 		updateAcademicDates: vi.fn(),
-	} as any);
+	} as ReturnType<typeof useAcademicCalendar>);
 
 	vi.mocked(useSubjectData).mockReturnValue({
 		allSubjects: mockSubjects,
@@ -47,7 +47,7 @@ function setupHooks() {
 		getApprovedCount: vi.fn(),
 		getApprovedCredits: vi.fn(),
 		getAverage: vi.fn(),
-	} as any);
+	} as unknown as ReturnType<typeof useSubjectData>);
 }
 
 describe("Examenes", () => {

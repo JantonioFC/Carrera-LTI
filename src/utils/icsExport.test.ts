@@ -30,7 +30,7 @@ beforeEach(() => {
 	const origCreate = document.createElement.bind(document);
 	vi.spyOn(document, "createElement").mockImplementation((tag: string) => {
 		if (tag === "a") return linkElement;
-		return origCreate(tag as any);
+		return origCreate(tag as Parameters<typeof document.createElement>[0]);
 	});
 
 	vi.spyOn(document.body, "appendChild").mockImplementation(() => linkElement);

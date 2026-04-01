@@ -219,7 +219,7 @@ async function installRuVector() {
 	}
 }
 
-// --- Python (Docling + Whisper) ---
+// --- Python (Docling) ---
 
 const VENV_DIR = join(homedir(), ".carrera-lti", "venv");
 const VENV_PYTHON = join(
@@ -473,7 +473,7 @@ Redirect URI: ${pc.cyan("http://localhost:5173/")} (¡No olvides la barra final!
 	// 6. RuVector
 	await installRuVector();
 
-	// 7. Python (Docling + Whisper)
+	// 7. Python (Docling)
 	await installPythonDeps();
 
 	outro(pc.green("Tu sistema está listo para operar en Estado de Flow."));

@@ -1,4 +1,8 @@
-import type { GenerateContentParameters, Schema } from "@google/genai";
+import type {
+	GenerateContentParameters,
+	GoogleGenAI,
+	Schema,
+} from "@google/genai";
 import { describe, expect, it, vi } from "vitest";
 import { z } from "zod";
 import {
@@ -34,7 +38,7 @@ describe("generateContentWithRetry", () => {
 	it("devuelve resultado en el primer intento exitoso", async () => {
 		const mockAi = {
 			models: { generateContent: vi.fn().mockResolvedValue({ text: "ok" }) },
-		} as any;
+		} as unknown as GoogleGenAI;
 
 		const result = await generateContentWithRetry(
 			mockAi,
@@ -49,7 +53,7 @@ describe("generateContentWithRetry", () => {
 		const error429 = Object.assign(new Error("rate limited"), { status: 429 });
 		const mockAi = {
 			models: { generateContent: vi.fn().mockRejectedValue(error429) },
-		} as any;
+		} as unknown as GoogleGenAI;
 
 		await expect(
 			generateContentWithRetry(mockAi, {} as GenerateContentParameters, 2),
@@ -62,7 +66,7 @@ describe("generateContentWithRetry", () => {
 		const error400 = Object.assign(new Error("bad request"), { status: 400 });
 		const mockAi = {
 			models: { generateContent: vi.fn().mockRejectedValue(error400) },
-		} as any;
+		} as unknown as GoogleGenAI;
 
 		await expect(
 			generateContentWithRetry(mockAi, {} as GenerateContentParameters, 3),
@@ -79,7 +83,7 @@ describe("generateContentWithRetry", () => {
 					.mockRejectedValueOnce(networkError)
 					.mockResolvedValueOnce({ text: "recovered" }),
 			},
-		} as any;
+		} as unknown as GoogleGenAI;
 
 		const result = await generateContentWithRetry(
 			mockAi,
@@ -97,7 +101,7 @@ describe("generateContentWithRetry", () => {
 			models: {
 				generateContent: vi.fn().mockRejectedValue(networkError),
 			},
-		} as any;
+		} as unknown as GoogleGenAI;
 
 		await expect(
 			generateContentWithRetry(mockAi, {} as GenerateContentParameters, 3),
@@ -119,7 +123,7 @@ describe("generateStructuredContentWithRetry", () => {
 					.fn()
 					.mockResolvedValue({ text: JSON.stringify({ answer: "hola" }) }),
 			},
-		} as any;
+		} as unknown as GoogleGenAI;
 
 		const result = await generateStructuredContentWithRetry(
 			mockAi,
@@ -134,7 +138,7 @@ describe("generateStructuredContentWithRetry", () => {
 	it("retorna err si el texto está vacío", async () => {
 		const mockAi = {
 			models: { generateContent: vi.fn().mockResolvedValue({ text: "" }) },
-		} as any;
+		} as unknown as GoogleGenAI;
 
 		const result = await generateStructuredContentWithRetry(
 			mockAi,
@@ -151,7 +155,7 @@ describe("generateStructuredContentWithRetry", () => {
 			models: {
 				generateContent: vi.fn().mockResolvedValue({ text: "no-es-json{" }),
 			},
-		} as any;
+		} as unknown as GoogleGenAI;
 
 		const result = await generateStructuredContentWithRetry(
 			mockAi,
@@ -170,7 +174,7 @@ describe("generateStructuredContentWithRetry", () => {
 					.fn()
 					.mockResolvedValue({ text: JSON.stringify({ wrong: 123 }) }),
 			},
-		} as any;
+		} as unknown as GoogleGenAI;
 
 		const result = await generateStructuredContentWithRetry(
 			mockAi,

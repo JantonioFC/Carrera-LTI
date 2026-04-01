@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import type { NexusDocumentId } from "../utils/schemas";
 
 // nexusStore usa IndexeddbPersistence de yjs — mock para no tocar IDB en tests
 vi.mock("y-indexeddb", () => ({
@@ -60,7 +61,7 @@ describe("nexusStore — mutaciones de documentos", () => {
 		expect(() =>
 			useNexusStore
 				.getState()
-				.updateDocument("doc_ghost" as any, { title: "X" }),
+				.updateDocument("doc_ghost" as NexusDocumentId, { title: "X" }),
 		).not.toThrow();
 	});
 
@@ -82,7 +83,7 @@ describe("nexusStore — mutaciones de documentos", () => {
 
 	it("getDocument retorna undefined para id inexistente", () => {
 		expect(
-			useNexusStore.getState().getDocument("doc_nada" as any),
+			useNexusStore.getState().getDocument("doc_nada" as NexusDocumentId),
 		).toBeUndefined();
 	});
 
@@ -109,7 +110,7 @@ describe("nexusStore — getYDoc y deleteDocument con YDoc", () => {
 			this: unknown,
 		) {
 			return {};
-		} as any);
+		} as unknown as typeof IndexeddbPersistence);
 	});
 	afterEach(() => {
 		localStorage.clear();

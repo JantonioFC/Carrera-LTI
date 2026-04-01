@@ -1,19 +1,5 @@
-import { type CortexActivity, useCortexStore } from "./cortexStore";
-
-function activityLabel(activity: CortexActivity): string {
-	switch (activity.type) {
-		case "idle":
-			return "Inactivo";
-		case "indexing":
-			return `Indexando: ${activity.docTitle}`;
-		case "querying":
-			return `Consultando: ${activity.query}`;
-		case "query_error":
-			return `Error: ${activity.error}`;
-		case "ocr":
-			return `OCR: ${activity.filename}`;
-	}
-}
+import { activityLabel } from "./activityLabel";
+import { useCortexStore } from "./cortexStore";
 
 function formatTs(ts: number | null): string {
 	if (ts === null) return "Nunca";
