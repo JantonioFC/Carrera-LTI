@@ -27,14 +27,6 @@
     Abort
   ${EndIf}
 
-  ; ── FFmpeg ────────────────────────────────────────────────────────────────
-  nsExec::ExecToStack 'ffmpeg -version'
-  Pop $0
-  Pop $1
-
-  ${If} $0 != 0
-    MessageBox MB_OK|MB_ICONEXCLAMATION \
-      "FFmpeg no encontrado en el sistema.$\n$\nCarrera LTI requiere FFmpeg para procesar audio (Whisper).$\nDescárgalo desde: https://ffmpeg.org/download.html$\n$\nAsegurate de agregarlo al PATH del sistema."
-    Abort
-  ${EndIf}
+  ; Nota: FFmpeg no se verifica aquí — es una dependencia del backend VPS (Sovereign Station),
+  ; no del instalador del cliente Windows. Ver scripts/vps-setup.sh.
 !macroend

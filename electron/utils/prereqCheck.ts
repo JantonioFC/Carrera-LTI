@@ -34,32 +34,19 @@ function checkPython(): string | null {
 	return null; // ok
 }
 
-function checkFFmpeg(): string | null {
-	const result = spawnSync("ffmpeg", ["-version"], {
-		encoding: "utf8",
-		timeout: 5000,
-	});
-
-	if (result.error || result.status !== 0) {
-		return "FFmpeg no encontrado en el sistema.\nEs necesario para el procesamiento de audio (Whisper).\nInstálalo desde https://ffmpeg.org/download.html y agrégalo al PATH.";
-	}
-
-	return null; // ok
-}
-
 /**
  * Verifica los prerequisitos del sistema al arrancar la app.
  * Si falta alguno, muestra un diálogo de error y devuelve { ok: false }.
  * El caller debe llamar app.quit() si ok === false.
+ *
+ * Nota: FFmpeg no se verifica aquí — es una dependencia del backend VPS,
+ * no del cliente Windows. Ver scripts/vps-setup.sh.
  */
 export function checkPrereqs(): PrereqResult {
 	const missing: string[] = [];
 
 	const pythonError = checkPython();
 	if (pythonError) missing.push(pythonError);
-
-	const ffmpegError = checkFFmpeg();
-	if (ffmpegError) missing.push(ffmpegError);
 
 	if (missing.length > 0) {
 		const detail = missing.join("\n\n");
