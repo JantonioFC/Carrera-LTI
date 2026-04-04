@@ -35,9 +35,9 @@ const GITIGNORE_PATH = join(ROOT, ".gitignore");
 function validateNodeVersion() {
 	const version = process.versions.node;
 	const major = parseInt(version.split(".")[0], 10);
-	if (major < 18) {
+	if (major < 20) {
 		cancel(
-			`Node.js version ${version} detected. Carrera LTI requiere Node.js >= 18.0.0.`,
+			`Node.js ${version} detectado. Carrera LTI requiere Node.js >= 20.0.0.`,
 		);
 		process.exit(1);
 	}
@@ -213,16 +213,10 @@ async function installRuVector() {
 // --- Python (Docling + Whisper) ---
 
 const VENV_DIR = join(homedir(), ".carrera-lti", "venv");
-const VENV_PYTHON = join(
-	VENV_DIR,
-	"bin",
-	process.platform === "win32" ? "python.exe" : "python",
-);
-const VENV_PIP = join(
-	VENV_DIR,
-	"bin",
-	process.platform === "win32" ? "pip.exe" : "pip",
-);
+const IS_WIN = process.platform === "win32";
+const SYSTEM_PYTHON = IS_WIN ? "python" : "python3";
+const VENV_PYTHON = join(VENV_DIR, IS_WIN ? "Scripts/python.exe" : "bin/python");
+const VENV_PIP = join(VENV_DIR, IS_WIN ? "Scripts/pip.exe" : "bin/pip");
 
 async function installPythonDeps() {
 	const shouldInstall = await confirm({
@@ -242,13 +236,29 @@ async function installPythonDeps() {
 
 	const s = spinner();
 
-	// Verificar Python disponible
-	s.start("Verificando Python 3...");
+	// Verificar Python disponible y versión >= 3.10
+	s.start("Verificando Python 3.10+...");
 	try {
-		execSync("python3 --version", { stdio: "ignore" });
-		s.stop("Python 3 detectado.");
-	} catch {
-		s.stop(pc.red("Python 3 no encontrado en el PATH."));
+		const raw = execSync(`${SYSTEM_PYTHON} --version`, {
+			encoding: "utf8",
+			stdio: ["ignore", "pipe", "pipe"],
+		}).trim();
+		// "Python 3.X.Y"
+		const match = raw.match(/Python (\d+)\.(\d+)/);
+		if (!match) throw new Error(`Versión no reconocida: ${raw}`);
+		const [, major, minor] = match.map(Number);
+		if (major < 3 || (major === 3 && minor < 10)) {
+			s.stop(pc.red(`Python ${major}.${minor} detectado — se requiere >= 3.10.`));
+			note(
+				pc.yellow(
+					"Instala Python 3.10+ desde https://python.org y vuelve a ejecutar el setup.",
+				),
+			);
+			return;
+		}
+		s.stop(`Python ${major}.${minor} detectado.`);
+	} catch (err) {
+		s.stop(pc.red("Python no encontrado en el PATH."));
 		note(
 			pc.yellow(
 				"Instala Python 3.10+ desde https://python.org y vuelve a ejecutar el setup.",
@@ -261,7 +271,7 @@ async function installPythonDeps() {
 	if (!existsSync(VENV_DIR)) {
 		s.start("Creando entorno virtual Python...");
 		try {
-			execSync(`python3 -m venv "${VENV_DIR}"`, { stdio: "ignore" });
+			execSync(`${SYSTEM_PYTHON} -m venv "${VENV_DIR}"`, { stdio: "ignore" });
 			s.stop(`Entorno virtual creado en ${pc.cyan(VENV_DIR)}`);
 		} catch (err) {
 			s.stop(pc.red(`Error al crear el entorno virtual: ${err.message}`));

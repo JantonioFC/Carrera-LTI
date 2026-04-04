@@ -18,6 +18,7 @@ import { makeWhisperHandlers } from "./handlers/whisperHandlers";
 import { SubprocessAdapter } from "./subprocess/SubprocessAdapter";
 import { StdioTransport } from "./transports/StdioTransport";
 import { logger } from "./utils/logger"; // AR-01 (#193): evita importar desde src/ en main process
+import { checkPrereqs } from "./utils/prereqCheck";
 
 // ── Rate limiter ──────────────────────────────────────────────────────────────
 function createRateLimiter(max: number, windowMs: number): () => void {
@@ -52,12 +53,13 @@ const RUVECTOR_BIN = join(
 	CARRERA_BIN,
 	process.platform === "win32" ? "ruvector.exe" : "ruvector",
 );
+const IS_WIN = process.platform === "win32";
 const VENV_PYTHON = join(
 	homedir(),
 	".carrera-lti",
 	"venv",
-	"bin",
-	process.platform === "win32" ? "python.exe" : "python",
+	IS_WIN ? "Scripts" : "bin",
+	IS_WIN ? "python.exe" : "python",
 );
 // Scripts Python: en dev desde el proyecto, en prod desde resources
 const SCRIPTS_DIR = isDev
@@ -388,6 +390,12 @@ function createWindow(): void {
 
 // ── Arranque ──────────────────────────────────────────────────────────────────
 app.whenReady().then(async () => {
+	const prereqs = checkPrereqs();
+	if (!prereqs.ok) {
+		app.quit();
+		return;
+	}
+
 	const store = await initStore();
 	initConfig(store, ipcMain);
 
