@@ -215,7 +215,10 @@ async function installRuVector() {
 const VENV_DIR = join(homedir(), ".carrera-lti", "venv");
 const IS_WIN = process.platform === "win32";
 const SYSTEM_PYTHON = IS_WIN ? "python" : "python3";
-const VENV_PYTHON = join(VENV_DIR, IS_WIN ? "Scripts/python.exe" : "bin/python");
+const VENV_PYTHON = join(
+	VENV_DIR,
+	IS_WIN ? "Scripts/python.exe" : "bin/python",
+);
 const VENV_PIP = join(VENV_DIR, IS_WIN ? "Scripts/pip.exe" : "bin/pip");
 
 async function installPythonDeps() {
@@ -248,7 +251,9 @@ async function installPythonDeps() {
 		if (!match) throw new Error(`Versión no reconocida: ${raw}`);
 		const [, major, minor] = match.map(Number);
 		if (major < 3 || (major === 3 && minor < 10)) {
-			s.stop(pc.red(`Python ${major}.${minor} detectado — se requiere >= 3.10.`));
+			s.stop(
+				pc.red(`Python ${major}.${minor} detectado — se requiere >= 3.10.`),
+			);
 			note(
 				pc.yellow(
 					"Instala Python 3.10+ desde https://python.org y vuelve a ejecutar el setup.",
@@ -257,7 +262,7 @@ async function installPythonDeps() {
 			return;
 		}
 		s.stop(`Python ${major}.${minor} detectado.`);
-	} catch (err) {
+	} catch {
 		s.stop(pc.red("Python no encontrado en el PATH."));
 		note(
 			pc.yellow(
