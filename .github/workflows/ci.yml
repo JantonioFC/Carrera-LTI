@@ -7,7 +7,8 @@ on:
     branches: [ "main", "cortex/develop" ]
 
 permissions:
-  contents: read  # mínimo global; evita GITHUB_TOKEN con write por defecto (#178)
+  contents: read      # mínimo global; evita GITHUB_TOKEN con write por defecto (#178)
+  pull-requests: read # requerido por gitleaks-action para leer commits de PRs de Dependabot
 
 jobs:
   build-and-test:
