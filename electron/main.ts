@@ -1,5 +1,6 @@
 import { randomBytes } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { readFile } from "node:fs/promises";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import {
@@ -13,12 +14,17 @@ import {
 import { type ConfigStore, initConfig } from "./handlers/configHandlers";
 import { makeDoclingHandlers } from "./handlers/doclingHandlers";
 import { makeObserverHandlers } from "./handlers/observerHandlers";
+import { assertSafePath } from "./handlers/pathSecurity";
 import { makeRuVectorHandlers } from "./handlers/ruVectorHandlers";
 import { makeWhisperHandlers } from "./handlers/whisperHandlers";
 import { SubprocessAdapter } from "./subprocess/SubprocessAdapter";
 import { StdioTransport } from "./transports/StdioTransport";
 import { logger } from "./utils/logger"; // AR-01 (#193): evita importar desde src/ en main process
 import { checkPrereqs } from "./utils/prereqCheck";
+
+// ── Modo VPS ──────────────────────────────────────────────────────────────────
+// Vacío → subprocesos Python locales. Con valor → HTTP al VPS vía Tailscale.
+const CORTEX_URL = (process.env.VITE_CORTEX_URL ?? "").trim();
 
 // ── Rate limiter ──────────────────────────────────────────────────────────────
 function createRateLimiter(max: number, windowMs: number): () => void {
@@ -209,6 +215,13 @@ function initRuVector(): void {
 
 // ── Docling ───────────────────────────────────────────────────────────────────
 function initDocling(): void {
+	if (CORTEX_URL) {
+		logger.info(
+			"Docling",
+			`modo VPS (${CORTEX_URL}) — subprocess local omitido`,
+		);
+		return;
+	}
 	if (!existsSync(VENV_PYTHON) || !existsSync(DOCLING_SCRIPT)) {
 		logger.warn(
 			"Docling",
@@ -238,6 +251,13 @@ function initDocling(): void {
 
 // ── Whisper ───────────────────────────────────────────────────────────────────
 function initWhisper(): void {
+	if (CORTEX_URL) {
+		logger.info(
+			"Whisper",
+			`modo VPS (${CORTEX_URL}) — subprocess local omitido`,
+		);
+		return;
+	}
 	if (!existsSync(VENV_PYTHON) || !existsSync(WHISPER_SCRIPT)) {
 		logger.warn(
 			"Whisper",
@@ -340,6 +360,19 @@ function initObserver(): void {
 //   6. connect-src allowlist   — solo dominios de Google API autorizados
 // La combinación de sandbox + contextIsolation elimina el vector de escalada
 // de privilegios incluso si un atacante logra ejecutar JS en el renderer.
+// ── Filesystem (VPS mode) ─────────────────────────────────────────────────────
+// Permite al renderer leer un archivo local para enviarlo al VPS (ej: WAV).
+// pathSecurity.assertSafePath() restringe a homedir/userData/documents/temp.
+function initFsHandlers(): void {
+	ipcMain.handle("fs:read-file", async (_event, filePath: unknown) => {
+		if (typeof filePath !== "string") {
+			throw new Error("fs:read-file — filePath debe ser string");
+		}
+		assertSafePath(filePath);
+		return readFile(filePath);
+	});
+}
+
 function setupCSP(): void {
 	session.defaultSession.webRequest.onHeadersReceived(
 		{ urls: ["<all_urls>"] },
@@ -355,7 +388,19 @@ function setupCSP(): void {
 							"font-src 'self' data: https://fonts.gstatic.com",
 							"img-src 'self' data: https:",
 							// SC-09 (#210): allowlist explícita — sin wildcards de subdominio
-							"connect-src 'self' https://generativelanguage.googleapis.com https://identitytoolkit.googleapis.com https://firestore.googleapis.com https://securetoken.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com",
+							// CORTEX_URL se agrega dinámicamente si modo VPS está activo
+							[
+								"connect-src 'self'",
+								"https://generativelanguage.googleapis.com",
+								"https://identitytoolkit.googleapis.com",
+								"https://firestore.googleapis.com",
+								"https://securetoken.googleapis.com",
+								"https://*.firebaseio.com",
+								"wss://*.firebaseio.com",
+								CORTEX_URL || null,
+							]
+								.filter(Boolean)
+								.join(" "),
 							"object-src 'none'",
 							"frame-src 'none'",
 						].join("; "),
@@ -403,6 +448,7 @@ app.whenReady().then(async () => {
 	initDocling();
 	initWhisper();
 	initObserver();
+	initFsHandlers();
 
 	setupCSP();
 	createWindow();

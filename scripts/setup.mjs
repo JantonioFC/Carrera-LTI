@@ -349,24 +349,60 @@ async function main() {
 
 	const currentEnv = await handleEnvManagement();
 
-	// 2. Módulo IA (Gemini)
+	// 2. Modo de backend (VPS o local)
 	note(
-		'Módulo IA: Gemini será el motor de tu "Segundo Cerebro" (Nexus/Aether).',
+		`Arquitectura Sovereign Station:\n${pc.cyan("Local")} — Python corre en este equipo (T490).\n${pc.cyan("VPS")}   — Python corre en el servidor remoto (requiere Tailscale).`,
 	);
-	const geminiKey = await password({
-		message: "Ingresa tu Gemini API Key:",
-		placeholder: "AIza...",
+	const cortexUrl = await text({
+		message: "URL del VPS Cortex (dejar vacío para modo local):",
+		placeholder: "http://100.x.x.x:8000",
+		initialValue: currentEnv.VITE_CORTEX_URL ?? "",
 		validate(value) {
-			if (!value.startsWith("AIza")) return 'La clave debe comenzar con "AIza"';
-			if (value.length < 30) return "La clave parece demasiado corta.";
+			if (!value) return; // vacío = modo local, válido
+			try {
+				const u = new URL(value);
+				if (!["http:", "https:"].includes(u.protocol)) {
+					return "Solo se aceptan URLs http:// o https://";
+				}
+			} catch {
+				return "URL inválida. Ejemplo: http://100.x.x.x:8000";
+			}
 		},
 	});
-
-	if (isCancel(geminiKey)) {
+	if (isCancel(cortexUrl)) {
 		cancel("Operación cancelada.");
 		process.exit(0);
 	}
-	currentEnv.VITE_GEMINI_API_KEY = geminiKey;
+	currentEnv.VITE_CORTEX_URL = cortexUrl;
+
+	const isVPS = Boolean(cortexUrl);
+
+	// 2b. Módulo IA (Gemini) — solo en modo local
+	if (isVPS) {
+		note(
+			pc.cyan("Modo VPS activo") +
+				" — la clave Gemini vive en el servidor. No es necesaria aquí.",
+		);
+		currentEnv.VITE_GEMINI_API_KEY = "";
+	} else {
+		note(
+			'Módulo IA: Gemini será el motor de tu "Segundo Cerebro" (Nexus/Aether).',
+		);
+		const geminiKey = await password({
+			message: "Ingresa tu Gemini API Key:",
+			placeholder: "AIza...",
+			validate(value) {
+				if (!value.startsWith("AIza"))
+					return 'La clave debe comenzar con "AIza"';
+				if (value.length < 30) return "La clave parece demasiado corta.";
+			},
+		});
+		if (isCancel(geminiKey)) {
+			cancel("Operación cancelada.");
+			process.exit(0);
+		}
+		currentEnv.VITE_GEMINI_API_KEY = geminiKey;
+	}
 
 	// 3. Módulo Comunicación (Gmail)
 	note(`Módulo Comunicación: Configura el acceso a Gmail.
@@ -482,8 +518,15 @@ Redirect URI: ${pc.cyan("http://localhost:5173/")} (¡No olvides la barra final!
 	// 6. RuVector
 	await installRuVector();
 
-	// 7. Python (Docling + Whisper)
-	await installPythonDeps();
+	// 7. Python (Docling + Whisper) — solo en modo local
+	if (isVPS) {
+		note(
+			pc.cyan("Modo VPS activo") +
+				" — Python y Whisper corren en el servidor. Instalación local omitida.",
+		);
+	} else {
+		await installPythonDeps();
+	}
 
 	outro(pc.green("Tu sistema está listo para operar en Estado de Flow."));
 

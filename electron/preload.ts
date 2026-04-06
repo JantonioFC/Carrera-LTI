@@ -42,4 +42,10 @@ contextBridge.exposeInMainWorld("cortexAPI", {
 		status: (): Promise<{ active: boolean }> =>
 			ipcRenderer.invoke("observer:status"),
 	},
+	// Fase VPS: leer un archivo local (WAV) para enviarlo al backend remoto.
+	// Restringido a rutas dentro de homedir() por pathSecurity en el main process.
+	fs: {
+		readFile: (filePath: string): Promise<Uint8Array> =>
+			ipcRenderer.invoke("fs:read-file", filePath),
+	},
 });

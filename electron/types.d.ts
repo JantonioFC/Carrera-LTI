@@ -46,10 +46,17 @@ export interface ObserverIPC {
 	status(): Promise<{ active: boolean }>;
 }
 
+export interface FsIPC {
+	/** Lee un archivo local y devuelve sus bytes. Restringido a homedir/userData por pathSecurity. */
+	readFile(filePath: string): Promise<Uint8Array>;
+}
+
 export interface CortexAPI {
 	config: ConfigAPI;
 	cortex: CortexIPC;
 	observer: ObserverIPC;
+	/** Fase VPS: acceso a sistema de archivos local para enviar archivos al backend remoto. */
+	fs: FsIPC;
 }
 
 declare global {

@@ -217,10 +217,139 @@ Acción: Retorno la lista estructurada con colores (si aplica).`;
 	}
 }
 
+// ── VPS client (modo Sovereign Station) ──────────────────────────────────────
+// Delega las llamadas a IA al backend VPS vía HTTP en lugar de llamar Gemini
+// directamente. La API key vive en el servidor; el cliente no la necesita.
+
+const _CORTEX_URL = (import.meta.env.VITE_CORTEX_URL ?? "").trim();
+
+interface VPSGenerateRequest {
+	action: "askAether" | "askNexus" | "askAetherStream" | "askNexusStream";
+	model: string;
+	contents?: unknown;
+	messages?: unknown;
+	systemInstruction?: string;
+	temperature?: number;
+}
+
+interface VPSGenerateResponse {
+	text: string;
+}
+
+async function vpsGenerate(req: VPSGenerateRequest): Promise<string> {
+	const res = await fetch(`${_CORTEX_URL}/ai/generate`, {
+		method: "POST",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify(req),
+	});
+	if (!res.ok) {
+		throw new Error(`VPS /ai/generate error: ${res.status} ${res.statusText}`);
+	}
+	const data = (await res.json()) as VPSGenerateResponse;
+	return data.text;
+}
+
+export class VPSAIClient extends AIBackendClient {
+	override updateApiKey(_apiKey: string): void {
+		// no-op: la clave vive en el VPS
+	}
+
+	override async askAether(
+		prompt: string,
+		contextNotes: string,
+		zodSchema: Parameters<AIBackendClient["askAether"]>[2],
+	) {
+		const text = await vpsGenerate({
+			action: "askAether",
+			model: "gemini-2.5-flash",
+			contents: prompt,
+			systemInstruction: contextNotes,
+			temperature: 0.7,
+		});
+		// Parsear el JSON que devuelve el VPS con el mismo esquema Zod
+		const parsed = JSON.parse(text);
+		return zodSchema.parse(parsed);
+	}
+
+	override async askNexus(
+		messages: Parameters<AIBackendClient["askNexus"]>[0],
+		systemContext: string,
+		zodSchema: Parameters<AIBackendClient["askNexus"]>[2],
+	) {
+		const text = await vpsGenerate({
+			action: "askNexus",
+			model: "gemini-2.5-flash",
+			messages,
+			systemInstruction: systemContext,
+		});
+		const parsed = JSON.parse(text);
+		return zodSchema.parse(parsed);
+	}
+
+	override async askAetherStream(
+		prompt: string,
+		contextNotes: string,
+		onChunk: (text: string) => void,
+	): Promise<void> {
+		const res = await fetch(`${_CORTEX_URL}/ai/generate/stream`, {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({
+				action: "askAetherStream",
+				model: "gemini-2.5-flash",
+				contents: prompt,
+				systemInstruction: contextNotes,
+				temperature: 0.7,
+			}),
+		});
+		if (!res.ok || !res.body) {
+			throw new Error(`VPS stream error: ${res.status}`);
+		}
+		const reader = res.body.getReader();
+		const decoder = new TextDecoder();
+		while (true) {
+			const { done, value } = await reader.read();
+			if (done) break;
+			onChunk(decoder.decode(value, { stream: true }));
+		}
+	}
+
+	override async askNexusStream(
+		messages: Parameters<AIBackendClient["askNexusStream"]>[0],
+		systemContext: string,
+		onChunk: (text: string) => void,
+	): Promise<void> {
+		const res = await fetch(`${_CORTEX_URL}/ai/generate/stream`, {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({
+				action: "askNexusStream",
+				model: "gemini-2.5-flash",
+				messages,
+				systemInstruction: systemContext,
+			}),
+		});
+		if (!res.ok || !res.body) {
+			throw new Error(`VPS stream error: ${res.status}`);
+		}
+		const reader = res.body.getReader();
+		const decoder = new TextDecoder();
+		while (true) {
+			const { done, value } = await reader.read();
+			if (done) break;
+			onChunk(decoder.decode(value, { stream: true }));
+		}
+	}
+}
+
+// ── Singleton ─────────────────────────────────────────────────────────────────
 // Singleton client instance.
 // Usar `let` permite reemplazarlo en tests con _setApiBackend().
 // AR-02 (#258): evita acoplamiento a GoogleGenAI en tests de variantes.
-export let apiBackend: AIBackendClient = new AIBackendClient();
+// En modo VPS se instancia VPSAIClient en lugar de AIBackendClient.
+export let apiBackend: AIBackendClient = _CORTEX_URL
+	? new VPSAIClient()
+	: new AIBackendClient();
 
 /** Para tests únicamente: reemplaza la instancia singleton. */
 export function _setApiBackend(client: AIBackendClient): void {

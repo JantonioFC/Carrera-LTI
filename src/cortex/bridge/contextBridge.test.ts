@@ -57,6 +57,11 @@ function buildMockCortexAPI() {
 				.fn<() => Promise<{ active: boolean }>>()
 				.mockResolvedValue({ active: false }),
 		},
+		fs: {
+			readFile: vi
+				.fn<(filePath: string) => Promise<Uint8Array>>()
+				.mockResolvedValue(new Uint8Array()),
+		},
 	} satisfies CortexAPI;
 }
 
