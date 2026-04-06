@@ -46,3 +46,8 @@ openspec/
 
 # Electron build output
 dist-electron/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
