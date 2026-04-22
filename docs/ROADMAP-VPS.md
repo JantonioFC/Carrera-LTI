@@ -27,10 +27,13 @@
    - Endpoint `POST /cortex/ocr` — recibe path de imagen → retorna `{ text }`
    - Mantener el protocolo de respuesta compatible con el IPC actual (mismos campos)
 
-2. **Migrar RuVector al VPS**
-   - Compilar o copiar el binario Rust al VPS
-   - Configurar como servicio systemd (persistencia entre reinicios)
-   - Verificar que el índice persiste en el NVMe del VPS
+2. **RuVector — decisión: permanece local en T490** ✅ decidido 2026-04-22
+   - Descartada la migración al VPS en esta iteración.
+   - Razones: (a) binario Rust liviano, bajo consumo de RAM/CPU; (b) moverlo añade
+     latencia de red en cada consulta semántica; (c) la alternativa limpia sería
+     reemplazarlo por `chromadb`/`hnswlib` nativo en FastAPI, pero requiere migrar
+     el formato de índice — sin beneficio claro para uso personal en un solo dispositivo.
+   - Revisar si el caso de uso cambia (multi-dispositivo, T490 muy limitado en recursos).
 
 3. **Configurar API Gateway para claves Gemini**
    - Endpoint proxy en FastAPI: `POST /ai/generate`
