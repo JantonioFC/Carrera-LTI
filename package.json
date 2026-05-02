@@ -23,9 +23,9 @@
 		"test:coverage": "vitest run --coverage"
 	},
 	"dependencies": {
-		"@blocknote/core": "^0.47.3",
-		"@blocknote/mantine": "^0.47.3",
-		"@blocknote/react": "^0.47.1",
+		"@blocknote/core": "^0.49.0",
+		"@blocknote/mantine": "^0.49.0",
+		"@blocknote/react": "^0.49.0",
 		"@dnd-kit/core": "^6.3.1",
 		"@dnd-kit/sortable": "^10.0.0",
 		"@dnd-kit/utilities": "^3.2.2",
@@ -48,7 +48,7 @@
 		"react-router-dom": "^7.13.2",
 		"recharts": "^3.8.1",
 		"rehype-sanitize": "^6.0.0",
-		"uuid": "^13.0.0",
+		"uuid": "^14.0.0",
 		"y-indexeddb": "^9.0.12",
 		"yjs": "^13.6.30",
 		"zod": "^4.3.6",
