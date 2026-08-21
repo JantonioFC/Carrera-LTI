@@ -41,6 +41,7 @@
 		"idb-keyval": "^6.2.2",
 		"immer": "^11.1.4",
 		"lucide-react": "^1.8.0",
+		"protobufjs": "^8.0.1",
 		"react": "^19.2.5",
 		"react-dom": "^19.2.5",
 		"react-force-graph-2d": "^1.29.1",
