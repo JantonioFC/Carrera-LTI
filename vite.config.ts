@@ -54,7 +54,7 @@ export default defineConfig({
 				],
 			},
 			workbox: {
-				maximumFileSizeToCacheInBytes: 3 * 1024 * 1024, // 3MB
+				maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5MB (vendor-blocknote ~4.4MB)
 			},
 		}),
 	],
@@ -92,6 +92,11 @@ export default defineConfig({
 		globals: true,
 		include: ["src/**/*.test.{ts,tsx}", "electron/**/*.test.ts"],
 		setupFiles: ["./src/test/setup.tsx"],
+		server: {
+			deps: {
+				inline: [/@uiw\//],
+			},
+		},
 		coverage: {
 			provider: "v8",
 			include: ["src/**/*.{ts,tsx}", "electron/**/*.ts"],
